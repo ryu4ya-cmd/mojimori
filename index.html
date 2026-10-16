@@ -3,10 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="ひらがな・カタカナの五十音と濁音で遊べる、幼児向けのもじあそび">
+<meta name="theme-color" content="#bfe8ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="もじもじの もり">
-<meta name="theme-color" content="#bfe8ff">
+<meta name="apple-mobile-web-app-title" content="もじもり">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}[hidden]{display:none!important}</style>
 <title>もじもじの もり</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -81,6 +85,7 @@
   @keyframes pulse { 50% { transform: scale(1.07); } }
 
   /* ---------- ホーム ---------- */
+  .home-corner { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); }
   .script-toggle { display: flex; gap: 10px; background: rgba(255,255,255,.6); padding: 6px; border-radius: 40px; margin-bottom: 3.5vmin; }
   .script-toggle button {
     display: flex; align-items: center; gap: 8px;
@@ -130,32 +135,46 @@
     font-size: 34px; display: grid; place-items: center; flex: none;
   }
   .round-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.14); }
-  .round-btn.ghost { visibility: hidden; }
-  .pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.75); padding: 6px 16px; border-radius: 40px; font-weight: 900; font-size: clamp(18px, 4vmin, 26px); font-variant-numeric: tabular-nums; }
+  .round-btn.off { opacity: .55; }
+  .pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.75); padding: 6px 14px; border-radius: 40px; font-weight: 900; font-size: clamp(16px, 3.8vmin, 24px); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .progress { display: flex; gap: 4px; font-size: clamp(22px, 5vmin, 32px); }
   .progress .dim { filter: grayscale(1); opacity: .3; }
+  /* 清音・濁音の切りかえ */
+  .page-toggle { display: flex; gap: 6px; background: rgba(255,255,255,.6); padding: 5px; border-radius: 40px; }
+  .page-toggle button {
+    width: 54px; height: 54px; border-radius: 50%;
+    font-family: var(--kana-font); font-size: 30px; line-height: 1;
+    display: grid; place-items: center;
+    background: rgba(74,59,51,.08);
+  }
+  .page-toggle button[aria-pressed="true"] { background: var(--accent); color: #fff; box-shadow: 0 4px 0 rgba(0,0,0,.14); }
+  .touch-head { display: flex; align-items: center; gap: 10px; margin-inline: auto; }
   @media (max-height: 520px) {
     .topbar { padding-top: max(8px, env(safe-area-inset-top, 0px)); }
     .round-btn { width: 52px; height: 52px; font-size: 28px; }
+    .page-toggle button { width: 44px; height: 44px; font-size: 24px; }
   }
 
   /* ---------- ふれてみよう：五十音を1画面に ---------- */
   #touch { --top: 84px; }
   @media (max-height: 520px) { #touch { --top: 66px; } }
   .kana-grid { display: grid; --gap: clamp(4px, 1.1vmin, 10px); gap: var(--gap); margin-top: var(--top); }
+  /* よこ長のときの 列×行（--nl × --ml）と、たて長のときの 列×行（--np × --mp） */
+  .kana-grid.sei { --nl: 11; --ml: 5; --np: 5; --mp: 11; }
+  .kana-grid.daku { --nl: 5; --ml: 5; --np: 5; --mp: 5; }
   /* よこ長の画面は昔ながらの五十音表（右から あ・か・さ…の行がたてに並ぶ） */
   @media (orientation: landscape) {
     .kana-grid {
-      --cell: min(110px, calc((100vw - 40px - 10 * var(--gap)) / 11), calc((var(--vh) - var(--top) - 32px - 4 * var(--gap)) / 5));
-      grid-template-columns: repeat(11, var(--cell)); grid-template-rows: repeat(5, var(--cell));
+      --cell: min(110px, calc((100vw - 40px - (var(--nl) - 1) * var(--gap)) / var(--nl)), calc((var(--vh) - var(--top) - 32px - (var(--ml) - 1) * var(--gap)) / var(--ml)));
+      grid-template-columns: repeat(var(--nl), var(--cell)); grid-template-rows: repeat(var(--ml), var(--cell));
     }
     .tile { grid-column: var(--lc); grid-row: var(--lr); }
   }
   /* たて長の画面は、あいうえお を横に読む並び */
   @media (orientation: portrait) {
     .kana-grid {
-      --cell: min(110px, calc((100vw - 40px - 4 * var(--gap)) / 5), calc((var(--vh) - var(--top) - 32px - 10 * var(--gap)) / 11));
-      grid-template-columns: repeat(5, var(--cell)); grid-template-rows: repeat(11, var(--cell));
+      --cell: min(110px, calc((100vw - 40px - (var(--np) - 1) * var(--gap)) / var(--np)), calc((var(--vh) - var(--top) - 32px - (var(--mp) - 1) * var(--gap)) / var(--mp)));
+      grid-template-columns: repeat(var(--np), var(--cell)); grid-template-rows: repeat(var(--mp), var(--cell));
     }
     .tile { grid-column: var(--pc); grid-row: var(--pr); }
   }
@@ -185,7 +204,7 @@
     max-width: calc(100vw - 32px);
   }
   .spot-card .friend .hat { font-size: calc(var(--friend) * .42); margin-bottom: calc(var(--friend) * -.06); }
-  .spot-word { font-family: var(--kana-font); font-size: clamp(28px, 8vmin, 68px); letter-spacing: .08em; line-height: 1.2; text-align: center; }
+  .spot-word { font-family: var(--kana-font); font-size: clamp(26px, 7.5vmin, 64px); letter-spacing: .06em; line-height: 1.2; text-align: center; }
   .spot-word b, .quiz-word b { color: var(--c); font-weight: inherit; }
 
   /* ---------- もじのおともだち ---------- */
@@ -263,6 +282,7 @@
   /* ---------- 演出 ---------- */
   #fx { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
   #fx span { position: absolute; line-height: 1; will-change: transform; }
+  #fx .ring { border-radius: 50%; border: 8px solid var(--c, #fff59d); }
 
   /* ---------- 保護者用 ---------- */
   .parent-btn {
@@ -275,11 +295,17 @@
   .parent-btn.holding .ring { transition: clip-path 1.5s linear; clip-path: inset(0 0 0 0); }
   .panel-bg { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none; align-items: center; justify-content: center; z-index: 40; padding: 16px; }
   .panel-bg.open { display: flex; }
-  .panel { background: #fff; border-radius: 20px; padding: 24px; width: min(440px, 100%); font-size: 16px; line-height: 1.7; }
+  .panel { background: #fff; border-radius: 20px; padding: 22px 24px; width: min(460px, 100%); max-height: calc(var(--vh) - 32px); overflow-y: auto; font-size: 15px; line-height: 1.65; user-select: text; -webkit-user-select: text; }
   .panel h2 { margin: 0 0 8px; font-size: 20px; }
+  .panel h3 { margin: 14px 0 4px; font-size: 16px; }
   .panel p { margin: 6px 0; }
-  .panel .row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-  .panel .row button { padding: 10px 18px; border-radius: 12px; background: #f1ece6; font-weight: 700; font-size: 16px; }
+  .panel .note { font-size: 13px; color: #6d6058; }
+  .panel label { display: grid; grid-template-columns: 6.5em 1fr 3em; align-items: center; gap: 8px; margin: 6px 0; }
+  .panel select { grid-column: 2 / 4; font: inherit; padding: 6px 8px; border-radius: 10px; border: 1px solid #d8cfc6; background: #fff; color: var(--ink); min-width: 0; }
+  .panel input[type=range] { width: 100%; accent-color: #ff8a65; }
+  .panel output { font-variant-numeric: tabular-nums; text-align: right; }
+  .panel .row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .panel .row button { padding: 10px 16px; border-radius: 12px; background: #f1ece6; font-weight: 700; font-size: 15px; }
   .panel .row button.primary { background: #ff8a65; color: #fff; }
   .panel .row button.danger { background: #e53935; color: #fff; }
 
@@ -289,7 +315,6 @@
 </style>
 </head>
 <body>
-
 <div class="scenery" aria-hidden="true">
   <span class="cloud" style="top:6vh;font-size:64px;animation-delay:-6s">☁️</span>
   <span class="cloud" style="top:16vh;font-size:44px;animation-delay:-22s;animation-duration:55s">☁️</span>
@@ -312,6 +337,7 @@
 
 <!-- ホーム -->
 <section id="home" class="screen">
+  <div class="home-corner"><button class="round-btn" id="bgmBtn" aria-label="おんがく">🎵</button></div>
   <h1 class="title" id="homeTitle">もじもじの もり</h1>
   <div class="script-toggle" role="group" aria-label="もじの しゅるい">
     <button id="scriptHira" data-script="hira" aria-pressed="true"><b>あ</b>ひらがな</button>
@@ -325,14 +351,19 @@
   <div class="parade" id="parade"></div>
 </section>
 
-<!-- ふれてみよう（五十音） -->
+<!-- ふれてみよう（五十音・濁音） -->
 <section id="touch" class="screen">
   <div class="topbar">
     <button class="round-btn" data-home aria-label="おうちにもどる">🏠</button>
-    <div class="pill" aria-label="なかよしになった おともだち"><span aria-hidden="true">⭐</span><span id="touchCount">0 / 46</span></div>
-    <span class="round-btn ghost" aria-hidden="true"></span>
+    <div class="touch-head">
+      <div class="page-toggle" role="group" aria-label="ひょうの しゅるい">
+        <button id="pageSei" data-page="sei" aria-pressed="true">あ</button>
+        <button id="pageDaku" data-page="daku" aria-pressed="false">が</button>
+      </div>
+      <div class="pill" aria-label="なかよしになった おともだち"><span aria-hidden="true">⭐</span><span id="touchCount">0 / 46</span></div>
+    </div>
   </div>
-  <div class="kana-grid" id="kanaGrid"></div>
+  <div class="kana-grid sei" id="kanaGrid"></div>
 </section>
 
 <!-- さがしてみよう／これなあに？（共通の画面） -->
@@ -366,8 +397,16 @@
 <div class="panel-bg" id="panelBg">
   <div class="panel" role="dialog" aria-label="保護者メニュー">
     <h2>保護者の方へ</h2>
-    <p id="voiceInfo"></p>
-    <p>ずかんに集まったおともだち<br>ひらがな：<b id="countHira">0</b> / 46　カタカナ：<b id="countKata">0</b> / 46</p>
+    <h3>読み上げの声</h3>
+    <label for="voiceSelect"><span>声の種類</span><select id="voiceSelect"></select></label>
+    <label for="voicePitch"><span>声の高さ</span><input type="range" id="voicePitch" min="0.8" max="2" step="0.1"><output id="pitchOut"></output></label>
+    <label for="voiceRate"><span>話す速さ</span><input type="range" id="voiceRate" min="0.6" max="1.4" step="0.05"><output id="rateOut"></output></label>
+    <p class="note" id="voiceInfo"></p>
+    <p class="note">声は端末に入っている読み上げ音声を使います。Microsoft Edge の「Nanami（ナチュラル）」や、iPhone・iPad で追加できる「O-ren（拡張）」「Kyoko（拡張）」を選ぶと、よりなめらかになります。iPhone・iPad では「設定 → アクセシビリティ → 読み上げコンテンツ → 声 → 日本語」から追加できます。</p>
+    <h3>おんがく</h3>
+    <label for="bgmVolume"><span>BGMの音量</span><input type="range" id="bgmVolume" min="0" max="1" step="0.05"><output id="bgmOut"></output></label>
+    <h3>ずかん</h3>
+    <p>ひらがな：<b id="countHira">0</b> / 71　カタカナ：<b id="countKata">0</b> / 71</p>
     <div class="row">
       <button id="voiceTest">声をためす</button>
       <button id="resetZukan">ずかんをリセット</button>
@@ -377,109 +416,162 @@
 </div>
 
 <script>
-  // ---------- 五十音表 ----------
+  // ---------- 五十音表・濁音表 ----------
   // 色は母音（あ・い・う・え・お の段）ごとにそろえる。「ん」だけ特別な色
   const VOWEL_COLORS = ['#ff8a80', '#f5b62e', '#4fc79a', '#5aa9f0', '#a88bd8'];
   const N_COLOR = '#f48fb1';
-  const TABLE = ['あいうえお', 'かきくけこ', 'さしすせそ', 'たちつてと', 'なにぬねの', 'はひふへほ', 'まみむめも', 'や・ゆ・よ', 'らりるれろ', 'わ・・・を', 'ん'];
+  const TABLE_SEI = ['あいうえお', 'かきくけこ', 'さしすせそ', 'たちつてと', 'なにぬねの', 'はひふへほ', 'まみむめも', 'や・ゆ・よ', 'らりるれろ', 'わ・・・を', 'ん'];
+  const TABLE_DAKU = ['がぎぐげご', 'ざじずぜぞ', 'だぢづでど', 'ばびぶべぼ', 'ぱぴぷぺぽ'];
 
   // ことば：「ことば 絵 うごき」。最後に * があるものは「これなあに？」に出さない（絵だけだと名前がひとつに決まらないもの）
-  // うごき: run hop fly swim spin wobble grow up wave rain snow petals leaves stars hearts notes bubbles splash rocket
+  // うごき: run walk zoom hop fly swim spin wobble grow up wave rain snow petals leaves wind stars hearts notes bubbles splash
+  //         rocket thanks sun party sleep eat dance cry laugh firework parade
   const HIRA_WORDS = `
-あ: あり 🐜 run | あひる 🦆 swim | あいす 🍦 wobble | あめ ☔ rain *
-い: いぬ 🐕 run | いちご 🍓 hop | いるか 🐬 swim | いか 🦑 swim
-う: うさぎ 🐇 hop | うし 🐄 run | うま 🐎 run | うみ 🌊 splash *
-え: えんぴつ ✏️ spin | えび 🦐 swim | えほん 📕 wobble *
-お: おにぎり 🍙 wobble | おばけ 👻 fly | おに 👹 hop
-か: かに 🦀 run | かめ 🐢 run | かえる 🐸 hop | かさ ☂️ rain
-き: きりん 🦒 wobble | きのこ 🍄 grow | きつね 🦊 run
-く: くま 🐻 wobble | くるま 🚗 run | くつ 👟 hop | くじら 🐳 swim
-け: けいと 🧶 spin | けーき 🍰 wobble | けむし 🐛 run *
-こ: こあら 🐨 wobble | こいのぼり 🎏 fly | こおり 🧊 spin * | こぶた 🐷 hop *
-さ: さかな 🐟 swim | さる 🐒 hop | さくら 🌸 petals * | さつまいも 🍠 wobble *
-し: しか 🦌 hop | しまうま 🦓 run | しんかんせん 🚄 run
-す: すいか 🍉 wobble | すし 🍣 wobble | すず 🔔 notes
-せ: せっけん 🧼 bubbles | せんせい 👩‍🏫 wave * | せんろ 🛤️ run *
-そ: そり 🛷 run | そら ☁️ up * | そば 🍜 wobble *
-た: たまご 🥚 wobble | たこ 🐙 swim | たいこ 🥁 notes
-ち: ちーず 🧀 wobble | ちきゅう 🌏 spin | ちず 🗺️ wobble *
+あ: あり 🐜 parade | あめ ☔ rain * | ありがとう 💐 thanks * | あひる 🦆 swim | あいす 🍦 wobble | あかちゃん 👶 laugh | あし 🦶 walk * | あさがお 🌺 petals *
+い: いぬ 🐕 run | いちご 🍓 hop | いるか 🐬 swim | いか 🦑 swim | いす 🪑 wobble | いただきます 🍚 eat * | いえ 🏠 wobble * | いってきます 🎒 walk *
+う: うさぎ 🐇 hop | うし 🐄 walk | うま 🐎 run | うみ 🌊 splash * | うた 🎤 notes * | うちゅう 🌌 stars * | うどん 🍜 eat *
+え: えんぴつ ✏️ spin | えび 🦐 swim | えほん 📕 wobble * | えがお 😊 laugh * | えき 🚉 zoom * | えだ 🌿 wind *
+お: おにぎり 🍙 eat | おばけ 👻 fly | おに 👹 hop | おはよう 🌅 sun * | おやすみ 😴 sleep * | おふろ 🛁 bubbles * | おかし 🍬 eat * | おうさま 🤴 dance * | おめでとう 🎉 party *
+か: かに 🦀 run | かめ 🐢 walk | かえる 🐸 hop | かさ ☂️ rain | かぜ 🌬️ wind * | かいじゅう 🦖 run * | かみなり ⚡ firework *
+き: きりん 🦒 wobble | きのこ 🍄 grow | きつね 🦊 run | きしゃ 🚂 zoom | きいろ 🟡 spin * | きらきら ✨ stars *
+く: くま 🐻 wobble | くるま 🚗 zoom | くつ 👟 hop | くじら 🐳 swim | くり 🌰 wobble * | くも ☁️ up *
+け: けいと 🧶 spin | けーき 🍰 eat | けむし 🐛 walk * | けいさつ 👮 zoom *
+こ: こあら 🐨 wobble | こいのぼり 🎏 fly | こおり 🧊 spin * | こぶた 🐷 hop * | こんにちは 👋 wave * | こっぷ 🥛 wobble *
+さ: さかな 🐟 swim | さる 🐒 hop | さめ 🦈 swim | さんた 🎅 party | さくら 🌸 petals * | さつまいも 🍠 eat * | さようなら 👋 wave *
+し: しか 🦌 hop | しまうま 🦓 run | しんかんせん 🚄 zoom | しろ 🏯 wobble * | しずく 💧 rain *
+す: すいか 🍉 eat | すし 🍣 eat | すず 🔔 notes | すき 💖 hearts * | すごい 👍 party *
+せ: せっけん 🧼 bubbles | せんせい 👩‍🏫 wave * | せんろ 🛤️ zoom *
+そ: そり 🛷 zoom | そら ☁️ up * | そば 🍜 eat * | そふとくりーむ 🍦 wobble *
+た: たまご 🥚 wobble | たこ 🐙 swim | たいこ 🥁 notes | たいよう ☀️ sun | たんぽぽ 🌼 petals * | ただいま 🏠 wave * | たべる 🍴 eat *
+ち: ちーず 🧀 eat | ちきゅう 🌏 spin | ちず 🗺️ wobble *
 つ: つき 🌙 stars | つり 🎣 swim * | つみき 🧱 hop *
-て: てんとうむし 🐞 fly | てがみ ✉️ fly | てれび 📺 wobble | て ✋ wave
-と: とり 🐦 fly | とけい ⏰ spin | とまと 🍅 hop | とら 🐯 run
-な: なす 🍆 wobble | なし 🍐 hop | なみ 🌊 splash *
-に: にんじん 🥕 spin | にわとり 🐔 run | にじ 🌈 stars
-ぬ: ぬいぐるみ 🧸 hop | ぬりえ 🖍️ spin *
-ね: ねこ 🐈 run | ねずみ 🐭 run | ねくたい 👔 wobble *
-の: のーと 📓 wobble * | のりもの 🚌 run * | のはら 🌼 petals *
-は: はな 🌷 petals | はさみ ✂️ spin | はち 🐝 fly | はーと ❤️ hearts
-ひ: ひよこ 🐤 hop | ひこうき ✈️ fly | ひまわり 🌻 petals | ひつじ 🐑 hop
-ふ: ふね 🚢 run | ふうせん 🎈 up | ふくろう 🦉 fly
+て: てんとうむし 🐞 fly | てがみ ✉️ fly | てれび 📺 wobble | てぶくろ 🧤 wobble | て ✋ wave
+と: とり 🐦 fly | とけい ⏰ spin | とまと 🍅 hop | とら 🐯 run | とうもろこし 🌽 eat | とまれ 🛑 wobble *
+な: なす 🍆 wobble | なし 🍐 hop | なみ 🌊 splash * | なく 😢 cry * | なまけもの 🦥 sleep *
+に: にんじん 🥕 spin | にわとり 🐔 walk | にじ 🌈 stars | にこにこ 😊 laugh * | にんぎょう 🎎 wobble *
+ぬ: ぬいぐるみ 🧸 hop | ぬりえ 🖍️ spin * | ぬれる 💦 rain *
+ね: ねこ 🐈 run | ねずみ 🐭 run | ねくたい 👔 wobble * | ねる 😴 sleep *
+の: のりもの 🚌 zoom * | のはら 🌼 petals * | のーと 📓 wobble * | のむ 🥤 eat *
+は: はな 🌷 petals | はさみ ✂️ spin | はち 🐝 fly | はーと ❤️ hearts | はなび 🎆 firework | はしる 🏃 run * | はみがき 🦷 bubbles * | はと 🕊️ fly *
+ひ: ひよこ 🐤 hop | ひこうき ✈️ fly | ひまわり 🌻 petals | ひつじ 🐑 hop | ひかり ✨ stars *
+ふ: ふね 🚢 swim | ふうせん 🎈 up | ふくろう 🦉 fly | ふく 👕 spin * | ふゆ ⛄ snow * | ふらみんご 🦩 dance *
 へ: へび 🐍 run | へりこぷたー 🚁 fly | へるめっと ⛑️ wobble *
-ほ: ほし ⭐ stars | ほうき 🧹 wobble | ほね 🦴 spin | ほん 📖 wobble *
-ま: まいく 🎤 notes | まめ 🥜 wobble * | まる ⭕ spin *
-み: みかん 🍊 hop | みみ 👂 wave | みず 💧 rain *
-む: むし 🐛 run | むしめがね 🔍 spin *
-め: めがね 👓 spin | めろん 🍈 hop | め 👀 wave *
-も: もも 🍑 wobble | もみじ 🍁 leaves
-や: やま ⛰️ wobble | やぎ 🐐 hop | やさい 🥦 wobble *
-ゆ: ゆき ❄️ snow | ゆきだるま ☃️ snow | ゆびわ 💍 spin
-よ: よる 🌃 stars | よっと ⛵ swim
-ら: らいおん 🦁 run | らっぱ 🎺 notes | らくだ 🐫 run | らーめん 🍜 wobble
+ほ: ほし ⭐ stars | ほうき 🧹 wobble | ほね 🦴 spin | ほっとけーき 🥞 eat | ほん 📖 wobble *
+ま: まいく 🎤 notes | まめ 🥜 wobble * | まる ⭕ spin * | まま 👩 hearts * | まつり 🏮 party * | まんごー 🥭 hop *
+み: みかん 🍊 hop | みみ 👂 wave | みず 💧 rain * | みつばち 🐝 fly * | みどり 🟢 spin *
+む: むし 🐛 walk | むしめがね 🔍 spin * | むぎ 🌾 wind *
+め: めがね 👓 spin | めろん 🍈 hop | めだる 🏅 spin | め 👀 wave *
+も: もも 🍑 wobble | もみじ 🍁 leaves | もぐもぐ 😋 eat * | もち 🍡 eat * | もくもく ☁️ up *
+や: やま ⛰️ wobble | やぎ 🐐 hop | やさい 🥦 eat * | やきいも 🍠 eat * | やったー 🙌 party *
+ゆ: ゆき ❄️ snow | ゆきだるま ☃️ snow | ゆびわ 💍 spin | ゆうえんち 🎡 spin * | ゆめ 💭 up *
+よ: よる 🌃 stars | よっと ⛵ swim | よーよー 🪀 spin *
+ら: らいおん 🦁 run | らっぱ 🎺 notes | らくだ 🐫 walk | らーめん 🍜 eat | らくがき 🖍️ spin *
 り: りんご 🍎 hop | りす 🐿️ hop | りぼん 🎀 spin
 る: るーぺ 🔍 spin * | るびー 💎 spin *
-れ: れもん 🍋 wobble | れたす 🥬 wobble * | れっしゃ 🚃 run *
-ろ: ろけっと 🚀 rocket | ろぼっと 🤖 wobble | ろうそく 🕯️ wobble *
-わ: わに 🐊 run | わんちゃん 🐶 run *
-を: ほんを_よむ 📖 wobble | えを_かく 🖍️ spin | みずを_のむ 🥛 wobble
-ん: ぱん 🍞 wobble | みかん 🍊 hop | らいおん 🦁 run | ぺんぎん 🐧 run
+れ: れもん 🍋 wobble | れたす 🥬 eat * | れっしゃ 🚃 zoom *
+ろ: ろけっと 🚀 rocket | ろぼっと 🤖 dance | ろうそく 🕯️ wobble *
+わ: わに 🐊 run | わんちゃん 🐶 run * | わらう 😄 laugh * | わーい 🙌 party *
+を: ほんを_よむ 📖 wobble | えを_かく 🖍️ spin | みずを_のむ 🥛 eat | てを_あらう 🧼 bubbles | うたを_うたう 🎤 notes
+ん: ぱん 🍞 eat | みかん 🍊 hop | らいおん 🦁 run | ぺんぎん 🐧 walk | でんしゃ 🚃 zoom | きりん 🦒 wobble
+が: がっこう 🏫 wobble | がおー 🦖 run * | がたんごとん 🚃 zoom * | がーがー 🦆 swim *
+ぎ: ぎたー 🎸 notes | ぎんこう 🏦 wobble * | ぎざぎざ ⚡ firework *
+ぐ: ぐみ 🍬 eat * | ぐるぐる 🌀 spin * | ぐー ✊ wave *
+げ: げーむ 🎮 dance | げんき 💪 party * | げんかん 🚪 wobble *
+ご: ごりら 🦍 run | ごはん 🍚 eat | ごめんね 🙇 wave * | ごちそうさま 😋 eat * | ごみばこ 🗑️ wobble *
+ざ: ざりがに 🦞 walk * | ざぶーん 🌊 splash *
+じ: じてんしゃ 🚲 zoom | じしゃく 🧲 spin * | じどうしゃ 🚗 zoom *
+ず: ずぼん 👖 spin | ずかん 📗 wobble *
+ぜ: ぜりー 🍮 wobble * | ぜろ 0️⃣ spin *
+ぞ: ぞう 🐘 walk | ぞろぞろ 🐜 parade *
+だ: だんご 🍡 eat | だんす 💃 dance * | だっこ 🤗 hearts * | だいすき 💖 hearts *
+ぢ: ちぢむ 🐌 wobble
+づ: こづつみ 📦 wobble | みかづき 🌙 stars
+で: でんしゃ 🚃 zoom | でんわ ☎️ notes | でんきゅう 💡 sun * | でぐち 🚪 wobble *
+ど: どーなつ 🍩 eat | どんぐり 🌰 hop * | どらむ 🥁 notes * | どあ 🚪 wobble *
+ば: ばなな 🍌 eat | ばす 🚌 zoom | ばら 🌹 petals * | ばいく 🏍️ zoom * | ばんざい 🙌 party *
+び: びすけっと 🍪 eat * | びっくり 😲 firework *
+ぶ: ぶた 🐷 run | ぶどう 🍇 eat | ぶーぶー 🚗 zoom * | ぶろっこりー 🥦 eat *
+べ: べっど 🛏️ sleep | べんとう 🍱 eat | べる 🛎️ notes * | べろ 👅 wobble *
+ぼ: ぼうし 👒 spin | ぼーる ⚽ hop * | ぼーと 🚤 swim *
+ぱ: ぱんだ 🐼 wobble | ぱん 🍞 eat | ぱんけーき 🥞 eat * | ぱらしゅーと 🪂 up * | ぱちぱち 👏 party *
+ぴ: ぴあの 🎹 notes | ぴざ 🍕 eat | ぴよぴよ 🐥 hop * | ぴかぴか ✨ stars *
+ぷ: ぷりん 🍮 wobble | ぷれぜんと 🎁 party | ぷーる 🏊 splash *
+ぺ: ぺんぎん 🐧 walk | ぺん 🖊️ spin * | ぺろぺろ 😛 eat *
+ぽ: ぽすと 📮 wobble | ぽっぷこーん 🍿 hop | ぽかぽか ☀️ sun *
 `;
+  // カタカナは、外来語を先に並べる。そのあとに上のひらがなのことばをカタカナにして足す
   const KATA_WORDS = `
-ア: アイス 🍦 wobble | アヒル 🦆 swim | アリ 🐜 run | アボカド 🥑 wobble *
+ア: アイス 🍦 wobble | アヒル 🦆 swim | アリ 🐜 parade | アボカド 🥑 wobble *
 イ: イルカ 🐬 swim | イヌ 🐕 run | イチゴ 🍓 hop | イカ 🦑 swim
-ウ: ウサギ 🐇 hop | ウシ 🐄 run | ウマ 🐎 run
+ウ: ウサギ 🐇 hop | ウシ 🐄 walk | ウマ 🐎 run
 エ: エビ 🦐 swim | エンピツ ✏️ spin
-オ: オバケ 👻 fly | オニ 👹 hop | オレンジ 🍊 hop * | オートバイ 🏍️ run *
-カ: カメラ 📷 spin | カニ 🦀 run | カメ 🐢 run | カレー 🍛 wobble | カエル 🐸 hop
+オ: オバケ 👻 fly | オニ 👹 hop | オレンジ 🍊 hop * | オートバイ 🏍️ zoom *
+カ: カメラ 📷 spin | カニ 🦀 run | カメ 🐢 walk | カレー 🍛 eat | カエル 🐸 hop
 キ: キリン 🦒 wobble | キツネ 🦊 run | キウイ 🥝 hop | キノコ 🍄 grow
-ク: クマ 🐻 wobble | クジラ 🐳 swim | クッキー 🍪 spin | クルマ 🚗 run
-ケ: ケーキ 🍰 wobble | ケイト 🧶 spin | ケムシ 🐛 run *
+ク: クマ 🐻 wobble | クジラ 🐳 swim | クッキー 🍪 eat | クルマ 🚗 zoom
+ケ: ケーキ 🍰 eat | ケイト 🧶 spin | ケムシ 🐛 walk *
 コ: コアラ 🐨 wobble | コイノボリ 🎏 fly | コーヒー ☕ wobble * | コップ 🥛 wobble *
-サ: サル 🐒 hop | サッカー ⚽ hop | サンドイッチ 🥪 wobble | サカナ 🐟 swim
-シ: シマウマ 🦓 run | シカ 🦌 hop | シンカンセン 🚄 run
-ス: スイカ 🍉 wobble | スプーン 🥄 spin | スキー ⛷️ run | スカート 👗 spin *
+サ: サル 🐒 hop | サッカー ⚽ hop | サンドイッチ 🥪 eat | サカナ 🐟 swim
+シ: シマウマ 🦓 run | シカ 🦌 hop | シンカンセン 🚄 zoom
+ス: スイカ 🍉 eat | スプーン 🥄 spin | スキー ⛷️ zoom | スカート 👗 spin *
 セ: セッケン 🧼 bubbles | センセイ 👩‍🏫 wave *
-ソ: ソリ 🛷 run | ソフトクリーム 🍦 wobble * | ソファ 🛋️ wobble *
-タ: タコ 🐙 swim | タクシー 🚕 run | タマゴ 🥚 wobble | タイコ 🥁 notes
-チ: チーズ 🧀 wobble | チキュウ 🌏 spin
+ソ: ソリ 🛷 zoom | ソフトクリーム 🍦 wobble * | ソファ 🛋️ wobble *
+タ: タコ 🐙 swim | タクシー 🚕 zoom | タマゴ 🥚 wobble | タイコ 🥁 notes
+チ: チーズ 🧀 eat | チキュウ 🌏 spin
 ツ: ツキ 🌙 stars | ツリー 🎄 stars *
 テ: テレビ 📺 wobble | テント ⛺ wobble | テニス 🎾 hop | テントウムシ 🐞 fly
-ト: トマト 🍅 hop | トラック 🚚 run | トラ 🐯 run | トランペット 🎺 notes *
+ト: トマト 🍅 hop | トラック 🚚 zoom | トラ 🐯 run | トランペット 🎺 notes *
 ナ: ナス 🍆 wobble | ナシ 🍐 hop | ナミ 🌊 splash *
-ニ: ニンジン 🥕 spin | ニワトリ 🐔 run | ニジ 🌈 stars
+ニ: ニンジン 🥕 spin | ニワトリ 🐔 walk | ニジ 🌈 stars
 ヌ: ヌイグルミ 🧸 hop | ヌリエ 🖍️ spin *
 ネ: ネコ 🐈 run | ネズミ 🐭 run | ネクタイ 👔 wobble *
-ノ: ノート 📓 wobble * | ノリモノ 🚌 run *
-ハ: ハンバーガー 🍔 wobble | ハート ❤️ hearts | ハサミ ✂️ spin | ハチ 🐝 fly
+ノ: ノート 📓 wobble * | ノリモノ 🚌 zoom *
+ハ: ハンバーガー 🍔 eat | ハート ❤️ hearts | ハサミ ✂️ spin | ハチ 🐝 fly
 ヒ: ヒヨコ 🐤 hop | ヒコウキ ✈️ fly | ヒツジ 🐑 hop | ヒマワリ 🌻 petals
-フ: フネ 🚢 run | フウセン 🎈 up | フクロウ 🦉 fly | フライパン 🍳 wobble *
+フ: フネ 🚢 swim | フウセン 🎈 up | フクロウ 🦉 fly | フライパン 🍳 wobble *
 ヘ: ヘリコプター 🚁 fly | ヘビ 🐍 run | ヘルメット ⛑️ wobble *
-ホ: ホットケーキ 🥞 wobble | ホシ ⭐ stars | ホネ 🦴 spin | ホウキ 🧹 wobble
+ホ: ホットケーキ 🥞 eat | ホシ ⭐ stars | ホネ 🦴 spin | ホウキ 🧹 wobble
 マ: マイク 🎤 notes | マフラー 🧣 wobble | マンゴー 🥭 hop *
 ミ: ミカン 🍊 hop | ミミ 👂 wave | ミルク 🥛 wobble *
-ム: ムシ 🐛 run | ムシメガネ 🔍 spin *
+ム: ムシ 🐛 walk | ムシメガネ 🔍 spin *
 メ: メロン 🍈 hop | メガネ 👓 spin | メダル 🏅 spin
-モ: モモ 🍑 wobble | モミジ 🍁 leaves | モノレール 🚝 run *
-ヤ: ヤギ 🐐 hop | ヤマ ⛰️ wobble | ヤシノキ 🌴 wobble *
+モ: モモ 🍑 wobble | モミジ 🍁 leaves | モノレール 🚝 zoom *
+ヤ: ヤギ 🐐 hop | ヤマ ⛰️ wobble | ヤシノキ 🌴 wind *
 ユ: ユキ ❄️ snow | ユキダルマ ☃️ snow | ユーフォー 🛸 fly | ユビワ 💍 spin
 ヨ: ヨット ⛵ swim | ヨル 🌃 stars
-ラ: ライオン 🦁 run | ラーメン 🍜 wobble | ラクダ 🐫 run | ラッパ 🎺 notes
+ラ: ライオン 🦁 run | ラーメン 🍜 eat | ラクダ 🐫 walk | ラッパ 🎺 notes
 リ: リンゴ 🍎 hop | リス 🐿️ hop | リボン 🎀 spin
 ル: ルーペ 🔍 spin * | ルビー 💎 spin *
-レ: レモン 🍋 wobble | レタス 🥬 wobble * | レッシャ 🚃 run *
-ロ: ロケット 🚀 rocket | ロボット 🤖 wobble | ローソク 🕯️ wobble *
+レ: レモン 🍋 wobble | レタス 🥬 eat * | レッシャ 🚃 zoom *
+ロ: ロケット 🚀 rocket | ロボット 🤖 dance | ローソク 🕯️ wobble *
 ワ: ワニ 🐊 run | ワンピース 👗 spin *
-ヲ: ホンヲ_ヨム 📖 wobble | エヲ_カク 🖍️ spin | ミズヲ_ノム 🥛 wobble
-ン: パン 🍞 wobble | ペンギン 🐧 run | ライオン 🦁 run | ミカン 🍊 hop
+ヲ: ホンヲ_ヨム 📖 wobble
+ン: パン 🍞 eat | ペンギン 🐧 walk | ライオン 🦁 run | ミカン 🍊 hop
+ガ: ガム 🍬 eat * | ガオー 🦖 run *
+ギ: ギター 🎸 notes
+グ: グミ 🍬 eat * | グローブ 🧤 wobble *
+ゲ: ゲーム 🎮 dance
+ゴ: ゴリラ 🦍 run | ゴール 🥅 party *
+ザ: ザリガニ 🦞 walk *
+ジ: ジーンズ 👖 spin *
+ズ: ズボン 👖 spin
+ゼ: ゼリー 🍮 wobble * | ゼブラ 🦓 run *
+ゾ: ゾウ 🐘 walk
+ダ: ダンス 💃 dance * | ダイヤ 💎 spin *
+ヂ: チヂム 🐌 wobble
+ヅ: コヅツミ 📦 wobble
+デ: デンシャ 🚃 zoom | デザート 🍨 eat *
+ド: ドーナツ 🍩 eat | ドラム 🥁 notes * | ドラゴン 🐉 fly * | ドア 🚪 wobble *
+バ: バナナ 🍌 eat | バス 🚌 zoom | バラ 🌹 petals * | バイク 🏍️ zoom *
+ビ: ビスケット 🍪 eat * | ビル 🏢 wobble *
+ブ: ブドウ 🍇 eat | ブーツ 👢 hop * | ブロッコリー 🥦 eat *
+ベ: ベッド 🛏️ sleep | ベル 🛎️ notes *
+ボ: ボール ⚽ hop * | ボート 🚤 swim * | ボタン 🔘 spin *
+パ: パンダ 🐼 wobble | パン 🍞 eat | パイナップル 🍍 hop | パトカー 🚓 zoom
+ピ: ピアノ 🎹 notes | ピザ 🍕 eat | ピエロ 🤡 dance *
+プ: プリン 🍮 wobble | プレゼント 🎁 party | プール 🏊 splash *
+ペ: ペンギン 🐧 walk | ペン 🖊️ spin *
+ポ: ポスト 📮 wobble | ポップコーン 🍿 hop | ポテト 🍟 eat *
 `;
   // まちがえやすい字（「さがしてみよう」で、ときどき並べて出す）
   const CONFUSABLE = {
@@ -502,25 +594,47 @@
     }
     return out;
   }
-  const WORDS = { hira: parseWords(HIRA_WORDS), kata: parseWords(KATA_WORDS) };
+  const HIRA = parseWords(HIRA_WORDS);
+  const KATA_ONLY = parseWords(KATA_WORDS);
+  const KATA = {};
+  for (const id of Object.keys(HIRA)) {
+    const list = [...(KATA_ONLY[id] || [])];
+    for (const w of HIRA[id]) {
+      const kw = { ...w, w: toKata(w.w) };
+      if (!list.some(x => x.w === kw.w)) list.push(kw);
+    }
+    KATA[id] = list;
+  }
+  const WORDS = { hira: HIRA, kata: KATA };
 
-  const ENTRIES = [];
-  TABLE.forEach((row, r) => [...row].forEach((id, v) => {
-    if (id === '・') return;
-    ENTRIES.push({
-      id, r, v,
-      color: id === 'ん' ? N_COLOR : VOWEL_COLORS[v],
-      // よこ長（右から左へ行が並ぶ）とたて長の、表の中の場所
-      lc: 11 - r, lr: v + 1, pc: v + 1, pr: r + 1,
-    });
-  }));
+  function buildTable(table, group) {
+    const cols = table.length;
+    const out = [];
+    table.forEach((row, r) => [...row].forEach((id, v) => {
+      if (id === '・') return;
+      out.push({
+        id, r, v, group,
+        color: id === 'ん' ? N_COLOR : VOWEL_COLORS[v],
+        // よこ長（右から左へ行が並ぶ）とたて長の、表の中の場所
+        lc: cols - r, lr: v + 1, pc: v + 1, pr: r + 1,
+      });
+    }));
+    return out;
+  }
+  const SEI = buildTable(TABLE_SEI, 'sei');
+  const DAKU = buildTable(TABLE_DAKU, 'daku');
+  const ENTRIES = [...SEI, ...DAKU];
+  const GROUPS = { sei: SEI, daku: DAKU };
   const byId = Object.fromEntries(ENTRIES.map(e => [e.id, e]));
-  const TOTAL = ENTRIES.length;
+  // 「か」と「が」、「は」と「ば」「ぱ」のように、点や丸がちがうだけの字
+  const baseOf = id => id.normalize('NFD')[0];
 
   const $ = sel => document.querySelector(sel);
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const shuffle = a => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
   const pick = a => a[Math.floor(Math.random() * a.length)];
+  const load = (key, fallback) => { try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback; } catch { return fallback; } };
+  const store = (key, v) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} };
 
   // ---------- ひらがな／カタカナ ----------
   const SCRIPT_KEY = 'mojimori.v2.script';
@@ -537,29 +651,151 @@
   // ---------- ずかん（この端末の中だけに保存） ----------
   const STORE_KEY = 'mojimori.v2.zukan';
   let zukan = { hira: new Set(), kata: new Set() };
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+  {
+    const saved = load(STORE_KEY, null);
     if (saved) zukan = { hira: new Set(saved.hira || []), kata: new Set(saved.kata || []) };
-    else zukan.hira = new Set(JSON.parse(localStorage.getItem('mojimori.v1.zukan') || '[]'));
-  } catch {}
-  function saveZukan() { try { localStorage.setItem(STORE_KEY, JSON.stringify({ hira: [...zukan.hira], kata: [...zukan.kata] })); } catch {} }
+    else zukan.hira = new Set(load('mojimori.v1.zukan', []));
+  }
+  function saveZukan() { store(STORE_KEY, { hira: [...zukan.hira], kata: [...zukan.kata] }); }
   const has = e => zukan[script].has(e.id);
-  // 新しく集まったら true。46文字そろった瞬間なら 'all'
+  // 新しく集まったら true。その表（清音・濁音）がぜんぶそろった瞬間なら 'all'
   function collect(e) {
     const s = zukan[script];
     if (s.has(e.id)) return false;
     s.add(e.id);
     saveZukan();
     updateTiles();
-    return s.size === TOTAL ? 'all' : true;
+    return GROUPS[e.group].every(x => s.has(x.id)) ? 'all' : true;
   }
 
+  // ---------- BGM（オルゴールの音を、その場で作って鳴らす） ----------
+  let ac = null;
+  function unlockAudio() {
+    try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch {}
+  }
+  const BGM = (() => {
+    const BEAT = 60 / 96;
+    // 「音:拍」の並び。| は小節の区切り（読みやすさのためだけ）。R はやすみ
+    const MELODY = `
+      E5:.5 D5:.5 C5:1 G4:1 E4:1 | D5:.5 E5:.5 D5:1 B4:1 G4:1 | C5:.5 D5:.5 E5:1 A4:1 C5:1 | A4:.5 C5:.5 F5:1 E5:1 C5:1 |
+      E5:.5 G5:.5 E5:1 C5:1 D5:1 | D5:.5 B4:.5 G4:1 B4:1 D5:1 | C5:.5 A4:.5 F4:1 A4:.5 C5:.5 D5:1 | B4:1 D5:1 C5:2 |
+      A4:1 C5:1 F5:1 E5:1 | D5:1 B4:1 G4:2 | G4:.5 A4:.5 B4:1 E5:1 D5:1 | C5:1 A4:1 E4:2 |
+      F4:.5 A4:.5 C5:1 F5:1 E5:1 | D5:.5 E5:.5 D5:1 B4:1 G4:1 | E5:.5 D5:.5 C5:1 E5:1 G5:1 | C5:3 R:1`;
+    const CHORDS = ['C', 'G', 'Am', 'F', 'C', 'G', 'F', 'C', 'F', 'G', 'Em', 'Am', 'F', 'G', 'C', 'C'];
+    const CHORD_NOTES = { C: [48, 60, 64, 67], G: [43, 59, 62, 67], Am: [45, 60, 64, 69], F: [41, 60, 65, 69], Em: [40, 59, 64, 67] };
+    const NOTE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const midi = n => 12 * (+n.slice(-1) + 1) + NOTE[n[0]];
+    const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+    const events = [];
+    let beat = 0;
+    for (const tok of MELODY.replace(/\|/g, ' ').trim().split(/\s+/)) {
+      const [n, d] = tok.split(':');
+      if (n !== 'R') events.push({ beat, kind: 'mel', m: midi(n), d: +d });
+      beat += +d;
+    }
+    const LOOP = beat;
+    CHORDS.forEach((c, bar) => {
+      const [root, ...tones] = CHORD_NOTES[c];
+      events.push({ beat: bar * 4, kind: 'bass', m: root, d: 2 }, { beat: bar * 4 + 2, kind: 'bass', m: root + 7, d: 2 });
+      for (let b = 0; b < 4; b++) events.push({ beat: bar * 4 + b + .5, kind: 'arp', m: tones[b % 3], d: .5 });
+    });
+    events.sort((a, b) => a.beat - b.beat);
+
+    let master = null, timer = null, idx = 0, loopStart = 0, playing = false, ducked = false;
+    let volume = load('mojimori.v2.bgmVolume', .5);
+    let enabled = load('mojimori.v2.bgm', true);
+    const level = () => volume * .16 * (ducked ? .3 : 1);
+
+    function note(ev, t) {
+      const o = ac.createOscillator(), g = ac.createGain();
+      const f = hz(ev.m);
+      let peak, decay;
+      if (ev.kind === 'mel') { o.type = 'sine'; peak = .55; decay = 1.6; }
+      else if (ev.kind === 'bass') { o.type = 'triangle'; peak = .35; decay = ev.d * BEAT * 1.1; }
+      else { o.type = 'sine'; peak = .12; decay = .6; }
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(peak, t + .008);
+      g.gain.exponentialRampToValueAtTime(.0008, t + decay);
+      o.connect(g).connect(master);
+      o.start(t); o.stop(t + decay + .05);
+      // オルゴールらしい、きらっとした倍音
+      if (ev.kind === 'mel') {
+        const o2 = ac.createOscillator(), g2 = ac.createGain();
+        o2.type = 'sine'; o2.frequency.value = f * 4;
+        g2.gain.setValueAtTime(0, t);
+        g2.gain.linearRampToValueAtTime(.08, t + .005);
+        g2.gain.exponentialRampToValueAtTime(.0008, t + .35);
+        o2.connect(g2).connect(master);
+        o2.start(t); o2.stop(t + .4);
+      }
+    }
+    function tick() {
+      const ahead = ac.currentTime + .4;
+      for (;;) {
+        const ev = events[idx];
+        const t = loopStart + ev.beat * BEAT;
+        if (t > ahead) break;
+        if (t >= ac.currentTime - .02) note(ev, t);
+        if (++idx >= events.length) { idx = 0; loopStart += LOOP * BEAT; }
+      }
+    }
+    function start() {
+      if (!enabled || playing || !ac || document.hidden) return;
+      playing = true;
+      master = ac.createGain();
+      master.gain.value = 0;
+      master.connect(ac.destination);
+      master.gain.setTargetAtTime(level(), ac.currentTime, .6);
+      idx = 0;
+      loopStart = ac.currentTime + .15;
+      tick();
+      timer = setInterval(tick, 120);
+    }
+    function stop() {
+      if (!playing) return;
+      playing = false;
+      clearInterval(timer);
+      const m = master;
+      m.gain.setTargetAtTime(0, ac.currentTime, .25);
+      setTimeout(() => m.disconnect(), 1500);
+    }
+    function duck(on) {
+      ducked = on;
+      if (playing) master.gain.setTargetAtTime(level(), ac.currentTime, on ? .08 : .5);
+    }
+    function setVolume(v) {
+      volume = v;
+      store('mojimori.v2.bgmVolume', v);
+      if (playing) master.gain.setTargetAtTime(level(), ac.currentTime, .1);
+    }
+    function setEnabled(on) {
+      enabled = on;
+      store('mojimori.v2.bgm', on);
+      if (on) start(); else stop();
+    }
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else if (nightQuiet === false) start(); });
+    return { start, stop, duck, setVolume, setEnabled, get enabled() { return enabled; }, get volume() { return volume; } };
+  })();
+  let nightQuiet = false; // おやすみの画面では BGM を止めておく
+
   // ---------- 声（ブラウザの音声合成） ----------
+  const VOICE_KEY = 'mojimori.v2.voice';
+  const voiceSettings = { name: '', pitch: 1.5, rate: 1.0, ...load(VOICE_KEY, {}) };
   let jaVoice = null;
+  const jaVoices = () => ('speechSynthesis' in window ? speechSynthesis.getVoices() : []).filter(v => /^ja/i.test(v.lang));
+  // なめらかな（ニューラル・拡張）女性の声を上にする
+  function scoreVoice(v) {
+    let s = 0;
+    if (/Natural|Online|Neural|ナチュラル|オンライン/i.test(v.name)) s += 50;
+    if (/Enhanced|Premium|拡張|プレミアム/i.test(v.name)) s += 40;
+    if (/Nanami|Mayu|Aoi|Shiori|Kyoko|O-ren|Haruka|Ayumi|Sayaka|Hikari|Misaki|Google/i.test(v.name)) s += 20;
+    if (/Keita|Ichiro|Otoya|Hattori|Daichi|Naoki|Kenta|Takumi|Hiroshi/i.test(v.name)) s -= 100;
+    return s;
+  }
   function pickVoice() {
-    if (!('speechSynthesis' in window)) return;
-    const ja = speechSynthesis.getVoices().filter(v => /^ja/i.test(v.lang));
-    jaVoice = ja.find(v => /Nanami|Ayumi|Haruka|Kyoko|O-ren|Google/i.test(v.name)) || ja[0] || null;
+    const ja = jaVoices();
+    jaVoice = (voiceSettings.name && ja.find(v => v.name === voiceSettings.name)) || [...ja].sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
   }
   if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 
@@ -580,22 +816,25 @@
     if (pendingFinish) pendingFinish();
     if ('speechSynthesis' in window) speechSynthesis.cancel();
   }
-  function say(text, { speech = text, rate = 0.8, pitch = 1.3 } = {}) {
+  function say(text, { speech = text, rate = 1, pitch = 1 } = {}) {
     // 前の声がまだ待っているなら、ここで終わらせる（連打で声がたまらないように）
     stopVoice();
-    const estimate = 800 + text.length * 250;
+    const r = voiceSettings.rate * rate;
+    const estimate = (700 + text.length * 210) / r;
     showCaption(text, estimate + 800);
+    BGM.duck(true);
     return new Promise(resolve => {
       let done = false;
-      const finish = () => { if (done) return; done = true; if (pendingFinish === finish) pendingFinish = null; resolve(); };
+      const finish = () => { if (done) return; done = true; if (pendingFinish === finish) pendingFinish = null; BGM.duck(false); resolve(); };
       pendingFinish = finish;
       setTimeout(finish, estimate + 1500); // 声が出ない環境でも先へ進める
       if (!('speechSynthesis' in window)) return;
-      const u = new SpeechSynthesisUtterance(speech.replace(/[「」]/g, ''));
+      // 全角スペースは読み上げで間があいて、とぎれとぎれに聞こえるので取りのぞく
+      const u = new SpeechSynthesisUtterance(speech.replace(/[「」　]/g, ''));
       u.lang = 'ja-JP';
       if (jaVoice) u.voice = jaVoice;
-      u.rate = rate;
-      u.pitch = pitch;
+      u.rate = Math.min(2, r);
+      u.pitch = Math.min(2, voiceSettings.pitch * pitch);
       u.onend = finish;
       u.onerror = finish;
       // cancel 直後の speak が無視されるブラウザがあるので、少し待つ
@@ -604,10 +843,6 @@
   }
 
   // ---------- 効果音（ファイルを使わずに作る） ----------
-  let ac = null;
-  function unlockAudio() {
-    try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch {}
-  }
   function tones(freqs, { dur = .2, gap = .1, type = 'triangle', vol = .16 } = {}) {
     if (!ac) return;
     const t0 = ac.currentTime + .01;
@@ -650,6 +885,8 @@
       () => tones([f, f * 1.25, f * 1.5, f * 2], { gap: .07, dur: .3, type: 'sine', vol: .12 }),
       () => sweep(f * .5, f * 1.5, .45, .14),
       () => tones([f * 2, f * 1.5, f], { gap: .08, dur: .18 }),
+      () => tones([f, f * 2, f, f * 2], { gap: .06, dur: .12, type: 'square', vol: .05 }),
+      () => tones([f * 1.5, f * 1.5, f * 2], { gap: .12, dur: .2, type: 'sine', vol: .14 }),
     ])();
   }
 
@@ -705,6 +942,15 @@
       { transform: 'perspective(600px) translateY(-30px) rotateY(180deg)', offset: .5 },
       { transform: 'perspective(600px) rotateY(360deg)' },
     ], { duration: 1200, easing: 'ease-in-out' }),
+    jumpjump: el => anim(el, [
+      { transform: 'translateY(0)' }, { transform: 'translateY(-30px)', offset: .17 }, { transform: 'translateY(0)', offset: .33 },
+      { transform: 'translateY(-30px)', offset: .5 }, { transform: 'translateY(0)', offset: .67 },
+      { transform: 'translateY(-50px) scale(1.1)', offset: .84 }, { transform: 'translateY(0)' },
+    ], { duration: 1400, easing: 'ease-in-out' }),
+    peek: el => anim(el, [
+      { transform: 'scale(1)' }, { transform: 'scale(.4) translateY(30%)', offset: .3 },
+      { transform: 'scale(.4) translateY(30%)', offset: .5 }, { transform: 'scale(1.2)', offset: .8 }, { transform: 'scale(1)' },
+    ], { duration: 1300, easing: 'cubic-bezier(.3,1.4,.6,1)' }),
     // ずっこけ
     zukko: el => anim(el, [
       { transform: 'rotate(0)' },
@@ -724,11 +970,11 @@
       ], { duration: 950, iterations: 3, easing: 'ease-in-out' });
     },
   };
-  const TAP_MOVES = ['bounce', 'happy', 'squish', 'wiggle', 'twirl'];
+  const TAP_MOVES = ['bounce', 'happy', 'squish', 'wiggle', 'twirl', 'jumpjump', 'peek'];
 
   // ---------- 演出 ----------
   // 古い端末で重くならないよう、画面に出せる数に上限をつける
-  const FX_MAX = 80;
+  const FX_MAX = 90;
   const room = n => Math.max(0, Math.min(n, FX_MAX - $('#fx').childElementCount));
   function spawn(text, style) {
     const s = document.createElement('span');
@@ -737,6 +983,7 @@
     $('#fx').appendChild(s);
     return s;
   }
+  const center = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, top: r.top }; };
   function popAt(el, emoji, scale = 1) {
     const r = el.getBoundingClientRect();
     const s = spawn(emoji, { left: `${r.left + r.width / 2}px`, top: `${r.top}px`, fontSize: `${Math.max(80, r.width * .8) * scale}px` });
@@ -752,7 +999,7 @@
   // 上からふってくる（あめ・ゆき・はな・ほし・はっぱ）
   function fall(emoji, count = 22) {
     for (let i = 0, n = room(count); i < n; i++) {
-      const d = spawn(emoji, { left: `${Math.random() * 100}vw`, top: '-10vh', fontSize: `${20 + Math.random() * 22}px` });
+      const d = spawn(Array.isArray(emoji) ? pick(emoji) : emoji, { left: `${Math.random() * 100}vw`, top: '-10vh', fontSize: `${20 + Math.random() * 22}px` });
       const sway = (Math.random() - .5) * 12;
       anim(d, [{ transform: 'translate(0, 0) rotate(0)' }, { transform: `translate(${sway}vw, 120vh) rotate(${(Math.random() - .5) * 360}deg)` }],
         { duration: 3000 + Math.random() * 1600, delay: Math.random() * 1600, easing: 'linear' }).onfinish = () => d.remove();
@@ -761,28 +1008,41 @@
   // 下からのぼっていく（おと・あわ・はーと）
   function rise(emoji, count = 14, style = {}) {
     for (let i = 0, n = room(count); i < n; i++) {
-      const d = spawn(emoji, { left: `${10 + Math.random() * 80}vw`, top: '100vh', fontSize: `${26 + Math.random() * 22}px`, ...style });
+      const d = spawn(Array.isArray(emoji) ? pick(emoji) : emoji, { left: `${10 + Math.random() * 80}vw`, top: '100vh', fontSize: `${26 + Math.random() * 22}px`, ...style });
       const sway = (Math.random() - .5) * 14;
       anim(d, [{ transform: 'translate(0, 0)', opacity: 1 }, { transform: `translate(${sway}vw, -115vh)`, opacity: .8 }],
         { duration: 3600 + Math.random() * 1600, delay: Math.random() * 1400, easing: 'ease-out' }).onfinish = () => d.remove();
     }
   }
-  // 画面をよこぎる（はしる・はねる・とぶ・およぐ）
-  function across(emoji, kind) {
+  // 画面をよこぎる（はしる・あるく・はやい・はねる・とぶ・およぐ）
+  function across(emoji, kind, { delay = 0, top } = {}) {
     if (!room(1)) return;
-    const top = { fly: '24vh', swim: '52vh' }[kind] || '68vh';
-    const s = spawn(emoji, { left: '0', top, fontSize: 'clamp(64px, 15vmin, 120px)' });
+    const y = top || { fly: '24vh', swim: '52vh' }[kind] || '68vh';
+    const s = spawn(emoji, { left: '0', top: y, fontSize: 'clamp(64px, 15vmin, 120px)' });
     const frames = [];
-    const steps = 12;
+    const steps = kind === 'walk' ? 20 : 12;
     for (let i = 0; i <= steps; i++) {
       let lift = i % 2 ? -14 : 0;
+      if (kind === 'walk') lift = i % 2 ? -8 : 0;
+      if (kind === 'zoom') lift = 0;
       if (kind === 'hop') lift = i % 2 ? -120 : 0;
       if (kind === 'fly') lift = Math.sin(i / steps * Math.PI * 3) * 60;
       if (kind === 'swim') lift = Math.sin(i / steps * Math.PI * 4) * 28;
       frames.push({ transform: `translate(${-20 + i * (140 / steps)}vw, ${lift}px) scaleX(-1)` });
     }
-    const duration = { run: 4400, hop: 5400, fly: 5600, swim: 5200 }[kind];
-    anim(s, frames, { duration, easing: 'linear' }).onfinish = () => s.remove();
+    const duration = { run: 4400, walk: 7000, zoom: 2400, hop: 5400, fly: 5600, swim: 5200 }[kind] || 4400;
+    anim(s, frames, { duration, delay, easing: 'linear', fill: 'backwards' }).onfinish = () => s.remove();
+    // はやいのりものは、うしろに けむり
+    if (kind === 'zoom') {
+      for (let i = 1; i <= 5; i++) {
+        setTimeout(() => {
+          if (!room(1)) return;
+          const p = s.getBoundingClientRect();
+          const puff = spawn('💨', { left: `${p.right - 10}px`, top: `${p.top + p.height * .4}px`, fontSize: '40px' });
+          anim(puff, [{ transform: 'scale(.6)', opacity: .9 }, { transform: 'scale(1.4) translateX(30px)', opacity: 0 }], { duration: 700 }).onfinish = () => puff.remove();
+        }, delay + i * 330);
+      }
+    }
   }
   function launch(el, emoji, { duration = 4200, wobble = true } = {}) {
     const r = el.getBoundingClientRect();
@@ -795,18 +1055,34 @@
       { transform: 'translate(-50%, -130vh) scale(1)' },
     ], { duration, easing: 'ease-in' }).onfinish = () => s.remove();
   }
-  // まわりにきらきら
-  function sparkle(el) {
-    const r = el.getBoundingClientRect();
-    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-    for (let i = 0, n = room(8); i < n; i++) {
-      const s = spawn(pick(['✨', '💫', '⭐']), { left: `${cx}px`, top: `${cy}px`, fontSize: `${18 + Math.random() * 16}px` });
-      const a = (i / 8) * Math.PI * 2, d = r.width * (.7 + Math.random() * .3);
+  // ある点から、まわりへ広がる
+  function burst(x, y, items, n = 8, dist = 120, size = [18, 34]) {
+    for (let i = 0, k = room(n); i < k; i++) {
+      const s = spawn(pick(items), { left: `${x}px`, top: `${y}px`, fontSize: `${size[0] + Math.random() * (size[1] - size[0])}px` });
+      const a = (i / k) * Math.PI * 2 + Math.random() * .4, d = dist * (.7 + Math.random() * .5);
       anim(s, [
         { transform: 'translate(-50%,-50%) scale(.2)', opacity: 0 },
         { transform: `translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d}px)) scale(1)`, opacity: 1, offset: .5 },
-        { transform: `translate(calc(-50% + ${Math.cos(a) * d * 1.2}px), calc(-50% + ${Math.sin(a) * d * 1.2}px)) scale(.6)`, opacity: 0 },
-      ], { duration: 1400 }).onfinish = () => s.remove();
+        { transform: `translate(calc(-50% + ${Math.cos(a) * d * 1.25}px), calc(-50% + ${Math.sin(a) * d * 1.25 + 30}px)) scale(.6)`, opacity: 0 },
+      ], { duration: 1500 }).onfinish = () => s.remove();
+    }
+  }
+  const sparkle = el => { const c = center(el); burst(c.x, c.y, ['✨', '💫', '⭐'], 8, c.w * .8); };
+  const heartBurst = el => { const c = center(el); burst(c.x, c.y, ['💖', '💕', '💗'], 7, c.w * .75); };
+  // わっか（ぽわん）
+  function ring(el, color) {
+    if (!room(2)) return;
+    const c = center(el);
+    for (let i = 0; i < 2; i++) {
+      const s = spawn('', { left: `${c.x}px`, top: `${c.y}px`, width: `${c.w}px`, height: `${c.w}px`, marginLeft: `${-c.w / 2}px`, marginTop: `${-c.w / 2}px` });
+      s.className = 'ring';
+      s.style.setProperty('--c', color || '#fff59d');
+      anim(s, [{ transform: 'scale(.5)', opacity: .9 }, { transform: 'scale(2.2)', opacity: 0 }], { duration: 1100, delay: i * 250, fill: 'backwards' }).onfinish = () => s.remove();
+    }
+  }
+  function fireworks() {
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => burst(innerWidth * (.2 + Math.random() * .6), innerHeight * (.15 + Math.random() * .3), ['✨', '🎇', '⭐', '💥'], 10, 110, [20, 36]), i * 500);
     }
   }
   function confetti() {
@@ -823,31 +1099,63 @@
       ], { duration: 3200, easing: 'cubic-bezier(.2,.8,.3,1)' }).onfinish = () => s.remove();
     }
   }
-  // ことばごとの演出
-  function wordAction(w, el) {
-    if (w.a === 'rocket') { launch(el, w.e); return; }
-    if (w.a === 'up') { launch(el, w.e, { duration: 6000, wobble: false }); return; }
-    const s = popAt(el, w.e, w.a === 'grow' ? 1.6 : 1);
-    switch (w.a) {
-      case 'rain':    fall('💧'); break;
-      case 'snow':    fall('❄️'); break;
-      case 'petals':  fall('🌸'); break;
-      case 'leaves':  fall('🍁', 16); break;
-      case 'stars':   fall('⭐', 16); break;
-      case 'splash':  fall('💧', 12); rise('💦', 6); break;
-      case 'hearts':  rise('❤️', 10); rise('💕', 6); break;
-      case 'notes':   rise('🎵', 8); rise('🎶', 6); break;
-      case 'bubbles': rise('◯', 16, { color: '#8fd3ff', fontWeight: '900' }); break;
-      case 'run':
-      case 'hop':
-      case 'fly':
-      case 'swim':    across(w.e, w.a); break;
-      case 'spin':    anim(s, [{ rotate: '0deg' }, { rotate: '720deg' }], { duration: 3400, easing: 'ease-in-out', composite: 'add' }); break;
-      case 'wave':    anim(s, [{ rotate: '-25deg' }, { rotate: '25deg' }], { duration: 360, iterations: 9, direction: 'alternate', easing: 'ease-in-out', composite: 'add' }); break;
-      case 'grow':    anim(s, [{ scale: '1' }, { scale: '1.3' }], { duration: 600, iterations: 4, direction: 'alternate', composite: 'add' }); break;
-      default:        anim(s, [{ rotate: '-15deg' }, { rotate: '15deg' }], { duration: 480, iterations: 7, direction: 'alternate', easing: 'ease-in-out', composite: 'add' }); break;
+  // 風にのって よこへ流れる
+  function wind(items) {
+    for (let i = 0, n = room(12); i < n; i++) {
+      const d = spawn(pick(items), { left: '-8vw', top: `${10 + Math.random() * 70}vh`, fontSize: `${22 + Math.random() * 18}px` });
+      anim(d, [{ transform: 'translate(0,0) rotate(0)' }, { transform: `translate(120vw, ${(Math.random() - .5) * 30}vh) rotate(${360 + Math.random() * 360}deg)` }],
+        { duration: 2600 + Math.random() * 1400, delay: Math.random() * 1200, easing: 'ease-in-out', fill: 'backwards' }).onfinish = () => d.remove();
     }
   }
+
+  // ことばごとの演出
+  function wordAction(w, el) {
+    if (w.a === 'rocket') { launch(el, w.e); fall(['✨', '⭐'], 8); return; }
+    if (w.a === 'up') { launch(el, w.e, { duration: 6000, wobble: false }); return; }
+    if (w.a === 'parade') { for (let i = 0; i < 4; i++) across(w.e, 'walk', { delay: i * 450 }); popAt(el, w.e); return; }
+    const s = popAt(el, w.e, w.a === 'grow' || w.a === 'sun' ? 1.5 : 1);
+    const twist = (frames, opts) => anim(s, frames, { composite: 'add', easing: 'ease-in-out', ...opts });
+    switch (w.a) {
+      case 'rain':     fall('💧'); break;
+      case 'snow':     fall('❄️'); break;
+      case 'petals':   fall('🌸'); break;
+      case 'leaves':   fall(['🍁', '🍂'], 16); break;
+      case 'stars':    fall('⭐', 16); break;
+      case 'wind':     wind(['🍃', '🍂', '🌸']); break;
+      case 'splash':   fall('💧', 12); rise('💦', 6); break;
+      case 'hearts':   rise('❤️', 10); rise('💕', 6); break;
+      case 'notes':    rise('🎵', 8); rise('🎶', 6); twist([{ rotate: '-12deg' }, { rotate: '12deg' }], { duration: 400, iterations: 8, direction: 'alternate' }); break;
+      case 'bubbles':  rise('◯', 16, { color: '#8fd3ff', fontWeight: '900' }); break;
+      case 'thanks':   heartBurst(el); rise(['💐', '🌸', '💖'], 8); twist([{ rotate: '0deg' }, { rotate: '28deg' }, { rotate: '0deg' }], { duration: 1100, iterations: 2 }); break;
+      case 'sun':      ring(el, '#ffd54f'); burst(center(el).x, center(el).top, ['✨', '🌟'], 10, 160); break;
+      case 'party':    confetti(); break;
+      case 'sleep':    rise('💤', 6); twist([{ rotate: '-8deg' }, { rotate: '8deg' }], { duration: 1400, iterations: 3, direction: 'alternate' }); break;
+      case 'eat':      twist([{ scale: '1 1' }, { scale: '1.15 .8' }], { duration: 220, iterations: 8, direction: 'alternate' }); burst(center(el).x, center(el).top, ['😋', '✨', '💛'], 6, 110); break;
+      case 'dance':    twist([{ translate: '-24px 0', rotate: '-14deg' }, { translate: '24px 0', rotate: '14deg' }], { duration: 380, iterations: 8, direction: 'alternate' }); rise(['🎵', '🎶'], 8); break;
+      case 'cry':      fall('💧', 10); twist([{ translate: '-6px 0' }, { translate: '6px 0' }], { duration: 120, iterations: 14, direction: 'alternate' }); break;
+      case 'laugh':    twist([{ translate: '0 0' }, { translate: '0 -24px' }], { duration: 260, iterations: 10, direction: 'alternate' }); burst(center(el).x, center(el).top, ['😆', '✨', '🎶'], 6, 120); break;
+      case 'firework': fireworks(); break;
+      case 'run':
+      case 'walk':
+      case 'zoom':
+      case 'hop':
+      case 'fly':
+      case 'swim':     across(w.e, w.a); break;
+      case 'spin':     twist([{ rotate: '0deg' }, { rotate: '720deg' }], { duration: 3400 }); break;
+      case 'wave':     twist([{ rotate: '-25deg' }, { rotate: '25deg' }], { duration: 360, iterations: 9, direction: 'alternate' }); break;
+      case 'grow':     twist([{ scale: '1' }, { scale: '1.3' }], { duration: 600, iterations: 4, direction: 'alternate' }); break;
+      default:         twist([{ rotate: '-15deg' }, { rotate: '15deg' }], { duration: 480, iterations: 7, direction: 'alternate' }); break;
+    }
+  }
+  // ことばの演出とは別に、ときどき おまけの演出
+  const EXTRAS = [
+    el => sparkle(el),
+    el => heartBurst(el),
+    el => ring(el, getComputedStyle(el).getPropertyValue('--c')),
+    () => fall(['⭐', '✨'], 10),
+    el => { const c = center(el); burst(c.x, c.y, ['🌈'], 1, 0, [70, 90]); },
+    () => wind(['🎈', '🎈', '🎈']),
+  ];
 
   // ---------- 画面の切り替え ----------
   let askAgain = null; // 👂ボタンで呼ぶ
@@ -859,6 +1167,8 @@
     $('#fx').innerHTML = '';
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
     document.querySelectorAll('.twinkle').forEach(t => t.remove());
+    nightQuiet = id === 'night';
+    if (nightQuiet) BGM.stop(); else BGM.start();
   }
 
   // ---------- ホーム ----------
@@ -866,34 +1176,45 @@
     $('#homeTitle').textContent = script === 'kata' ? 'モジモジの モリ' : 'もじもじの もり';
     $('#scriptHira').setAttribute('aria-pressed', script === 'hira');
     $('#scriptKata').setAttribute('aria-pressed', script === 'kata');
+    $('#pageSei').textContent = script === 'kata' ? 'ア' : 'あ';
+    $('#pageDaku').textContent = script === 'kata' ? 'ガ' : 'が';
     renderParade();
   }
   function renderParade() {
     const p = $('#parade');
     p.innerHTML = '';
-    shuffle(ENTRIES).slice(0, 5).forEach((e, i) => {
+    shuffle(SEI).slice(0, 5).forEach((e, i) => {
       const el = makeFriend(e, { delay: i * .4 });
       el.addEventListener('click', () => {
         const w = pick(wordsOf(e));
         kanaSound(e);
         moves[pick(TAP_MOVES)](el);
         popAt(el, w.e);
-        const line = (k) => `${k}！　${w.w}の　${k}！`;
+        const line = k => `${k}！　${w.w}の　${k}！`;
         say(line(disp(e)), { speech: line(spoken(e)) });
       });
       p.appendChild(el);
     });
   }
+  function renderBgmBtn() {
+    const b = $('#bgmBtn');
+    b.textContent = BGM.enabled ? '🎵' : '🔇';
+    b.classList.toggle('off', !BGM.enabled);
+    b.setAttribute('aria-pressed', BGM.enabled);
+  }
   function goHome() {
     show('home');
     applyScript();
+    renderBgmBtn();
   }
 
-  // ---------- ① ふれてみよう（五十音を1画面に） ----------
+  // ---------- ① ふれてみよう（五十音・濁音） ----------
+  let page = 'sei';
   function renderGrid() {
     const g = $('#kanaGrid');
+    g.className = `kana-grid ${page}`;
     g.innerHTML = '';
-    for (const e of ENTRIES) {
+    for (const e of GROUPS[page]) {
       const t = document.createElement('button');
       t.className = 'tile';
       t.dataset.id = e.id;
@@ -904,17 +1225,28 @@
       t.addEventListener('click', () => openSpot(e));
       g.appendChild(t);
     }
+    $('#pageSei').setAttribute('aria-pressed', page === 'sei');
+    $('#pageDaku').setAttribute('aria-pressed', page === 'daku');
     updateTiles();
   }
   function updateTiles() {
     document.querySelectorAll('.tile').forEach(t => t.classList.toggle('got', zukan[script].has(t.dataset.id)));
-    $('#touchCount').textContent = `${zukan[script].size} / ${TOTAL}`;
+    const list = GROUPS[page];
+    $('#touchCount').textContent = `${list.filter(has).length} / ${list.length}`;
   }
   function goTouch() {
     show('touch');
     renderGrid();
-    say('すきな　もじに　さわってみよう！');
+    say(page === 'sei' ? 'すきな　もじに　さわってみよう！' : 'てんてん　と　まるの　もじだよ！');
   }
+  document.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', () => {
+    if (page === b.dataset.page) return;
+    sfx.tap();
+    page = b.dataset.page;
+    closeSpot();
+    renderGrid();
+    say(page === 'sei' ? 'あいうえおの　ひょうだよ！' : 'てんてん　と　まるの　もじだよ！');
+  }));
 
   // さわったときの言い方（毎回ちがう言い方になるように）
   const LINES_FIRST = [
@@ -923,14 +1255,16 @@
     (k, w) => `${k}、${k}、${w}！`,
     (k, w) => `「${k}」は　${w}の　「${k}」だよ！`,
     (k, w) => `${k}の　つく　ことば、${w}！`,
+    (k, w) => `${w}！　${k}から　はじまるよ！`,
+    (k, w) => `みつけた！　${w}の　${k}！`,
   ];
-  // 「を」「ん」は、ことばの先頭にこないので別の言い方
+  // 「を」「ん」「ぢ」「づ」などは、ことばの先頭にこないので別の言い方
   const LINES_INSIDE = [
     (k, w) => `${k}！　${w}の　${k}！`,
     (k, w) => `${w}の　${k}！`,
     (k, w) => `${w}の　なかに　${k}が　いるよ！`,
   ];
-  const TICKLE = ['くすぐったい〜！', 'えへへ、もっと　さわって！', 'わーい！　たのしいね！', 'きゃー！　うれしいな！'];
+  const TICKLE = ['くすぐったい〜！', 'えへへ、もっと　さわって！', 'わーい！　たのしいね！', 'きゃー！　うれしいな！', 'もう、くすぐったいってば〜！', 'いっしょに　あそぼ！'];
 
   let spot = null;
   let spotCloseTimer;
@@ -966,10 +1300,16 @@
     const token = ++spot.token;
     const id = flow;
 
-    // ことばは順番に入れかわる（はじまりはランダム）
+    // ことばは、毎回ちがう順番でひとまわりする（同じことばが続かない）
+    const key = script + e.id;
     const list = wordsOf(e);
-    if (wordIdx[script + e.id] === undefined) wordIdx[script + e.id] = Math.floor(Math.random() * list.length);
-    const w = list[wordIdx[script + e.id]++ % list.length];
+    if (!wordIdx[key] || !wordIdx[key].length) {
+      wordIdx[key] = shuffle(list.map((_, i) => i));
+      if (wordIdx.last && wordIdx.last.key === key && wordIdx[key][0] === wordIdx.last.i && list.length > 1) wordIdx[key].push(wordIdx[key].shift());
+    }
+    const wi = wordIdx[key].shift();
+    wordIdx.last = { key, i: wi };
+    const w = list[wi];
     fr.querySelector('.hat').textContent = w.e;
     word.innerHTML = highlight(w.w, disp(e));
 
@@ -978,7 +1318,7 @@
     kanaSound(e);
     moves[pick(TAP_MOVES)](fr);
     wordAction(w, fr);
-    if (Math.random() < .35) sparkle(fr);
+    if (Math.random() < .4) pick(EXTRAS)(fr);
 
     let text, speech;
     if (streak >= 4 && streak % 4 === 0) {
@@ -997,7 +1337,7 @@
       if (id !== flow) return;
       sfx.yay();
       confetti();
-      await say('ぜんぶの　もじと　なかよしに　なれたね！　すごい！');
+      await say(e.group === 'sei' ? 'ぜんぶの　もじと　なかよしに　なれたね！　すごい！' : 'てんてんと　まるの　もじも　ぜんぶ　なかよし！　すごい！');
       if (id !== flow || !spot || spot.token !== token) return;
     }
     // しばらくさわらなければ、表にもどる
@@ -1024,12 +1364,18 @@
       p.appendChild(s);
     }
   }
-  // まちがえやすい字を、ときどきまぜる
+  // まちがえやすい字（形のにた字や、点・丸だけがちがう字）を、ときどきまぜる
   function pickDistractors(e, n, round) {
     const out = [];
     const group = CONFUSABLE[script].map(g => [...toHira(g)]).find(g => g.includes(e.id));
-    if (group && round >= 1 && Math.random() < .6) out.push(byId[pick(group.filter(x => x !== e.id))]);
-    for (const c of shuffle(ENTRIES)) {
+    const related = ENTRIES.filter(x => x !== e && baseOf(x.id) === baseOf(e.id));
+    if (round >= 1 && Math.random() < .6) {
+      const pool = [...(group || []).filter(x => x !== e.id).map(x => byId[x]), ...related];
+      if (pool.length) out.push(pick(pool));
+    }
+    // 清音の問題には清音を多めに、濁音の問題には濁音を多めにまぜる
+    const same = shuffle(GROUPS[e.group]), other = shuffle(ENTRIES);
+    for (const c of [...same.slice(0, 8), ...other]) {
       if (out.length >= n) break;
       if (c !== e && !out.includes(c)) out.push(c);
     }
@@ -1065,7 +1411,8 @@
         if (!items.some(x => x.e === it.e || x.w.e === it.w.e)) items.push(it);
       }
     } else {
-      items = shuffle(ENTRIES).slice(0, ROUNDS).map(e => ({ e }));
+      // 清音を多めに、濁音もときどき
+      items = shuffle([...shuffle(SEI).slice(0, 4), ...shuffle(DAKU).slice(0, 1 + (Math.random() < .5))]).slice(0, ROUNDS).map(e => ({ e }));
     }
     for (let round = 0; round < ROUNDS; round++) {
       renderProgress(round);
@@ -1089,6 +1436,7 @@
       return el;
     });
   }
+  const PRAISE = ['ぴんぽーん！', 'せいかい！', 'やったね！', 'すごーい！', 'あたり！'];
 
   // ---------- ② さがしてみよう ----------
   const FIND_CHOICES = [2, 2, 3, 3, 4];
@@ -1118,7 +1466,8 @@
           confetti();
           collect(target);
           // 声が早く終わっても、演出を最後まで見てから次へ進む
-          await Promise.all([say(`ぴんぽーん！　「${K}」だね！`, { speech: `ぴんぽーん！　${S}だね！` }), sleep(3600)]);
+          const p = pick(PRAISE);
+          await Promise.all([say(`${p}　「${K}」だね！`, { speech: `${p}　${S}だね！` }), sleep(3600)]);
           if (id !== flow) return;
           resolve();
         } else {
@@ -1151,7 +1500,7 @@
       const targetEl = els[choices.indexOf(target)];
       let locked = false;
 
-      const ask = () => say('これは　なにかな？');
+      const ask = () => say(pick(['これは　なにかな？', 'これ、なあに？', 'これは　なんだろう？']));
       // ヒント1：なまえを言って、さいしょのもじを空けて見せる
       const hintName = () => { wordEl.classList.remove('hide'); say(`${w.w}！　さいしょの　もじは　どれかな？`); };
       // ヒント2：正解のおともだちが手をふる
@@ -1178,7 +1527,8 @@
           els.forEach(o => { if (o !== el) setTimeout(() => { boing(); moves.zukko(o); }, 400); });
           confetti();
           collect(target);
-          await Promise.all([say(`ぴんぽーん！　${w.w}の　「${K}」！`, { speech: `ぴんぽーん！　${w.w}の　${S}！` }), sleep(3800)]);
+          const p = pick(PRAISE);
+          await Promise.all([say(`${p}　${w.w}の　「${K}」！`, { speech: `${p}　${w.w}の　${S}！` }), sleep(3800)]);
           if (id !== flow) return;
           resolve();
         } else {
@@ -1213,7 +1563,7 @@
       Object.assign(t.style, { left: `${Math.random() * 100}vw`, top: `${Math.random() * 40}vh`, fontSize: `${10 + Math.random() * 14}px`, animationDelay: `${-Math.random() * 2.4}s` });
       document.body.appendChild(t);
     }
-    say('きょうは　ここまで。たくさん　あそんだね。おやすみ〜', { rate: .75, pitch: 1.2 });
+    say('きょうは　ここまで。たくさん　あそんだね。おやすみ〜', { rate: .85, pitch: .9 });
   }
 
   // ---------- ボタン ----------
@@ -1228,6 +1578,12 @@
   });
   document.querySelectorAll('[data-home]').forEach(b => b.addEventListener('click', () => { sfx.tap(); goHome(); }));
   $('#askAgain').addEventListener('click', () => { sfx.tap(); if (askAgain) askAgain(); });
+  $('#bgmBtn').addEventListener('click', () => {
+    unlockAudio();
+    BGM.setEnabled(!BGM.enabled);
+    renderBgmBtn();
+    sfx.tap();
+  });
   document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
     unlockAudio();
     sfx.tap();
@@ -1253,20 +1609,41 @@
     $('#countHira').textContent = zukan.hira.size;
     $('#countKata').textContent = zukan.kata.size;
   }
-  function openPanel() {
-    holdEnd();
+  function renderVoicePanel() {
     pickVoice();
+    const sel = $('#voiceSelect');
+    const ja = [...jaVoices()].sort((a, b) => scoreVoice(b) - scoreVoice(a));
+    sel.innerHTML = '';
+    const auto = new Option('おまかせ（いちばんなめらかな声）', '');
+    sel.add(auto);
+    for (const v of ja) sel.add(new Option(v.name, v.name));
+    sel.value = voiceSettings.name && ja.some(v => v.name === voiceSettings.name) ? voiceSettings.name : '';
+    $('#voicePitch').value = voiceSettings.pitch;
+    $('#voiceRate').value = voiceSettings.rate;
+    $('#pitchOut').textContent = (+voiceSettings.pitch).toFixed(1);
+    $('#rateOut').textContent = (+voiceSettings.rate).toFixed(2);
+    $('#bgmVolume').value = BGM.volume;
+    $('#bgmOut').textContent = Math.round(BGM.volume * 100);
     $('#voiceInfo').textContent = !('speechSynthesis' in window)
       ? 'このブラウザは音声読み上げに対応していません。画面下の字幕で内容を確認できます。'
       : jaVoice
-        ? `読み上げの声：${jaVoice.name}`
+        ? `いまの声：${jaVoice.name}`
         : '日本語の読み上げ音声が見つかりません。端末の設定で日本語の音声を追加すると、声が出るようになります。';
+  }
+  function openPanel() {
+    holdEnd();
+    renderVoicePanel();
     updateCounts();
     disarmReset();
     $('#panelBg').classList.add('open');
   }
+  const saveVoice = () => store(VOICE_KEY, voiceSettings);
+  $('#voiceSelect').addEventListener('change', ev => { voiceSettings.name = ev.target.value; saveVoice(); renderVoicePanel(); });
+  $('#voicePitch').addEventListener('input', ev => { voiceSettings.pitch = +ev.target.value; saveVoice(); $('#pitchOut').textContent = voiceSettings.pitch.toFixed(1); });
+  $('#voiceRate').addEventListener('input', ev => { voiceSettings.rate = +ev.target.value; saveVoice(); $('#rateOut').textContent = voiceSettings.rate.toFixed(2); });
+  $('#bgmVolume').addEventListener('input', ev => { unlockAudio(); BGM.setVolume(+ev.target.value); $('#bgmOut').textContent = Math.round(BGM.volume * 100); });
   $('#closePanel').addEventListener('click', () => $('#panelBg').classList.remove('open'));
-  $('#voiceTest').addEventListener('click', () => { unlockAudio(); say('あ、い、う、え、お', { speech: 'ア、イ、ウ、エ、オ' }); });
+  $('#voiceTest').addEventListener('click', () => { unlockAudio(); say('こんにちは！　いっしょに　あそぼうね！'); });
   // リセットは2回押したときだけ（1回目で確認の表示に変わる）
   const resetBtn = $('#resetZukan');
   let resetTimer;

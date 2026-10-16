@@ -1,0 +1,16 @@
+{
+  "name": "もじもじの もり",
+  "short_name": "もじもり",
+  "description": "ひらがな・カタカナの五十音と濁音で遊べる、幼児向けのもじあそび",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#bfe8ff",
+  "theme_color": "#bfe8ff",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
