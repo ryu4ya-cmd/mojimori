@@ -66,7 +66,7 @@
     border-radius: 50%;
     background: #ff8a65;
     box-shadow: 0 10px 0 #d9643f, 0 18px 30px rgba(0,0,0,.2);
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
     animation: pulse 1.6s ease-in-out infinite;
   }
   .start-btn svg { width: 46%; height: 46%; fill: #fff; margin-left: 8%; }
@@ -83,7 +83,7 @@
   }
   .script-toggle button b {
     width: 8vmin; width: clamp(40px, 8vmin, 52px); height: 8vmin; height: clamp(40px, 8vmin, 52px); border-radius: 50%;
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
     font-family: var(--kana-font); font-size: 5vmin; font-size: clamp(24px, 5vmin, 32px);
     background: rgba(74,59,51,.1);
   }
@@ -120,7 +120,7 @@
   .round-btn {
     width: 64px; height: 64px; border-radius: 50%;
     background: var(--paper); box-shadow: 0 5px 0 rgba(0,0,0,.14);
-    font-size: 34px; display: grid; place-items: center; flex: none;
+    font-size: 34px; display: flex; align-items: center; justify-content: center; flex: none;
   }
   .round-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.14); }
   .round-btn.off { opacity: .55; }
@@ -132,7 +132,7 @@
   .page-toggle button {
     width: 54px; height: 54px; border-radius: 50%;
     font-family: var(--kana-font); font-size: 30px; line-height: 1;
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
     background: rgba(74,59,51,.08);
   }
   .page-toggle button[aria-pressed="true"] { background: var(--accent); color: #fff; box-shadow: 0 4px 0 rgba(0,0,0,.14); }
@@ -146,31 +146,16 @@
   /* ---------- ふれてみよう：五十音を1画面に ---------- */
   #touch { --top: 84px; }
   @media (max-height: 520px) { #touch { --top: 66px; } }
-  .kana-grid { display: grid; --gap: clamp(4px, 1.1vmin, 10px); grid-gap: var(--gap); gap: var(--gap); margin-top: var(--top); }
-  /* よこ長のときの 列×行（--nl × --ml）と、たて長のときの 列×行（--np × --mp） */
-  .kana-grid.sei { --nl: 11; --ml: 5; --np: 5; --mp: 11; }
-  .kana-grid.daku { --nl: 5; --ml: 5; --np: 5; --mp: 5; }
-  /* よこ長の画面は昔ながらの五十音表（右から あ・か・さ…の行がたてに並ぶ） */
-  @media (orientation: landscape) {
-    .kana-grid {
-      grid-template-columns: repeat(var(--nl), var(--cell)); grid-template-rows: repeat(var(--ml), var(--cell));
-    }
-    .tile { grid-column: var(--lc); grid-row: var(--lr); }
-  }
-  /* たて長の画面は、あいうえお を横に読む並び */
-  @media (orientation: portrait) {
-    .kana-grid {
-      grid-template-columns: repeat(var(--np), var(--cell)); grid-template-rows: repeat(var(--mp), var(--cell));
-    }
-    .tile { grid-column: var(--pc); grid-row: var(--pr); }
-  }
+  /* マスの大きさと場所は、画面の大きさから JS で決める（CSS Grid が使えない古いブラウザでも並ぶように） */
+  .kana-grid { position: relative; margin-top: var(--top); }
   .tile {
-    position: relative;
+    position: absolute;
+    width: var(--cell); height: var(--cell);
     border-radius: 24%;
     background: radial-gradient(circle at 35% 28%, rgba(255,255,255,.45), transparent 55%), var(--c);
     color: #fff;
     font-family: var(--kana-font); font-size: calc(var(--cell) * .6); line-height: 1;
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
     box-shadow: 0 calc(var(--cell) * .07) 0 rgba(0,0,0,.15);
     text-shadow: 0 2px 0 rgba(0,0,0,.2);
     transition: transform .1s;
@@ -275,10 +260,10 @@
     position: fixed; right: 12px; right: max(12px, env(safe-area-inset-right, 0px)); bottom: 12px; bottom: max(12px, env(safe-area-inset-bottom, 0px));
     width: 44px; height: 44px; border-radius: 50%;
     background: rgba(255,255,255,.55); font-size: 22px; z-index: 30;
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
   }
-  .parent-btn .ring { position: absolute; top: -4px; right: -4px; bottom: -4px; left: -4px; border-radius: 50%; border: 4px solid #ff8a65; clip-path: inset(0 100% 0 0); }
-  .parent-btn.holding .ring { transition: clip-path 1.5s linear; clip-path: inset(0 0 0 0); }
+  .parent-btn .ring { position: absolute; top: -4px; right: -4px; bottom: -4px; left: -4px; border-radius: 50%; border: 4px solid #ff8a65; -webkit-clip-path: inset(0 100% 0 0); clip-path: inset(0 100% 0 0); }
+  .parent-btn.holding .ring { transition: clip-path 1.5s linear; -webkit-clip-path: inset(0 0 0 0); clip-path: inset(0 0 0 0); }
   .panel-bg { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0,0,0,.35); display: none; align-items: center; justify-content: center; z-index: 40; padding: 16px; }
   .panel-bg.open { display: flex; }
   .panel { background: #fff; border-radius: 20px; padding: 22px 24px; width: 100%; max-width: 460px; max-height: calc(var(--vh) - 32px); overflow-y: auto; font-size: 15px; line-height: 1.65; user-select: text; -webkit-user-select: text; }
@@ -402,6 +387,7 @@
     <label for="voicePitch"><span>声の高さ</span><input type="range" id="voicePitch" min="0.8" max="2" step="0.1"><output id="pitchOut"></output></label>
     <label for="voiceRate"><span>話す速さ</span><input type="range" id="voiceRate" min="0.6" max="1.4" step="0.05"><output id="rateOut"></output></label>
     <p class="note" id="voiceInfo"></p>
+    <p class="note" id="browserInfo"></p>
     <p class="note">声は端末に入っている読み上げ音声を使います。Microsoft Edge の「Nanami（ナチュラル）」や、iPhone・iPad で追加できる「O-ren（拡張）」「Kyoko（拡張）」を選ぶと、よりなめらかになります。iPhone・iPad では「設定 → アクセシビリティ → 読み上げコンテンツ → 声 → 日本語」から追加できます。</p>
     <h3>おんがく</h3>
     <label for="bgmVolume"><span>BGMの音量</span><input type="range" id="bgmVolume" min="0" max="1" step="0.05"><output id="bgmOut"></output></label>
@@ -415,9 +401,24 @@
   </div>
 </div>
 
-<div class="old-msg" id="oldMsg" hidden>このブラウザでは、うまく動かないところがあります。Chrome を最新にするか、ほかのブラウザで開いてみてください。（さわると消えます）</div>
+<div class="old-msg" id="oldMsg" hidden>このブラウザでは、うまく動かないところがあります。Chrome を最新にするか、Firefox など ほかのブラウザで開いてみてください。（さわると消えます）</div>
 <script>
-  window.onerror = function () { var m = document.getElementById('oldMsg'); if (m) m.hidden = false; };
+  // ブラウザの名前とバージョン（保護者メニューと、エラーの案内に出す）
+  var BROWSER = (function (ua) {
+    var m = ua.match(/(Firefox|SamsungBrowser|Edg|OPR|Chrome|Version)\/(\d+)/);
+    if (!m) return 'ふめい';
+    var name = { Edg: 'Edge', OPR: 'Opera', Version: 'Safari', SamsungBrowser: 'Samsung Internet' }[m[1]] || m[1];
+    var os = (ua.match(/Android [\d.]+/) || ua.match(/OS [\d_]+ like Mac/) || [''])[0].replace(/_/g, '.').replace(' like Mac', '');
+    return name + ' ' + m[2] + (os ? '（' + os + '）' : '');
+  })(navigator.userAgent);
+  window.onerror = function () {
+    var m = document.getElementById('oldMsg');
+    if (m) { m.hidden = false; m.firstChild.nodeValue = m.firstChild.nodeValue.replace('このブラウザ', 'このブラウザ（' + BROWSER + '）'); window.onerror = null; }
+  };
+  // CSS の変数が使えないほど古いブラウザ（Chrome 48 以前など）では、最初から案内を出す
+  if (!(window.CSS && CSS.supports && CSS.supports('--a', '0'))) window.onerror();
+  // 古いブラウザにない NodeList.forEach を足す
+  if (window.NodeList && !NodeList.prototype.forEach) NodeList.prototype.forEach = Array.prototype.forEach;
   document.getElementById('oldMsg').onclick = function () { this.hidden = true; };
 </script>
 <script>
@@ -1249,7 +1250,6 @@
       const t = document.createElement('button');
       t.className = 'tile';
       t.dataset.id = e.id;
-      for (const k of ['lc', 'lr', 'pc', 'pr']) t.style.setProperty(`--${k}`, e[k]);
       t.style.setProperty('--c', e.color);
       t.setAttribute('aria-label', disp(e));
       t.innerHTML = `${disp(e)}<span class="badge" aria-hidden="true">⭐</span>`;
@@ -1270,8 +1270,17 @@
     const [nc, nr] = page === 'sei' ? (land ? [11, 5] : [5, 11]) : [5, 5];
     const cell = Math.floor(Math.min(110, (w - 40 - (nc - 1) * gap) / nc, (h - top - 32 - (nr - 1) * gap) / nr));
     g.style.setProperty('--cell', `${cell}px`);
-    g.style.setProperty('--gap', `${gap}px`);
     g.style.setProperty('--top', `${top}px`);
+    g.style.width = `${nc * cell + (nc - 1) * gap}px`;
+    g.style.height = `${nr * cell + (nr - 1) * gap}px`;
+    // よこ長は昔ながらの五十音表（右から行がたてに並ぶ）、たて長は あいうえお を横に読む並び
+    g.querySelectorAll('.tile').forEach(t => {
+      const e = byId[t.dataset.id];
+      const col = land ? e.lc : e.pc;
+      const row = land ? e.lr : e.pr;
+      t.style.left = `${(col - 1) * (cell + gap)}px`;
+      t.style.top = `${(row - 1) * (cell + gap)}px`;
+    });
   }
   addEventListener('resize', () => { if ($('#touch').classList.contains('active')) sizeGrid(); });
   function updateTiles() {
@@ -1669,6 +1678,7 @@
     $('#rateOut').textContent = (+voiceSettings.rate).toFixed(2);
     $('#bgmVolume').value = BGM.volume;
     $('#bgmOut').textContent = Math.round(BGM.volume * 100);
+    $('#browserInfo').textContent = `ブラウザ：${BROWSER}`;
     $('#voiceInfo').textContent = !('speechSynthesis' in window)
       ? 'このブラウザは音声読み上げに対応していません。画面下の字幕で内容を確認できます。'
       : jaVoice

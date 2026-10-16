@@ -79,7 +79,7 @@
     border-radius: 50%;
     background: #ff8a65;
     box-shadow: 0 10px 0 #d9643f, 0 18px 30px rgba(0,0,0,.2);
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
     animation: pulse 1.6s ease-in-out infinite;
   }
   .start-btn svg { width: 46%; height: 46%; fill: #fff; margin-left: 8%; }
@@ -96,7 +96,7 @@
   }
   .script-toggle button b {
     width: 8vmin; width: clamp(40px, 8vmin, 52px); height: 8vmin; height: clamp(40px, 8vmin, 52px); border-radius: 50%;
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
     font-family: var(--kana-font); font-size: 5vmin; font-size: clamp(24px, 5vmin, 32px);
     background: rgba(74,59,51,.1);
   }
@@ -133,7 +133,7 @@
   .round-btn {
     width: 64px; height: 64px; border-radius: 50%;
     background: var(--paper); box-shadow: 0 5px 0 rgba(0,0,0,.14);
-    font-size: 34px; display: grid; place-items: center; flex: none;
+    font-size: 34px; display: flex; align-items: center; justify-content: center; flex: none;
   }
   .round-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.14); }
   .round-btn.off { opacity: .55; }
@@ -145,7 +145,7 @@
   .page-toggle button {
     width: 54px; height: 54px; border-radius: 50%;
     font-family: var(--kana-font); font-size: 30px; line-height: 1;
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
     background: rgba(74,59,51,.08);
   }
   .page-toggle button[aria-pressed="true"] { background: var(--accent); color: #fff; box-shadow: 0 4px 0 rgba(0,0,0,.14); }
@@ -159,31 +159,16 @@
   /* ---------- ふれてみよう：五十音を1画面に ---------- */
   #touch { --top: 84px; }
   @media (max-height: 520px) { #touch { --top: 66px; } }
-  .kana-grid { display: grid; --gap: clamp(4px, 1.1vmin, 10px); grid-gap: var(--gap); gap: var(--gap); margin-top: var(--top); }
-  /* よこ長のときの 列×行（--nl × --ml）と、たて長のときの 列×行（--np × --mp） */
-  .kana-grid.sei { --nl: 11; --ml: 5; --np: 5; --mp: 11; }
-  .kana-grid.daku { --nl: 5; --ml: 5; --np: 5; --mp: 5; }
-  /* よこ長の画面は昔ながらの五十音表（右から あ・か・さ…の行がたてに並ぶ） */
-  @media (orientation: landscape) {
-    .kana-grid {
-      grid-template-columns: repeat(var(--nl), var(--cell)); grid-template-rows: repeat(var(--ml), var(--cell));
-    }
-    .tile { grid-column: var(--lc); grid-row: var(--lr); }
-  }
-  /* たて長の画面は、あいうえお を横に読む並び */
-  @media (orientation: portrait) {
-    .kana-grid {
-      grid-template-columns: repeat(var(--np), var(--cell)); grid-template-rows: repeat(var(--mp), var(--cell));
-    }
-    .tile { grid-column: var(--pc); grid-row: var(--pr); }
-  }
+  /* マスの大きさと場所は、画面の大きさから JS で決める（CSS Grid が使えない古いブラウザでも並ぶように） */
+  .kana-grid { position: relative; margin-top: var(--top); }
   .tile {
-    position: relative;
+    position: absolute;
+    width: var(--cell); height: var(--cell);
     border-radius: 24%;
     background: radial-gradient(circle at 35% 28%, rgba(255,255,255,.45), transparent 55%), var(--c);
     color: #fff;
     font-family: var(--kana-font); font-size: calc(var(--cell) * .6); line-height: 1;
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
     box-shadow: 0 calc(var(--cell) * .07) 0 rgba(0,0,0,.15);
     text-shadow: 0 2px 0 rgba(0,0,0,.2);
     transition: transform .1s;
@@ -288,10 +273,10 @@
     position: fixed; right: 12px; right: max(12px, env(safe-area-inset-right, 0px)); bottom: 12px; bottom: max(12px, env(safe-area-inset-bottom, 0px));
     width: 44px; height: 44px; border-radius: 50%;
     background: rgba(255,255,255,.55); font-size: 22px; z-index: 30;
-    display: grid; place-items: center;
+    display: flex; align-items: center; justify-content: center;
   }
-  .parent-btn .ring { position: absolute; top: -4px; right: -4px; bottom: -4px; left: -4px; border-radius: 50%; border: 4px solid #ff8a65; clip-path: inset(0 100% 0 0); }
-  .parent-btn.holding .ring { transition: clip-path 1.5s linear; clip-path: inset(0 0 0 0); }
+  .parent-btn .ring { position: absolute; top: -4px; right: -4px; bottom: -4px; left: -4px; border-radius: 50%; border: 4px solid #ff8a65; -webkit-clip-path: inset(0 100% 0 0); clip-path: inset(0 100% 0 0); }
+  .parent-btn.holding .ring { transition: clip-path 1.5s linear; -webkit-clip-path: inset(0 0 0 0); clip-path: inset(0 0 0 0); }
   .panel-bg { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0,0,0,.35); display: none; align-items: center; justify-content: center; z-index: 40; padding: 16px; }
   .panel-bg.open { display: flex; }
   .panel { background: #fff; border-radius: 20px; padding: 22px 24px; width: 100%; max-width: 460px; max-height: calc(var(--vh) - 32px); overflow-y: auto; font-size: 15px; line-height: 1.65; user-select: text; -webkit-user-select: text; }
@@ -416,6 +401,7 @@
     <label for="voicePitch"><span>声の高さ</span><input type="range" id="voicePitch" min="0.8" max="2" step="0.1"><output id="pitchOut"></output></label>
     <label for="voiceRate"><span>話す速さ</span><input type="range" id="voiceRate" min="0.6" max="1.4" step="0.05"><output id="rateOut"></output></label>
     <p class="note" id="voiceInfo"></p>
+    <p class="note" id="browserInfo"></p>
     <p class="note">声は端末に入っている読み上げ音声を使います。Microsoft Edge の「Nanami（ナチュラル）」や、iPhone・iPad で追加できる「O-ren（拡張）」「Kyoko（拡張）」を選ぶと、よりなめらかになります。iPhone・iPad では「設定 → アクセシビリティ → 読み上げコンテンツ → 声 → 日本語」から追加できます。</p>
     <h3>おんがく</h3>
     <label for="bgmVolume"><span>BGMの音量</span><input type="range" id="bgmVolume" min="0" max="1" step="0.05"><output id="bgmOut"></output></label>
@@ -429,38 +415,85 @@
   </div>
 </div>
 
-<div class="old-msg" id="oldMsg" hidden>このブラウザでは、うまく動かないところがあります。Chrome を最新にするか、ほかのブラウザで開いてみてください。（さわると消えます）</div>
+<div class="old-msg" id="oldMsg" hidden>このブラウザでは、うまく動かないところがあります。Chrome を最新にするか、Firefox など ほかのブラウザで開いてみてください。（さわると消えます）</div>
 <script>
-  window.onerror = function () { var m = document.getElementById('oldMsg'); if (m) m.hidden = false; };
-  document.getElementById('oldMsg').onclick = function () { this.hidden = true; };
+// ブラウザの名前とバージョン（保護者メニューと、エラーの案内に出す）
+var BROWSER = function (ua) {
+  var m = ua.match(/(Firefox|SamsungBrowser|Edg|OPR|Chrome|Version)\/(\d+)/);
+  if (!m) return 'ふめい';
+  var name = {
+    Edg: 'Edge',
+    OPR: 'Opera',
+    Version: 'Safari',
+    SamsungBrowser: 'Samsung Internet'
+  }[m[1]] || m[1];
+  var os = (ua.match(/Android [\d.]+/) || ua.match(/OS [\d_]+ like Mac/) || [''])[0].replace(/_/g, '.').replace(' like Mac', '');
+  return name + ' ' + m[2] + (os ? '（' + os + '）' : '');
+}(navigator.userAgent);
+window.onerror = function () {
+  var m = document.getElementById('oldMsg');
+  if (m) {
+    m.hidden = false;
+    m.firstChild.nodeValue = m.firstChild.nodeValue.replace('このブラウザ', 'このブラウザ（' + BROWSER + '）');
+    window.onerror = null;
+  }
+};
+// CSS の変数が使えないほど古いブラウザ（Chrome 48 以前など）では、最初から案内を出す
+if (!(window.CSS && CSS.supports && CSS.supports('--a', '0'))) window.onerror();
+// 古いブラウザにない NodeList.forEach を足す
+if (window.NodeList && !NodeList.prototype.forEach) NodeList.prototype.forEach = Array.prototype.forEach;
+document.getElementById('oldMsg').onclick = function () {
+  this.hidden = true;
+};
 </script>
 <script>
-  // flex の gap に対応していないブラウザかどうか
-  (function () {
-    var d = document.createElement('div');
-    d.style.cssText = 'display:flex;flex-direction:column;row-gap:1px;position:absolute;visibility:hidden';
-    d.appendChild(document.createElement('div'));
-    d.appendChild(document.createElement('div'));
-    document.body.appendChild(d);
-    if (d.scrollHeight !== 1) document.documentElement.classList.add('nogap');
-    document.body.removeChild(d);
-  })();
-  // clamp() が使えないブラウザでは、まん中の値（画面の大きさに合わせた値）だけを使う
-  var CLAMP_OK = !!(window.CSS && CSS.supports && CSS.supports('width', 'clamp(1px, 2px, 3px)'));
-  function fit(lo, v, hi) { return CLAMP_OK ? 'clamp(' + lo + ', ' + v + ', ' + hi + ')' : v; }
+// flex の gap に対応していないブラウザかどうか
+(function () {
+  var d = document.createElement('div');
+  d.style.cssText = 'display:flex;flex-direction:column;row-gap:1px;position:absolute;visibility:hidden';
+  d.appendChild(document.createElement('div'));
+  d.appendChild(document.createElement('div'));
+  document.body.appendChild(d);
+  if (d.scrollHeight !== 1) document.documentElement.classList.add('nogap');
+  document.body.removeChild(d);
+})();
+// clamp() が使えないブラウザでは、まん中の値（画面の大きさに合わせた値）だけを使う
+var CLAMP_OK = !!(window.CSS && CSS.supports && CSS.supports('width', 'clamp(1px, 2px, 3px)'));
+function fit(lo, v, hi) {
+  return CLAMP_OK ? 'clamp(' + lo + ', ' + v + ', ' + hi + ')' : v;
+}
 </script>
 <script>
-  // ---------- 五十音表・濁音表 ----------
-  // 色は母音（あ・い・う・え・お の段）ごとにそろえる。「ん」だけ特別な色
-  const VOWEL_COLORS = ['#ff8a80', '#f5b62e', '#4fc79a', '#5aa9f0', '#a88bd8'];
-  const N_COLOR = '#f48fb1';
-  const TABLE_SEI = ['あいうえお', 'かきくけこ', 'さしすせそ', 'たちつてと', 'なにぬねの', 'はひふへほ', 'まみむめも', 'や・ゆ・よ', 'らりるれろ', 'わ・・・を', 'ん'];
-  const TABLE_DAKU = ['がぎぐげご', 'ざじずぜぞ', 'だぢづでど', 'ばびぶべぼ', 'ぱぴぷぺぽ'];
+function _regeneratorValues(e) { if (null != e) { var t = e["function" == typeof Symbol && Symbol.iterator || "@@iterator"], r = 0; if (t) return t.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) return { next: function next() { return e && r >= e.length && (e = void 0), { value: e && e[r++], done: !e }; } }; } throw new TypeError(typeof e + " is not iterable"); }
+function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i.return) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
+function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
+function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
+function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
+function _toArray(r) { return _arrayWithHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableRest(); }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, e) { if ("object" != typeof t || !t) return t; var r; if ("undefined" != typeof Symbol && void 0 !== (r = t[Symbol.toPrimitive])) { var i = r.call(t, e || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === e ? String : Number)(t); }
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t.return || t.return(); } finally { if (u) throw o; } } }; }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+// ---------- 五十音表・濁音表 ----------
+// 色は母音（あ・い・う・え・お の段）ごとにそろえる。「ん」だけ特別な色
+var VOWEL_COLORS = ['#ff8a80', '#f5b62e', '#4fc79a', '#5aa9f0', '#a88bd8'];
+var N_COLOR = '#f48fb1';
+var TABLE_SEI = ['あいうえお', 'かきくけこ', 'さしすせそ', 'たちつてと', 'なにぬねの', 'はひふへほ', 'まみむめも', 'や・ゆ・よ', 'らりるれろ', 'わ・・・を', 'ん'];
+var TABLE_DAKU = ['がぎぐげご', 'ざじずぜぞ', 'だぢづでど', 'ばびぶべぼ', 'ぱぴぷぺぽ'];
 
-  // ことば：「ことば 絵 うごき」。最後に * があるものは「これなあに？」に出さない（絵だけだと名前がひとつに決まらないもの）
-  // うごき: run walk zoom hop fly swim spin wobble grow up wave rain snow petals leaves wind stars hearts notes bubbles splash
-  //         rocket thanks sun party sleep eat dance cry laugh firework parade
-  const HIRA_WORDS = `
+// ことば：「ことば 絵 うごき」。最後に * があるものは「これなあに？」に出さない（絵だけだと名前がひとつに決まらないもの）
+// うごき: run walk zoom hop fly swim spin wobble grow up wave rain snow petals leaves wind stars hearts notes bubbles splash
+//         rocket thanks sun party sleep eat dance cry laugh firework parade
+var HIRA_WORDS = `
 あ: あり 🐜 parade | あめ ☔ rain * | ありがとう 💐 thanks * | あひる 🦆 swim | あいす 🍦 wobble | あかちゃん 👶 laugh | あし 🦶 walk * | あさがお 🌺 petals *
 い: いぬ 🐕 run | いちご 🍓 hop | いるか 🐬 swim | いか 🦑 swim | いす 🪑 wobble | いただきます 🍚 eat * | いえ 🏠 wobble * | いってきます 🎒 walk *
 う: うさぎ 🐇 hop | うし 🐄 walk | うま 🐎 run | うみ 🌊 splash * | うた 🎤 notes * | うちゅう 🌌 stars * | うどん 🍜 eat *
@@ -533,8 +566,8 @@
 ぺ: ぺんぎん 🐧 walk | ぺん 🖊️ spin * | ぺろぺろ 😛 eat *
 ぽ: ぽすと 📮 wobble | ぽっぷこーん 🍿 hop | ぽかぽか ☀️ sun *
 `;
-  // カタカナは、外来語を先に並べる。そのあとに上のひらがなのことばをカタカナにして足す
-  const KATA_WORDS = `
+// カタカナは、外来語を先に並べる。そのあとに上のひらがなのことばをカタカナにして足す
+var KATA_WORDS = `
 ア: アイス 🍦 wobble | アヒル 🦆 swim | アリ 🐜 parade | アボカド 🥑 wobble *
 イ: イルカ 🐬 swim | イヌ 🐕 run | イチゴ 🍓 hop | イカ 🦑 swim
 ウ: ウサギ 🐇 hop | ウシ 🐄 walk | ウマ 🐎 run
@@ -607,1129 +640,2166 @@
 ペ: ペンギン 🐧 walk | ペン 🖊️ spin *
 ポ: ポスト 📮 wobble | ポップコーン 🍿 hop | ポテト 🍟 eat *
 `;
-  // まちがえやすい字（「さがしてみよう」で、ときどき並べて出す）
-  const CONFUSABLE = {
-    hira: ['ぬめ', 'わねれ', 'るろ', 'はほ', 'さち', 'きさ', 'いこり', 'あお', 'くへ', 'うつ', 'まも', 'たな', 'しつ', 'けは'],
-    kata: ['シツ', 'ソン', 'クケタ', 'ウワフ', 'コユ', 'アマ', 'チテ', 'ヌス', 'ノメ', 'ロコ', 'ラヲ', 'ナメ', 'キチ', 'ルレ', 'シン', 'ツソ'],
-  };
-
-  const toKata = s => s.replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
-  const toHira = s => s.replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
-
-  function parseWords(src) {
-    const out = {};
-    for (const line of src.trim().split('\n')) {
-      const i = line.indexOf(':');
-      const id = toHira(line.slice(0, i).trim());
+// まちがえやすい字（「さがしてみよう」で、ときどき並べて出す）
+var CONFUSABLE = {
+  hira: ['ぬめ', 'わねれ', 'るろ', 'はほ', 'さち', 'きさ', 'いこり', 'あお', 'くへ', 'うつ', 'まも', 'たな', 'しつ', 'けは'],
+  kata: ['シツ', 'ソン', 'クケタ', 'ウワフ', 'コユ', 'アマ', 'チテ', 'ヌス', 'ノメ', 'ロコ', 'ラヲ', 'ナメ', 'キチ', 'ルレ', 'シン', 'ツソ']
+};
+var toKata = s => s.replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
+var toHira = s => s.replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+function parseWords(src) {
+  var out = {};
+  var _iterator = _createForOfIteratorHelper(src.trim().split('\n')),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var line = _step.value;
+      var i = line.indexOf(':');
+      var id = toHira(line.slice(0, i).trim());
       out[id] = line.slice(i + 1).split('|').map(part => {
-        const [w, e, a, star] = part.trim().split(/\s+/);
-        return { w: w.replace(/_/g, '　'), e, a, quizOk: star !== '*' };
+        var _part$trim$split = part.trim().split(/\s+/),
+          _part$trim$split2 = _slicedToArray(_part$trim$split, 4),
+          w = _part$trim$split2[0],
+          e = _part$trim$split2[1],
+          a = _part$trim$split2[2],
+          star = _part$trim$split2[3];
+        return {
+          w: w.replace(/_/g, '　'),
+          e,
+          a,
+          quizOk: star !== '*'
+        };
       });
     }
-    return out;
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
   }
-  const HIRA = parseWords(HIRA_WORDS);
-  const KATA_ONLY = parseWords(KATA_WORDS);
-  const KATA = {};
-  for (const id of Object.keys(HIRA)) {
-    const list = [...(KATA_ONLY[id] || [])];
-    for (const w of HIRA[id]) {
-      const kw = { ...w, w: toKata(w.w) };
+  return out;
+}
+var HIRA = parseWords(HIRA_WORDS);
+var KATA_ONLY = parseWords(KATA_WORDS);
+var KATA = {};
+for (var _i = 0, _Object$keys = Object.keys(HIRA); _i < _Object$keys.length; _i++) {
+  var id = _Object$keys[_i];
+  var list = [...(KATA_ONLY[id] || [])];
+  var _iterator2 = _createForOfIteratorHelper(HIRA[id]),
+    _step2;
+  try {
+    var _loop = function _loop() {
+      var w = _step2.value;
+      var kw = _objectSpread(_objectSpread({}, w), {}, {
+        w: toKata(w.w)
+      });
       if (!list.some(x => x.w === kw.w)) list.push(kw);
+    };
+    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      _loop();
     }
-    KATA[id] = list;
+  } catch (err) {
+    _iterator2.e(err);
+  } finally {
+    _iterator2.f();
   }
-  const WORDS = { hira: HIRA, kata: KATA };
-
-  function buildTable(table, group) {
-    const cols = table.length;
-    const out = [];
-    table.forEach((row, r) => [...row].forEach((id, v) => {
-      if (id === '・') return;
-      out.push({
-        id, r, v, group,
-        color: id === 'ん' ? N_COLOR : VOWEL_COLORS[v],
-        // よこ長（右から左へ行が並ぶ）とたて長の、表の中の場所
-        lc: cols - r, lr: v + 1, pc: v + 1, pr: r + 1,
-      });
-    }));
-    return out;
+  KATA[id] = list;
+}
+var WORDS = {
+  hira: HIRA,
+  kata: KATA
+};
+function buildTable(table, group) {
+  var cols = table.length;
+  var out = [];
+  table.forEach((row, r) => [...row].forEach((id, v) => {
+    if (id === '・') return;
+    out.push({
+      id,
+      r,
+      v,
+      group,
+      color: id === 'ん' ? N_COLOR : VOWEL_COLORS[v],
+      // よこ長（右から左へ行が並ぶ）とたて長の、表の中の場所
+      lc: cols - r,
+      lr: v + 1,
+      pc: v + 1,
+      pr: r + 1
+    });
+  }));
+  return out;
+}
+var SEI = buildTable(TABLE_SEI, 'sei');
+var DAKU = buildTable(TABLE_DAKU, 'daku');
+var ENTRIES = [...SEI, ...DAKU];
+var GROUPS = {
+  sei: SEI,
+  daku: DAKU
+};
+var byId = {};
+ENTRIES.forEach(e => {
+  byId[e.id] = e;
+});
+// 「か」と「が」、「は」と「ば」「ぱ」のように、点や丸がちがうだけの字
+var baseOf = id => id.normalize('NFD')[0];
+var $ = sel => document.querySelector(sel);
+var sleep = ms => new Promise(r => setTimeout(r, ms));
+var shuffle = a => {
+  var b = [...a];
+  for (var i = b.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var _ref = [b[j], b[i]];
+    b[i] = _ref[0];
+    b[j] = _ref[1];
   }
-  const SEI = buildTable(TABLE_SEI, 'sei');
-  const DAKU = buildTable(TABLE_DAKU, 'daku');
-  const ENTRIES = [...SEI, ...DAKU];
-  const GROUPS = { sei: SEI, daku: DAKU };
-  const byId = {};
-  ENTRIES.forEach(e => { byId[e.id] = e; });
-  // 「か」と「が」、「は」と「ば」「ぱ」のように、点や丸がちがうだけの字
-  const baseOf = id => id.normalize('NFD')[0];
-
-  const $ = sel => document.querySelector(sel);
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
-  const shuffle = a => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
-  const pick = a => a[Math.floor(Math.random() * a.length)];
-  const load = (key, fallback) => { try { const v = JSON.parse(localStorage.getItem(key)); return v === null || v === undefined ? fallback : v; } catch (err) { return fallback; } };
-  const store = (key, v) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch (err) {} };
-
-  // ---------- ひらがな／カタカナ ----------
-  const SCRIPT_KEY = 'mojimori.v2.script';
-  let script = 'hira';
-  try { if (localStorage.getItem(SCRIPT_KEY) === 'kata') script = 'kata'; } catch (err) {}
-  const disp = e => script === 'kata' ? toKata(e.id) : e.id;
-  // 読み上げでは1文字をカタカナで渡す（「は」が「わ」、「へ」が「え」と助詞の読みになるのを防ぐ）
-  const spoken = e => toKata(e.id);
-  const wordsOf = e => WORDS[script][e.id];
-
-  // 画面が切り替わったら、前の画面の流れを止めるための番号
-  let flow = 0;
-
-  // ---------- ずかん（この端末の中だけに保存） ----------
-  const STORE_KEY = 'mojimori.v2.zukan';
-  let zukan = { hira: new Set(), kata: new Set() };
-  {
-    const saved = load(STORE_KEY, null);
-    if (saved) zukan = { hira: new Set(saved.hira || []), kata: new Set(saved.kata || []) };
-    else zukan.hira = new Set(load('mojimori.v1.zukan', []));
+  return b;
+};
+var pick = a => a[Math.floor(Math.random() * a.length)];
+var load = (key, fallback) => {
+  try {
+    var v = JSON.parse(localStorage.getItem(key));
+    return v === null || v === undefined ? fallback : v;
+  } catch (err) {
+    return fallback;
   }
-  function saveZukan() { store(STORE_KEY, { hira: [...zukan.hira], kata: [...zukan.kata] }); }
-  const has = e => zukan[script].has(e.id);
-  // 新しく集まったら true。その表（清音・濁音）がぜんぶそろった瞬間なら 'all'
-  function collect(e) {
-    const s = zukan[script];
-    if (s.has(e.id)) return false;
-    s.add(e.id);
-    saveZukan();
-    updateTiles();
-    return GROUPS[e.group].every(x => s.has(x.id)) ? 'all' : true;
-  }
+};
+var store = (key, v) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(v));
+  } catch (err) {}
+};
 
-  // ---------- BGM（オルゴールの音を、その場で作って鳴らす） ----------
-  let ac = null;
-  function unlockAudio() {
-    try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (err) {}
-  }
-  const BGM = (() => {
-    const BEAT = 60 / 96;
-    // 「音:拍」の並び。| は小節の区切り（読みやすさのためだけ）。R はやすみ
-    const MELODY = `
+// ---------- ひらがな／カタカナ ----------
+var SCRIPT_KEY = 'mojimori.v2.script';
+var script = 'hira';
+try {
+  if (localStorage.getItem(SCRIPT_KEY) === 'kata') script = 'kata';
+} catch (err) {}
+var disp = e => script === 'kata' ? toKata(e.id) : e.id;
+// 読み上げでは1文字をカタカナで渡す（「は」が「わ」、「へ」が「え」と助詞の読みになるのを防ぐ）
+var spoken = e => toKata(e.id);
+var wordsOf = e => WORDS[script][e.id];
+
+// 画面が切り替わったら、前の画面の流れを止めるための番号
+var flow = 0;
+
+// ---------- ずかん（この端末の中だけに保存） ----------
+var STORE_KEY = 'mojimori.v2.zukan';
+var zukan = {
+  hira: new Set(),
+  kata: new Set()
+};
+{
+  var saved = load(STORE_KEY, null);
+  if (saved) zukan = {
+    hira: new Set(saved.hira || []),
+    kata: new Set(saved.kata || [])
+  };else zukan.hira = new Set(load('mojimori.v1.zukan', []));
+}
+function saveZukan() {
+  store(STORE_KEY, {
+    hira: [...zukan.hira],
+    kata: [...zukan.kata]
+  });
+}
+var has = e => zukan[script].has(e.id);
+// 新しく集まったら true。その表（清音・濁音）がぜんぶそろった瞬間なら 'all'
+function collect(e) {
+  var s = zukan[script];
+  if (s.has(e.id)) return false;
+  s.add(e.id);
+  saveZukan();
+  updateTiles();
+  return GROUPS[e.group].every(x => s.has(x.id)) ? 'all' : true;
+}
+
+// ---------- BGM（オルゴールの音を、その場で作って鳴らす） ----------
+var ac = null;
+function unlockAudio() {
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === 'suspended') ac.resume();
+  } catch (err) {}
+}
+var BGM = (() => {
+  var BEAT = 60 / 96;
+  // 「音:拍」の並び。| は小節の区切り（読みやすさのためだけ）。R はやすみ
+  var MELODY = `
       E5:.5 D5:.5 C5:1 G4:1 E4:1 | D5:.5 E5:.5 D5:1 B4:1 G4:1 | C5:.5 D5:.5 E5:1 A4:1 C5:1 | A4:.5 C5:.5 F5:1 E5:1 C5:1 |
       E5:.5 G5:.5 E5:1 C5:1 D5:1 | D5:.5 B4:.5 G4:1 B4:1 D5:1 | C5:.5 A4:.5 F4:1 A4:.5 C5:.5 D5:1 | B4:1 D5:1 C5:2 |
       A4:1 C5:1 F5:1 E5:1 | D5:1 B4:1 G4:2 | G4:.5 A4:.5 B4:1 E5:1 D5:1 | C5:1 A4:1 E4:2 |
       F4:.5 A4:.5 C5:1 F5:1 E5:1 | D5:.5 E5:.5 D5:1 B4:1 G4:1 | E5:.5 D5:.5 C5:1 E5:1 G5:1 | C5:3 R:1`;
-    const CHORDS = ['C', 'G', 'Am', 'F', 'C', 'G', 'F', 'C', 'F', 'G', 'Em', 'Am', 'F', 'G', 'C', 'C'];
-    const CHORD_NOTES = { C: [48, 60, 64, 67], G: [43, 59, 62, 67], Am: [45, 60, 64, 69], F: [41, 60, 65, 69], Em: [40, 59, 64, 67] };
-    const NOTE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-    const midi = n => 12 * (+n.slice(-1) + 1) + NOTE[n[0]];
-    const hz = m => 440 * Math.pow(2, (m - 69) / 12);
-    const events = [];
-    let beat = 0;
-    for (const tok of MELODY.replace(/\|/g, ' ').trim().split(/\s+/)) {
-      const [n, d] = tok.split(':');
-      if (n !== 'R') events.push({ beat, kind: 'mel', m: midi(n), d: +d });
+  var CHORDS = ['C', 'G', 'Am', 'F', 'C', 'G', 'F', 'C', 'F', 'G', 'Em', 'Am', 'F', 'G', 'C', 'C'];
+  var CHORD_NOTES = {
+    C: [48, 60, 64, 67],
+    G: [43, 59, 62, 67],
+    Am: [45, 60, 64, 69],
+    F: [41, 60, 65, 69],
+    Em: [40, 59, 64, 67]
+  };
+  var NOTE = {
+    C: 0,
+    D: 2,
+    E: 4,
+    F: 5,
+    G: 7,
+    A: 9,
+    B: 11
+  };
+  var midi = n => 12 * (+n.slice(-1) + 1) + NOTE[n[0]];
+  var hz = m => 440 * Math.pow(2, (m - 69) / 12);
+  var events = [];
+  var beat = 0;
+  var _iterator3 = _createForOfIteratorHelper(MELODY.replace(/\|/g, ' ').trim().split(/\s+/)),
+    _step3;
+  try {
+    for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+      var tok = _step3.value;
+      var _tok$split = tok.split(':'),
+        _tok$split2 = _slicedToArray(_tok$split, 2),
+        n = _tok$split2[0],
+        d = _tok$split2[1];
+      if (n !== 'R') events.push({
+        beat,
+        kind: 'mel',
+        m: midi(n),
+        d: +d
+      });
       beat += +d;
     }
-    const LOOP = beat;
-    CHORDS.forEach((c, bar) => {
-      const [root, ...tones] = CHORD_NOTES[c];
-      events.push({ beat: bar * 4, kind: 'bass', m: root, d: 2 }, { beat: bar * 4 + 2, kind: 'bass', m: root + 7, d: 2 });
-      for (let b = 0; b < 4; b++) events.push({ beat: bar * 4 + b + .5, kind: 'arp', m: tones[b % 3], d: .5 });
+  } catch (err) {
+    _iterator3.e(err);
+  } finally {
+    _iterator3.f();
+  }
+  var LOOP = beat;
+  CHORDS.forEach((c, bar) => {
+    var _CHORD_NOTES$c = _toArray(CHORD_NOTES[c]),
+      root = _CHORD_NOTES$c[0],
+      tones = _arrayLikeToArray(_CHORD_NOTES$c).slice(1);
+    events.push({
+      beat: bar * 4,
+      kind: 'bass',
+      m: root,
+      d: 2
+    }, {
+      beat: bar * 4 + 2,
+      kind: 'bass',
+      m: root + 7,
+      d: 2
     });
-    events.sort((a, b) => a.beat - b.beat);
-
-    let master = null, timer = null, idx = 0, loopStart = 0, playing = false, ducked = false;
-    let volume = load('mojimori.v2.bgmVolume', .5);
-    let enabled = load('mojimori.v2.bgm', true);
-    const level = () => volume * .16 * (ducked ? .3 : 1);
-
-    function note(ev, t) {
-      const o = ac.createOscillator(), g = ac.createGain();
-      const f = hz(ev.m);
-      let peak, decay;
-      if (ev.kind === 'mel') { o.type = 'sine'; peak = .55; decay = 1.6; }
-      else if (ev.kind === 'bass') { o.type = 'triangle'; peak = .35; decay = ev.d * BEAT * 1.1; }
-      else { o.type = 'sine'; peak = .12; decay = .6; }
-      o.frequency.value = f;
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(peak, t + .008);
-      g.gain.exponentialRampToValueAtTime(.0008, t + decay);
-      o.connect(g).connect(master);
-      o.start(t); o.stop(t + decay + .05);
-      // オルゴールらしい、きらっとした倍音
-      if (ev.kind === 'mel') {
-        const o2 = ac.createOscillator(), g2 = ac.createGain();
-        o2.type = 'sine'; o2.frequency.value = f * 4;
-        g2.gain.setValueAtTime(0, t);
-        g2.gain.linearRampToValueAtTime(.08, t + .005);
-        g2.gain.exponentialRampToValueAtTime(.0008, t + .35);
-        o2.connect(g2).connect(master);
-        o2.start(t); o2.stop(t + .4);
+    for (var b = 0; b < 4; b++) events.push({
+      beat: bar * 4 + b + .5,
+      kind: 'arp',
+      m: tones[b % 3],
+      d: .5
+    });
+  });
+  events.sort((a, b) => a.beat - b.beat);
+  var master = null,
+    timer = null,
+    idx = 0,
+    loopStart = 0,
+    playing = false,
+    ducked = false;
+  var volume = load('mojimori.v2.bgmVolume', .5);
+  var enabled = load('mojimori.v2.bgm', true);
+  var level = () => volume * .16 * (ducked ? .3 : 1);
+  function note(ev, t) {
+    var o = ac.createOscillator(),
+      g = ac.createGain();
+    var f = hz(ev.m);
+    var peak, decay;
+    if (ev.kind === 'mel') {
+      o.type = 'sine';
+      peak = .55;
+      decay = 1.6;
+    } else if (ev.kind === 'bass') {
+      o.type = 'triangle';
+      peak = .35;
+      decay = ev.d * BEAT * 1.1;
+    } else {
+      o.type = 'sine';
+      peak = .12;
+      decay = .6;
+    }
+    o.frequency.value = f;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(peak, t + .008);
+    g.gain.exponentialRampToValueAtTime(.0008, t + decay);
+    o.connect(g).connect(master);
+    o.start(t);
+    o.stop(t + decay + .05);
+    // オルゴールらしい、きらっとした倍音
+    if (ev.kind === 'mel') {
+      var o2 = ac.createOscillator(),
+        g2 = ac.createGain();
+      o2.type = 'sine';
+      o2.frequency.value = f * 4;
+      g2.gain.setValueAtTime(0, t);
+      g2.gain.linearRampToValueAtTime(.08, t + .005);
+      g2.gain.exponentialRampToValueAtTime(.0008, t + .35);
+      o2.connect(g2).connect(master);
+      o2.start(t);
+      o2.stop(t + .4);
+    }
+  }
+  function tick() {
+    var ahead = ac.currentTime + .4;
+    for (;;) {
+      var ev = events[idx];
+      var t = loopStart + ev.beat * BEAT;
+      if (t > ahead) break;
+      if (t >= ac.currentTime - .02) note(ev, t);
+      if (++idx >= events.length) {
+        idx = 0;
+        loopStart += LOOP * BEAT;
       }
     }
-    function tick() {
-      const ahead = ac.currentTime + .4;
-      for (;;) {
-        const ev = events[idx];
-        const t = loopStart + ev.beat * BEAT;
-        if (t > ahead) break;
-        if (t >= ac.currentTime - .02) note(ev, t);
-        if (++idx >= events.length) { idx = 0; loopStart += LOOP * BEAT; }
-      }
+  }
+  function start() {
+    if (!enabled || playing || !ac || document.hidden) return;
+    playing = true;
+    master = ac.createGain();
+    master.gain.value = 0;
+    master.connect(ac.destination);
+    master.gain.setTargetAtTime(level(), ac.currentTime, .6);
+    idx = 0;
+    loopStart = ac.currentTime + .15;
+    tick();
+    timer = setInterval(tick, 120);
+  }
+  function stop() {
+    if (!playing) return;
+    playing = false;
+    clearInterval(timer);
+    var m = master;
+    m.gain.setTargetAtTime(0, ac.currentTime, .25);
+    setTimeout(() => m.disconnect(), 1500);
+  }
+  function duck(on) {
+    ducked = on;
+    if (playing) master.gain.setTargetAtTime(level(), ac.currentTime, on ? .08 : .5);
+  }
+  function setVolume(v) {
+    volume = v;
+    store('mojimori.v2.bgmVolume', v);
+    if (playing) master.gain.setTargetAtTime(level(), ac.currentTime, .1);
+  }
+  function setEnabled(on) {
+    enabled = on;
+    store('mojimori.v2.bgm', on);
+    if (on) start();else stop();
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stop();else if (nightQuiet === false) start();
+  });
+  return {
+    start,
+    stop,
+    duck,
+    setVolume,
+    setEnabled,
+    get enabled() {
+      return enabled;
+    },
+    get volume() {
+      return volume;
     }
-    function start() {
-      if (!enabled || playing || !ac || document.hidden) return;
-      playing = true;
-      master = ac.createGain();
-      master.gain.value = 0;
-      master.connect(ac.destination);
-      master.gain.setTargetAtTime(level(), ac.currentTime, .6);
-      idx = 0;
-      loopStart = ac.currentTime + .15;
-      tick();
-      timer = setInterval(tick, 120);
-    }
-    function stop() {
-      if (!playing) return;
-      playing = false;
-      clearInterval(timer);
-      const m = master;
-      m.gain.setTargetAtTime(0, ac.currentTime, .25);
-      setTimeout(() => m.disconnect(), 1500);
-    }
-    function duck(on) {
-      ducked = on;
-      if (playing) master.gain.setTargetAtTime(level(), ac.currentTime, on ? .08 : .5);
-    }
-    function setVolume(v) {
-      volume = v;
-      store('mojimori.v2.bgmVolume', v);
-      if (playing) master.gain.setTargetAtTime(level(), ac.currentTime, .1);
-    }
-    function setEnabled(on) {
-      enabled = on;
-      store('mojimori.v2.bgm', on);
-      if (on) start(); else stop();
-    }
-    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else if (nightQuiet === false) start(); });
-    return { start, stop, duck, setVolume, setEnabled, get enabled() { return enabled; }, get volume() { return volume; } };
-  })();
-  let nightQuiet = false; // おやすみの画面では BGM を止めておく
+  };
+})();
+var nightQuiet = false; // おやすみの画面では BGM を止めておく
 
-  // ---------- 声（ブラウザの音声合成） ----------
-  const VOICE_KEY = 'mojimori.v2.voice';
-  const voiceSettings = { name: '', pitch: 1.5, rate: 1.0, ...load(VOICE_KEY, {}) };
-  let jaVoice = null;
-  const jaVoices = () => ('speechSynthesis' in window ? speechSynthesis.getVoices() : []).filter(v => /^ja/i.test(v.lang));
-  // なめらかな（ニューラル・拡張）女性の声を上にする
-  function scoreVoice(v) {
-    let s = 0;
-    if (/Natural|Online|Neural|ナチュラル|オンライン/i.test(v.name)) s += 50;
-    if (/Enhanced|Premium|拡張|プレミアム/i.test(v.name)) s += 40;
-    if (/Nanami|Mayu|Aoi|Shiori|Kyoko|O-ren|Haruka|Ayumi|Sayaka|Hikari|Misaki|Google/i.test(v.name)) s += 20;
-    if (/Keita|Ichiro|Otoya|Hattori|Daichi|Naoki|Kenta|Takumi|Hiroshi/i.test(v.name)) s -= 100;
-    return s;
-  }
-  function pickVoice() {
-    const ja = jaVoices();
-    jaVoice = (voiceSettings.name && ja.find(v => v.name === voiceSettings.name)) || [...ja].sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
-  }
-  if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+// ---------- 声（ブラウザの音声合成） ----------
+var VOICE_KEY = 'mojimori.v2.voice';
+var voiceSettings = _objectSpread({
+  name: '',
+  pitch: 1.5,
+  rate: 1.0
+}, load(VOICE_KEY, {}));
+var jaVoice = null;
+var jaVoices = () => ('speechSynthesis' in window ? speechSynthesis.getVoices() : []).filter(v => /^ja/i.test(v.lang));
+// なめらかな（ニューラル・拡張）女性の声を上にする
+function scoreVoice(v) {
+  var s = 0;
+  if (/Natural|Online|Neural|ナチュラル|オンライン/i.test(v.name)) s += 50;
+  if (/Enhanced|Premium|拡張|プレミアム/i.test(v.name)) s += 40;
+  if (/Nanami|Mayu|Aoi|Shiori|Kyoko|O-ren|Haruka|Ayumi|Sayaka|Hikari|Misaki|Google/i.test(v.name)) s += 20;
+  if (/Keita|Ichiro|Otoya|Hattori|Daichi|Naoki|Kenta|Takumi|Hiroshi/i.test(v.name)) s -= 100;
+  return s;
+}
+function pickVoice() {
+  var ja = jaVoices();
+  jaVoice = voiceSettings.name && ja.find(v => v.name === voiceSettings.name) || [...ja].sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
+}
+if ('speechSynthesis' in window) {
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+var captionTimer;
+function showCaption(text, ms) {
+  var c = $('#caption');
+  c.textContent = text;
+  c.classList.add('show');
+  clearTimeout(captionTimer);
+  captionTimer = setTimeout(() => c.classList.remove('show'), ms);
+}
 
-  let captionTimer;
-  function showCaption(text, ms) {
-    const c = $('#caption');
-    c.textContent = text;
-    c.classList.add('show');
-    clearTimeout(captionTimer);
-    captionTimer = setTimeout(() => c.classList.remove('show'), ms);
-  }
+// text は字幕、speech は読み上げ用（省略時は同じ）
+var speakTimer = null;
+var pendingFinish = null;
+function stopVoice() {
+  clearTimeout(speakTimer);
+  if (pendingFinish) pendingFinish();
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+}
+function say(text, {
+  speech = text,
+  rate = 1,
+  pitch = 1
+} = {}) {
+  // 前の声がまだ待っているなら、ここで終わらせる（連打で声がたまらないように）
+  stopVoice();
+  var r = voiceSettings.rate * rate;
+  var estimate = (700 + text.length * 210) / r;
+  showCaption(text, estimate + 800);
+  BGM.duck(true);
+  return new Promise(resolve => {
+    var done = false;
+    var finish = () => {
+      if (done) return;
+      done = true;
+      if (pendingFinish === finish) pendingFinish = null;
+      BGM.duck(false);
+      resolve();
+    };
+    pendingFinish = finish;
+    setTimeout(finish, estimate + 1500); // 声が出ない環境でも先へ進める
+    if (!('speechSynthesis' in window)) return;
+    // 全角スペースは読み上げで間があいて、とぎれとぎれに聞こえるので取りのぞく
+    var u = new SpeechSynthesisUtterance(speech.replace(/[「」　]/g, ''));
+    u.lang = 'ja-JP';
+    if (jaVoice) u.voice = jaVoice;
+    u.rate = Math.min(2, r);
+    u.pitch = Math.min(2, voiceSettings.pitch * pitch);
+    u.onend = finish;
+    u.onerror = finish;
+    // cancel 直後の speak が無視されるブラウザがあるので、少し待つ
+    speakTimer = setTimeout(() => {
+      if (!done) speechSynthesis.speak(u);
+    }, 60);
+  });
+}
 
-  // text は字幕、speech は読み上げ用（省略時は同じ）
-  let speakTimer = null;
-  let pendingFinish = null;
-  function stopVoice() {
-    clearTimeout(speakTimer);
-    if (pendingFinish) pendingFinish();
-    if ('speechSynthesis' in window) speechSynthesis.cancel();
-  }
-  function say(text, { speech = text, rate = 1, pitch = 1 } = {}) {
-    // 前の声がまだ待っているなら、ここで終わらせる（連打で声がたまらないように）
-    stopVoice();
-    const r = voiceSettings.rate * rate;
-    const estimate = (700 + text.length * 210) / r;
-    showCaption(text, estimate + 800);
-    BGM.duck(true);
-    return new Promise(resolve => {
-      let done = false;
-      const finish = () => { if (done) return; done = true; if (pendingFinish === finish) pendingFinish = null; BGM.duck(false); resolve(); };
-      pendingFinish = finish;
-      setTimeout(finish, estimate + 1500); // 声が出ない環境でも先へ進める
-      if (!('speechSynthesis' in window)) return;
-      // 全角スペースは読み上げで間があいて、とぎれとぎれに聞こえるので取りのぞく
-      const u = new SpeechSynthesisUtterance(speech.replace(/[「」　]/g, ''));
-      u.lang = 'ja-JP';
-      if (jaVoice) u.voice = jaVoice;
-      u.rate = Math.min(2, r);
-      u.pitch = Math.min(2, voiceSettings.pitch * pitch);
-      u.onend = finish;
-      u.onerror = finish;
-      // cancel 直後の speak が無視されるブラウザがあるので、少し待つ
-      speakTimer = setTimeout(() => { if (!done) speechSynthesis.speak(u); }, 60);
-    });
-  }
-
-  // ---------- 効果音（ファイルを使わずに作る） ----------
-  function tones(freqs, { dur = .2, gap = .1, type = 'triangle', vol = .16 } = {}) {
-    if (!ac) return;
-    const t0 = ac.currentTime + .01;
-    freqs.forEach((f, i) => {
-      const o = ac.createOscillator(), g = ac.createGain();
-      const t = t0 + i * gap;
-      o.type = type; o.frequency.value = f;
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(vol, t + .015);
-      g.gain.exponentialRampToValueAtTime(.001, t + dur);
-      o.connect(g).connect(ac.destination);
-      o.start(t); o.stop(t + dur + .03);
-    });
-  }
-  function sweep(from, to, dur, vol = .18) {
-    if (!ac) return;
-    const t = ac.currentTime + .01, o = ac.createOscillator(), g = ac.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(from, t);
-    o.frequency.exponentialRampToValueAtTime(to, t + dur * .45);
-    o.frequency.exponentialRampToValueAtTime(to * .5, t + dur);
-    g.gain.setValueAtTime(vol, t);
+// ---------- 効果音（ファイルを使わずに作る） ----------
+function tones(freqs, {
+  dur = .2,
+  gap = .1,
+  type = 'triangle',
+  vol = .16
+} = {}) {
+  if (!ac) return;
+  var t0 = ac.currentTime + .01;
+  freqs.forEach((f, i) => {
+    var o = ac.createOscillator(),
+      g = ac.createGain();
+    var t = t0 + i * gap;
+    o.type = type;
+    o.frequency.value = f;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + .015);
     g.gain.exponentialRampToValueAtTime(.001, t + dur);
     o.connect(g).connect(ac.destination);
-    o.start(t); o.stop(t + dur + .05);
-  }
-  const boing = () => sweep(180, 520, .75);
-  const sfx = {
-    pop:  () => tones([660, 990], { gap: .09 }),
-    yay:  () => tones([523, 659, 784, 1047], { dur: .4, gap: .16 }),
-    hint: () => tones([440, 554], { dur: .3, gap: .18, type: 'sine', vol: .12 }),
-    tap:  () => tones([880], { dur: .08, vol: .1 }),
-  };
-  // もじごとに音の高さを変え、鳴らし方もいくつかから選ぶ
-  const PENTA = [523.25, 587.33, 659.25, 783.99, 880];
-  function kanaSound(e) {
-    const f = PENTA[e.v] * (e.r % 2 ? 1.5 : 1);
-    pick([
-      () => tones([f, f * 1.5], { gap: .09 }),
-      () => tones([f, f * 1.25, f * 1.5, f * 2], { gap: .07, dur: .3, type: 'sine', vol: .12 }),
-      () => sweep(f * .5, f * 1.5, .45, .14),
-      () => tones([f * 2, f * 1.5, f], { gap: .08, dur: .18 }),
-      () => tones([f, f * 2, f, f * 2], { gap: .06, dur: .12, type: 'square', vol: .05 }),
-      () => tones([f * 1.5, f * 1.5, f * 2], { gap: .12, dur: .2, type: 'sine', vol: .14 }),
-    ])();
-  }
+    o.start(t);
+    o.stop(t + dur + .03);
+  });
+}
+function sweep(from, to, dur, vol = .18) {
+  if (!ac) return;
+  var t = ac.currentTime + .01,
+    o = ac.createOscillator(),
+    g = ac.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(from, t);
+  o.frequency.exponentialRampToValueAtTime(to, t + dur * .45);
+  o.frequency.exponentialRampToValueAtTime(to * .5, t + dur);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  o.connect(g).connect(ac.destination);
+  o.start(t);
+  o.stop(t + dur + .05);
+}
+var boing = () => sweep(180, 520, .75);
+var sfx = {
+  pop: () => tones([660, 990], {
+    gap: .09
+  }),
+  yay: () => tones([523, 659, 784, 1047], {
+    dur: .4,
+    gap: .16
+  }),
+  hint: () => tones([440, 554], {
+    dur: .3,
+    gap: .18,
+    type: 'sine',
+    vol: .12
+  }),
+  tap: () => tones([880], {
+    dur: .08,
+    vol: .1
+  })
+};
+// もじごとに音の高さを変え、鳴らし方もいくつかから選ぶ
+var PENTA = [523.25, 587.33, 659.25, 783.99, 880];
+function kanaSound(e) {
+  var f = PENTA[e.v] * (e.r % 2 ? 1.5 : 1);
+  pick([() => tones([f, f * 1.5], {
+    gap: .09
+  }), () => tones([f, f * 1.25, f * 1.5, f * 2], {
+    gap: .07,
+    dur: .3,
+    type: 'sine',
+    vol: .12
+  }), () => sweep(f * .5, f * 1.5, .45, .14), () => tones([f * 2, f * 1.5, f], {
+    gap: .08,
+    dur: .18
+  }), () => tones([f, f * 2, f, f * 2], {
+    gap: .06,
+    dur: .12,
+    type: 'square',
+    vol: .05
+  }), () => tones([f * 1.5, f * 1.5, f * 2], {
+    gap: .12,
+    dur: .2,
+    type: 'sine',
+    vol: .14
+  })])();
+}
 
-  // ---------- おともだちの部品 ----------
-  function makeFriend(e, { asButton = true, delay = 0, emoji, hat = true } = {}) {
-    const el = document.createElement(asButton ? 'button' : 'div');
-    el.className = 'friend' + (hat ? '' : ' nohat');
-    el.dataset.id = e.id;
-    el.style.setProperty('--c', e.color);
-    el.style.setProperty('--d', `-${delay}s`);
-    if (asButton) el.setAttribute('aria-label', disp(e));
-    el.innerHTML = `
+// ---------- おともだちの部品 ----------
+function makeFriend(e, {
+  asButton = true,
+  delay = 0,
+  emoji,
+  hat = true
+} = {}) {
+  var el = document.createElement(asButton ? 'button' : 'div');
+  el.className = 'friend' + (hat ? '' : ' nohat');
+  el.dataset.id = e.id;
+  el.style.setProperty('--c', e.color);
+  el.style.setProperty('--d', `-${delay}s`);
+  if (asButton) el.setAttribute('aria-label', disp(e));
+  el.innerHTML = `
       <span class="hat" aria-hidden="true">${emoji || wordsOf(e)[0].e}</span>
       <span class="body">
         <span class="eyes"><i></i><i></i></span>
         <span class="cheeks"><i></i><i></i></span>
         <span class="kana">${disp(e)}</span>
       </span>`;
-    return el;
-  }
-  // ことばの中の、そのもじに色をつける
-  const highlight = (word, k) => [...word].map(c => c === k ? `<b>${c}</b>` : c).join('');
+  return el;
+}
+// ことばの中の、そのもじに色をつける
+var highlight = (word, k) => [...word].map(c => c === k ? `<b>${c}</b>` : c).join('');
 
-  // ---------- 動き（子どもが目で追えるよう、ゆっくりめ） ----------
-  const anim = (el, frames, opts) => el.animate(frames, { easing: 'ease-out', ...opts });
-  const moves = {
-    bounce: el => anim(el, [
-      { transform: 'translateY(0) scale(1)' },
-      { transform: 'translateY(-40px) scale(1.08,.94)', offset: .35 },
-      { transform: 'translateY(0) scale(1.06,.92)', offset: .7 },
-      { transform: 'translateY(0) scale(1)' },
-    ], { duration: 1100 }),
-    happy: el => anim(el, [
-      { transform: 'translateY(0) rotate(0)' },
-      { transform: 'translateY(-60px) rotate(-8deg)', offset: .25 },
-      { transform: 'translateY(0) rotate(0)', offset: .5 },
-      { transform: 'translateY(-44px) rotate(360deg)', offset: .75 },
-      { transform: 'translateY(0) rotate(360deg)' },
-    ], { duration: 2400, easing: 'ease-in-out' }),
-    squish: el => anim(el, [
-      { transform: 'scale(1)' },
-      { transform: 'scale(1.25,.75)', offset: .3 },
-      { transform: 'scale(.85,1.2)', offset: .6 },
-      { transform: 'scale(1.05,.95)', offset: .8 },
-      { transform: 'scale(1)' },
-    ], { duration: 1000 }),
-    wiggle: el => anim(el, [
-      { transform: 'translateX(0)' }, { transform: 'translateX(-14px) rotate(-5deg)' }, { transform: 'translateX(14px) rotate(5deg)' },
-      { transform: 'translateX(-10px) rotate(-3deg)' }, { transform: 'translateX(10px) rotate(3deg)' }, { transform: 'translateX(0)' },
-    ], { duration: 1000, easing: 'ease-in-out' }),
-    twirl: el => anim(el, [
-      { transform: 'perspective(600px) rotateY(0)' },
-      { transform: 'perspective(600px) translateY(-30px) rotateY(180deg)', offset: .5 },
-      { transform: 'perspective(600px) rotateY(360deg)' },
-    ], { duration: 1200, easing: 'ease-in-out' }),
-    jumpjump: el => anim(el, [
-      { transform: 'translateY(0)' }, { transform: 'translateY(-30px)', offset: .17 }, { transform: 'translateY(0)', offset: .33 },
-      { transform: 'translateY(-30px)', offset: .5 }, { transform: 'translateY(0)', offset: .67 },
-      { transform: 'translateY(-50px) scale(1.1)', offset: .84 }, { transform: 'translateY(0)' },
-    ], { duration: 1400, easing: 'ease-in-out' }),
-    peek: el => anim(el, [
-      { transform: 'scale(1)' }, { transform: 'scale(.4) translateY(30%)', offset: .3 },
-      { transform: 'scale(.4) translateY(30%)', offset: .5 }, { transform: 'scale(1.2)', offset: .8 }, { transform: 'scale(1)' },
-    ], { duration: 1300, easing: 'cubic-bezier(.3,1.4,.6,1)' }),
-    // ずっこけ
-    zukko: el => anim(el, [
-      { transform: 'rotate(0)' },
-      { transform: 'rotate(84deg) translateX(10px)', offset: .25 },
-      { transform: 'rotate(78deg) translateX(10px)', offset: .78 },
-      { transform: 'rotate(0)' },
-    ], { duration: 2800, easing: 'cubic-bezier(.3,1.3,.6,1)' }),
-    shake: el => anim(el, [
-      { transform: 'rotate(0)' }, { transform: 'rotate(-6deg)' }, { transform: 'rotate(6deg)' },
-      { transform: 'rotate(-4deg)' }, { transform: 'rotate(0)' },
-    ], { duration: 800 }),
-    wave: el => {
-      el.classList.add('glow');
-      setTimeout(() => el.classList.remove('glow'), 3400);
-      return anim(el, [
-        { transform: 'rotate(0)' }, { transform: 'rotate(-12deg)' }, { transform: 'rotate(12deg)' }, { transform: 'rotate(0)' },
-      ], { duration: 950, iterations: 3, easing: 'ease-in-out' });
-    },
-  };
-  const TAP_MOVES = ['bounce', 'happy', 'squish', 'wiggle', 'twirl', 'jumpjump', 'peek'];
-
-  // ---------- 演出 ----------
-  // 古い端末で重くならないよう、画面に出せる数に上限をつける
-  const FX_MAX = 90;
-  const room = n => Math.max(0, Math.min(n, FX_MAX - $('#fx').childElementCount));
-  function spawn(text, style) {
-    const s = document.createElement('span');
-    s.textContent = text;
-    Object.assign(s.style, style);
-    $('#fx').appendChild(s);
-    return s;
-  }
-  const center = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, top: r.top }; };
-  function popAt(el, emoji, scale = 1) {
-    const r = el.getBoundingClientRect();
-    const s = spawn('', { left: `${r.left + r.width / 2}px`, top: `${r.top}px`, fontSize: `${Math.max(80, r.width * .8) * scale}px` });
-    const inner = document.createElement('span');
-    inner.textContent = emoji;
-    inner.style.display = 'inline-block';
-    s.appendChild(inner);
-    anim(s, [
-      { transform: 'translate(-50%,0) scale(.2)', opacity: 0 },
-      { transform: 'translate(-50%,-70%) scale(1.25)', opacity: 1, offset: .2 },
-      { transform: 'translate(-50%,-80%) scale(1.1)', opacity: 1, offset: .5 },
-      { transform: 'translate(-50%,-95%) scale(1)', opacity: 1, offset: .85 },
-      { transform: 'translate(-50%,-115%) scale(.9)', opacity: 0 },
-    ], { duration: 3400, easing: 'ease-in-out' }).onfinish = () => s.remove();
-    return inner;
-  }
-  // 上からふってくる（あめ・ゆき・はな・ほし・はっぱ）
-  function fall(emoji, count = 22) {
-    for (let i = 0, n = room(count); i < n; i++) {
-      const d = spawn(Array.isArray(emoji) ? pick(emoji) : emoji, { left: `${Math.random() * 100}vw`, top: '-10vh', fontSize: `${20 + Math.random() * 22}px` });
-      const sway = (Math.random() - .5) * 12;
-      anim(d, [{ transform: 'translate(0, 0) rotate(0)' }, { transform: `translate(${sway}vw, 120vh) rotate(${(Math.random() - .5) * 360}deg)` }],
-        { duration: 3000 + Math.random() * 1600, delay: Math.random() * 1600, easing: 'linear' }).onfinish = () => d.remove();
-    }
-  }
-  // 下からのぼっていく（おと・あわ・はーと）
-  function rise(emoji, count = 14, style = {}) {
-    for (let i = 0, n = room(count); i < n; i++) {
-      const d = spawn(Array.isArray(emoji) ? pick(emoji) : emoji, { left: `${10 + Math.random() * 80}vw`, top: '100vh', fontSize: `${26 + Math.random() * 22}px`, ...style });
-      const sway = (Math.random() - .5) * 14;
-      anim(d, [{ transform: 'translate(0, 0)', opacity: 1 }, { transform: `translate(${sway}vw, -115vh)`, opacity: .8 }],
-        { duration: 3600 + Math.random() * 1600, delay: Math.random() * 1400, easing: 'ease-out' }).onfinish = () => d.remove();
-    }
-  }
-  // 画面をよこぎる（はしる・あるく・はやい・はねる・とぶ・およぐ）
-  function across(emoji, kind, { delay = 0, top } = {}) {
-    if (!room(1)) return;
-    const y = top || { fly: '24vh', swim: '52vh' }[kind] || '68vh';
-    const s = spawn(emoji, { left: '0', top: y, fontSize: fit('64px', '15vmin', '120px') });
-    const frames = [];
-    const steps = kind === 'walk' ? 20 : 12;
-    for (let i = 0; i <= steps; i++) {
-      let lift = i % 2 ? -14 : 0;
-      if (kind === 'walk') lift = i % 2 ? -8 : 0;
-      if (kind === 'zoom') lift = 0;
-      if (kind === 'hop') lift = i % 2 ? -120 : 0;
-      if (kind === 'fly') lift = Math.sin(i / steps * Math.PI * 3) * 60;
-      if (kind === 'swim') lift = Math.sin(i / steps * Math.PI * 4) * 28;
-      frames.push({ transform: `translate(${-20 + i * (140 / steps)}vw, ${lift}px) scaleX(-1)` });
-    }
-    const duration = { run: 4400, walk: 7000, zoom: 2400, hop: 5400, fly: 5600, swim: 5200 }[kind] || 4400;
-    anim(s, frames, { duration, delay, easing: 'linear', fill: 'backwards' }).onfinish = () => s.remove();
-    // はやいのりものは、うしろに けむり
-    if (kind === 'zoom') {
-      for (let i = 1; i <= 5; i++) {
-        setTimeout(() => {
-          if (!room(1)) return;
-          const p = s.getBoundingClientRect();
-          const puff = spawn('💨', { left: `${p.right - 10}px`, top: `${p.top + p.height * .4}px`, fontSize: '40px' });
-          anim(puff, [{ transform: 'scale(.6)', opacity: .9 }, { transform: 'scale(1.4) translateX(30px)', opacity: 0 }], { duration: 700 }).onfinish = () => puff.remove();
-        }, delay + i * 330);
-      }
-    }
-  }
-  function launch(el, emoji, { duration = 4200, wobble = true } = {}) {
-    const r = el.getBoundingClientRect();
-    const s = spawn(emoji, { left: `${r.left + r.width / 2}px`, top: `${r.top}px`, fontSize: fit('70px', '15vmin', '120px') });
-    anim(s, [
-      { transform: 'translate(-50%, 0) scale(.3)' },
-      { transform: 'translate(-50%, -30%) scale(1.1)', offset: .25 },
-      { transform: `translate(-50%, -40%) scale(1.1) rotate(${wobble ? -3 : -8}deg)`, offset: .4 },
-      { transform: `translate(-50%, -40%) scale(1.1) rotate(${wobble ? 3 : 8}deg)`, offset: .5 },
-      { transform: 'translate(-50%, -130vh) scale(1)' },
-    ], { duration, easing: 'ease-in' }).onfinish = () => s.remove();
-  }
-  // ある点から、まわりへ広がる
-  function burst(x, y, items, n = 8, dist = 120, size = [18, 34]) {
-    for (let i = 0, k = room(n); i < k; i++) {
-      const s = spawn(pick(items), { left: `${x}px`, top: `${y}px`, fontSize: `${size[0] + Math.random() * (size[1] - size[0])}px` });
-      const a = (i / k) * Math.PI * 2 + Math.random() * .4, d = dist * (.7 + Math.random() * .5);
-      anim(s, [
-        { transform: 'translate(-50%,-50%) scale(.2)', opacity: 0 },
-        { transform: `translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d}px)) scale(1)`, opacity: 1, offset: .5 },
-        { transform: `translate(calc(-50% + ${Math.cos(a) * d * 1.25}px), calc(-50% + ${Math.sin(a) * d * 1.25 + 30}px)) scale(.6)`, opacity: 0 },
-      ], { duration: 1500 }).onfinish = () => s.remove();
-    }
-  }
-  const sparkle = el => { const c = center(el); burst(c.x, c.y, ['✨', '💫', '⭐'], 8, c.w * .8); };
-  const heartBurst = el => { const c = center(el); burst(c.x, c.y, ['💖', '💕', '💗'], 7, c.w * .75); };
-  // わっか（ぽわん）
-  function ring(el, color) {
-    if (!room(2)) return;
-    const c = center(el);
-    for (let i = 0; i < 2; i++) {
-      const s = spawn('', { left: `${c.x}px`, top: `${c.y}px`, width: `${c.w}px`, height: `${c.w}px`, marginLeft: `${-c.w / 2}px`, marginTop: `${-c.w / 2}px` });
-      s.className = 'ring';
-      s.style.setProperty('--c', color || '#fff59d');
-      anim(s, [{ transform: 'scale(.5)', opacity: .9 }, { transform: 'scale(2.2)', opacity: 0 }], { duration: 1100, delay: i * 250, fill: 'backwards' }).onfinish = () => s.remove();
-    }
-  }
-  function fireworks() {
-    for (let i = 0; i < 3; i++) {
-      setTimeout(() => burst(innerWidth * (.2 + Math.random() * .6), innerHeight * (.15 + Math.random() * .3), ['✨', '🎇', '⭐', '💥'], 10, 110, [20, 36]), i * 500);
-    }
-  }
-  function confetti() {
-    const items = ['🎉', '⭐', '✨', '🌸', '🎈'];
-    for (let i = 0, n = room(26); i < n; i++) {
-      const s = spawn(items[i % items.length], { left: '50vw', top: '45vh', fontSize: `${24 + Math.random() * 22}px` });
-      const a = Math.random() * Math.PI * 2, d = 25 + Math.random() * 30;
-      const x = Math.cos(a) * d, y = Math.sin(a) * d;
-      anim(s, [
-        { transform: 'translate(-50%,-50%) scale(.3)', opacity: 1 },
-        { transform: `translate(calc(-50% + ${x}vmin), calc(-50% + ${y}vmin)) scale(1)`, opacity: 1, offset: .45 },
-        { transform: `translate(calc(-50% + ${x}vmin), calc(-50% + ${y + 6}vmin)) scale(1)`, opacity: 1, offset: .75 },
-        { transform: `translate(calc(-50% + ${x}vmin), calc(-50% + ${y + 14}vmin)) scale(1)`, opacity: 0 },
-      ], { duration: 3200, easing: 'cubic-bezier(.2,.8,.3,1)' }).onfinish = () => s.remove();
-    }
-  }
-  // 風にのって よこへ流れる
-  function wind(items) {
-    for (let i = 0, n = room(12); i < n; i++) {
-      const d = spawn(pick(items), { left: '-8vw', top: `${10 + Math.random() * 70}vh`, fontSize: `${22 + Math.random() * 18}px` });
-      anim(d, [{ transform: 'translate(0,0) rotate(0)' }, { transform: `translate(120vw, ${(Math.random() - .5) * 30}vh) rotate(${360 + Math.random() * 360}deg)` }],
-        { duration: 2600 + Math.random() * 1400, delay: Math.random() * 1200, easing: 'ease-in-out', fill: 'backwards' }).onfinish = () => d.remove();
-    }
-  }
-
-  // ことばごとの演出
-  function wordAction(w, el) {
-    if (w.a === 'rocket') { launch(el, w.e); fall(['✨', '⭐'], 8); return; }
-    if (w.a === 'up') { launch(el, w.e, { duration: 6000, wobble: false }); return; }
-    if (w.a === 'parade') { for (let i = 0; i < 4; i++) across(w.e, 'walk', { delay: i * 450 }); popAt(el, w.e); return; }
-    const s = popAt(el, w.e, w.a === 'grow' || w.a === 'sun' ? 1.5 : 1);
-    // { rotate, scale, translate } を transform の文字列にする
-    const tf = f => ({ transform: [
-      f.translate && `translate(${f.translate.split(' ').join(',')})`,
-      f.rotate && `rotate(${f.rotate})`,
-      f.scale && `scale(${f.scale.split(' ').join(',')})`,
-    ].filter(Boolean).join(' ') || 'none' });
-    const twist = (frames, opts) => anim(s, frames.map(tf), { easing: 'ease-in-out', ...opts });
-    switch (w.a) {
-      case 'rain':     fall('💧'); break;
-      case 'snow':     fall('❄️'); break;
-      case 'petals':   fall('🌸'); break;
-      case 'leaves':   fall(['🍁', '🍂'], 16); break;
-      case 'stars':    fall('⭐', 16); break;
-      case 'wind':     wind(['🍃', '🍂', '🌸']); break;
-      case 'splash':   fall('💧', 12); rise('💦', 6); break;
-      case 'hearts':   rise('❤️', 10); rise('💕', 6); break;
-      case 'notes':    rise('🎵', 8); rise('🎶', 6); twist([{ rotate: '-12deg' }, { rotate: '12deg' }], { duration: 400, iterations: 8, direction: 'alternate' }); break;
-      case 'bubbles':  rise('◯', 16, { color: '#8fd3ff', fontWeight: '900' }); break;
-      case 'thanks':   heartBurst(el); rise(['💐', '🌸', '💖'], 8); twist([{ rotate: '0deg' }, { rotate: '28deg' }, { rotate: '0deg' }], { duration: 1100, iterations: 2 }); break;
-      case 'sun':      ring(el, '#ffd54f'); burst(center(el).x, center(el).top, ['✨', '🌟'], 10, 160); break;
-      case 'party':    confetti(); break;
-      case 'sleep':    rise('💤', 6); twist([{ rotate: '-8deg' }, { rotate: '8deg' }], { duration: 1400, iterations: 3, direction: 'alternate' }); break;
-      case 'eat':      twist([{ scale: '1 1' }, { scale: '1.15 .8' }], { duration: 220, iterations: 8, direction: 'alternate' }); burst(center(el).x, center(el).top, ['😋', '✨', '💛'], 6, 110); break;
-      case 'dance':    twist([{ translate: '-24px 0', rotate: '-14deg' }, { translate: '24px 0', rotate: '14deg' }], { duration: 380, iterations: 8, direction: 'alternate' }); rise(['🎵', '🎶'], 8); break;
-      case 'cry':      fall('💧', 10); twist([{ translate: '-6px 0' }, { translate: '6px 0' }], { duration: 120, iterations: 14, direction: 'alternate' }); break;
-      case 'laugh':    twist([{ translate: '0 0' }, { translate: '0 -24px' }], { duration: 260, iterations: 10, direction: 'alternate' }); burst(center(el).x, center(el).top, ['😆', '✨', '🎶'], 6, 120); break;
-      case 'firework': fireworks(); break;
-      case 'run':
-      case 'walk':
-      case 'zoom':
-      case 'hop':
-      case 'fly':
-      case 'swim':     across(w.e, w.a); break;
-      case 'spin':     twist([{ rotate: '0deg' }, { rotate: '720deg' }], { duration: 3400 }); break;
-      case 'wave':     twist([{ rotate: '-25deg' }, { rotate: '25deg' }], { duration: 360, iterations: 9, direction: 'alternate' }); break;
-      case 'grow':     twist([{ scale: '1' }, { scale: '1.3' }], { duration: 600, iterations: 4, direction: 'alternate' }); break;
-      default:         twist([{ rotate: '-15deg' }, { rotate: '15deg' }], { duration: 480, iterations: 7, direction: 'alternate' }); break;
-    }
-  }
-  // ことばの演出とは別に、ときどき おまけの演出
-  const EXTRAS = [
-    el => sparkle(el),
-    el => heartBurst(el),
-    el => ring(el, getComputedStyle(el).getPropertyValue('--c')),
-    () => fall(['⭐', '✨'], 10),
-    el => { const c = center(el); burst(c.x, c.y, ['🌈'], 1, 0, [70, 90]); },
-    () => wind(['🎈', '🎈', '🎈']),
-  ];
-
-  // ---------- 画面の切り替え ----------
-  let askAgain = null; // 👂ボタンで呼ぶ
-  function show(id) {
-    flow++;
-    stopVoice();
-    closeSpot();
-    askAgain = null;
-    $('#fx').innerHTML = '';
-    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
-    document.querySelectorAll('.twinkle').forEach(t => t.remove());
-    nightQuiet = id === 'night';
-    if (nightQuiet) BGM.stop(); else BGM.start();
-  }
-
-  // ---------- ホーム ----------
-  function applyScript() {
-    $('#homeTitle').textContent = script === 'kata' ? 'モジモジの モリ' : 'もじもじの もり';
-    $('#scriptHira').setAttribute('aria-pressed', script === 'hira');
-    $('#scriptKata').setAttribute('aria-pressed', script === 'kata');
-    $('#pageSei').textContent = script === 'kata' ? 'ア' : 'あ';
-    $('#pageDaku').textContent = script === 'kata' ? 'ガ' : 'が';
-    renderParade();
-  }
-  function renderParade() {
-    const p = $('#parade');
-    p.innerHTML = '';
-    shuffle(SEI).slice(0, 5).forEach((e, i) => {
-      const el = makeFriend(e, { delay: i * .4 });
-      el.addEventListener('click', () => {
-        const w = pick(wordsOf(e));
-        kanaSound(e);
-        moves[pick(TAP_MOVES)](el);
-        popAt(el, w.e);
-        const line = k => `${k}！　${w.w}の　${k}！`;
-        say(line(disp(e)), { speech: line(spoken(e)) });
-      });
-      p.appendChild(el);
+// ---------- 動き（子どもが目で追えるよう、ゆっくりめ） ----------
+var anim = (el, frames, opts) => el.animate(frames, _objectSpread({
+  easing: 'ease-out'
+}, opts));
+var moves = {
+  bounce: el => anim(el, [{
+    transform: 'translateY(0) scale(1)'
+  }, {
+    transform: 'translateY(-40px) scale(1.08,.94)',
+    offset: .35
+  }, {
+    transform: 'translateY(0) scale(1.06,.92)',
+    offset: .7
+  }, {
+    transform: 'translateY(0) scale(1)'
+  }], {
+    duration: 1100
+  }),
+  happy: el => anim(el, [{
+    transform: 'translateY(0) rotate(0)'
+  }, {
+    transform: 'translateY(-60px) rotate(-8deg)',
+    offset: .25
+  }, {
+    transform: 'translateY(0) rotate(0)',
+    offset: .5
+  }, {
+    transform: 'translateY(-44px) rotate(360deg)',
+    offset: .75
+  }, {
+    transform: 'translateY(0) rotate(360deg)'
+  }], {
+    duration: 2400,
+    easing: 'ease-in-out'
+  }),
+  squish: el => anim(el, [{
+    transform: 'scale(1)'
+  }, {
+    transform: 'scale(1.25,.75)',
+    offset: .3
+  }, {
+    transform: 'scale(.85,1.2)',
+    offset: .6
+  }, {
+    transform: 'scale(1.05,.95)',
+    offset: .8
+  }, {
+    transform: 'scale(1)'
+  }], {
+    duration: 1000
+  }),
+  wiggle: el => anim(el, [{
+    transform: 'translateX(0)'
+  }, {
+    transform: 'translateX(-14px) rotate(-5deg)'
+  }, {
+    transform: 'translateX(14px) rotate(5deg)'
+  }, {
+    transform: 'translateX(-10px) rotate(-3deg)'
+  }, {
+    transform: 'translateX(10px) rotate(3deg)'
+  }, {
+    transform: 'translateX(0)'
+  }], {
+    duration: 1000,
+    easing: 'ease-in-out'
+  }),
+  twirl: el => anim(el, [{
+    transform: 'perspective(600px) rotateY(0)'
+  }, {
+    transform: 'perspective(600px) translateY(-30px) rotateY(180deg)',
+    offset: .5
+  }, {
+    transform: 'perspective(600px) rotateY(360deg)'
+  }], {
+    duration: 1200,
+    easing: 'ease-in-out'
+  }),
+  jumpjump: el => anim(el, [{
+    transform: 'translateY(0)'
+  }, {
+    transform: 'translateY(-30px)',
+    offset: .17
+  }, {
+    transform: 'translateY(0)',
+    offset: .33
+  }, {
+    transform: 'translateY(-30px)',
+    offset: .5
+  }, {
+    transform: 'translateY(0)',
+    offset: .67
+  }, {
+    transform: 'translateY(-50px) scale(1.1)',
+    offset: .84
+  }, {
+    transform: 'translateY(0)'
+  }], {
+    duration: 1400,
+    easing: 'ease-in-out'
+  }),
+  peek: el => anim(el, [{
+    transform: 'scale(1)'
+  }, {
+    transform: 'scale(.4) translateY(30%)',
+    offset: .3
+  }, {
+    transform: 'scale(.4) translateY(30%)',
+    offset: .5
+  }, {
+    transform: 'scale(1.2)',
+    offset: .8
+  }, {
+    transform: 'scale(1)'
+  }], {
+    duration: 1300,
+    easing: 'cubic-bezier(.3,1.4,.6,1)'
+  }),
+  // ずっこけ
+  zukko: el => anim(el, [{
+    transform: 'rotate(0)'
+  }, {
+    transform: 'rotate(84deg) translateX(10px)',
+    offset: .25
+  }, {
+    transform: 'rotate(78deg) translateX(10px)',
+    offset: .78
+  }, {
+    transform: 'rotate(0)'
+  }], {
+    duration: 2800,
+    easing: 'cubic-bezier(.3,1.3,.6,1)'
+  }),
+  shake: el => anim(el, [{
+    transform: 'rotate(0)'
+  }, {
+    transform: 'rotate(-6deg)'
+  }, {
+    transform: 'rotate(6deg)'
+  }, {
+    transform: 'rotate(-4deg)'
+  }, {
+    transform: 'rotate(0)'
+  }], {
+    duration: 800
+  }),
+  wave: el => {
+    el.classList.add('glow');
+    setTimeout(() => el.classList.remove('glow'), 3400);
+    return anim(el, [{
+      transform: 'rotate(0)'
+    }, {
+      transform: 'rotate(-12deg)'
+    }, {
+      transform: 'rotate(12deg)'
+    }, {
+      transform: 'rotate(0)'
+    }], {
+      duration: 950,
+      iterations: 3,
+      easing: 'ease-in-out'
     });
   }
-  function renderBgmBtn() {
-    const b = $('#bgmBtn');
-    b.textContent = BGM.enabled ? '🎵' : '🔇';
-    b.classList.toggle('off', !BGM.enabled);
-    b.setAttribute('aria-pressed', BGM.enabled);
-  }
-  function goHome() {
-    show('home');
-    applyScript();
-    renderBgmBtn();
-  }
+};
+var TAP_MOVES = ['bounce', 'happy', 'squish', 'wiggle', 'twirl', 'jumpjump', 'peek'];
 
-  // ---------- ① ふれてみよう（五十音・濁音） ----------
-  let page = 'sei';
-  function renderGrid() {
-    const g = $('#kanaGrid');
-    g.className = `kana-grid ${page}`;
-    g.innerHTML = '';
-    for (const e of GROUPS[page]) {
-      const t = document.createElement('button');
+// ---------- 演出 ----------
+// 古い端末で重くならないよう、画面に出せる数に上限をつける
+var FX_MAX = 90;
+var room = n => Math.max(0, Math.min(n, FX_MAX - $('#fx').childElementCount));
+function spawn(text, style) {
+  var s = document.createElement('span');
+  s.textContent = text;
+  Object.assign(s.style, style);
+  $('#fx').appendChild(s);
+  return s;
+}
+var center = el => {
+  var r = el.getBoundingClientRect();
+  return {
+    x: r.left + r.width / 2,
+    y: r.top + r.height / 2,
+    w: r.width,
+    top: r.top
+  };
+};
+function popAt(el, emoji, scale = 1) {
+  var r = el.getBoundingClientRect();
+  var s = spawn('', {
+    left: `${r.left + r.width / 2}px`,
+    top: `${r.top}px`,
+    fontSize: `${Math.max(80, r.width * .8) * scale}px`
+  });
+  var inner = document.createElement('span');
+  inner.textContent = emoji;
+  inner.style.display = 'inline-block';
+  s.appendChild(inner);
+  anim(s, [{
+    transform: 'translate(-50%,0) scale(.2)',
+    opacity: 0
+  }, {
+    transform: 'translate(-50%,-70%) scale(1.25)',
+    opacity: 1,
+    offset: .2
+  }, {
+    transform: 'translate(-50%,-80%) scale(1.1)',
+    opacity: 1,
+    offset: .5
+  }, {
+    transform: 'translate(-50%,-95%) scale(1)',
+    opacity: 1,
+    offset: .85
+  }, {
+    transform: 'translate(-50%,-115%) scale(.9)',
+    opacity: 0
+  }], {
+    duration: 3400,
+    easing: 'ease-in-out'
+  }).onfinish = () => s.remove();
+  return inner;
+}
+// 上からふってくる（あめ・ゆき・はな・ほし・はっぱ）
+function fall(emoji, count = 22) {
+  var _loop2 = function _loop2() {
+    var d = spawn(Array.isArray(emoji) ? pick(emoji) : emoji, {
+      left: `${Math.random() * 100}vw`,
+      top: '-10vh',
+      fontSize: `${20 + Math.random() * 22}px`
+    });
+    var sway = (Math.random() - .5) * 12;
+    anim(d, [{
+      transform: 'translate(0, 0) rotate(0)'
+    }, {
+      transform: `translate(${sway}vw, 120vh) rotate(${(Math.random() - .5) * 360}deg)`
+    }], {
+      duration: 3000 + Math.random() * 1600,
+      delay: Math.random() * 1600,
+      easing: 'linear'
+    }).onfinish = () => d.remove();
+  };
+  for (var i = 0, n = room(count); i < n; i++) {
+    _loop2();
+  }
+}
+// 下からのぼっていく（おと・あわ・はーと）
+function rise(emoji, count = 14, style = {}) {
+  var _loop3 = function _loop3() {
+    var d = spawn(Array.isArray(emoji) ? pick(emoji) : emoji, _objectSpread({
+      left: `${10 + Math.random() * 80}vw`,
+      top: '100vh',
+      fontSize: `${26 + Math.random() * 22}px`
+    }, style));
+    var sway = (Math.random() - .5) * 14;
+    anim(d, [{
+      transform: 'translate(0, 0)',
+      opacity: 1
+    }, {
+      transform: `translate(${sway}vw, -115vh)`,
+      opacity: .8
+    }], {
+      duration: 3600 + Math.random() * 1600,
+      delay: Math.random() * 1400,
+      easing: 'ease-out'
+    }).onfinish = () => d.remove();
+  };
+  for (var i = 0, n = room(count); i < n; i++) {
+    _loop3();
+  }
+}
+// 画面をよこぎる（はしる・あるく・はやい・はねる・とぶ・およぐ）
+function across(emoji, kind, {
+  delay = 0,
+  top
+} = {}) {
+  if (!room(1)) return;
+  var y = top || {
+    fly: '24vh',
+    swim: '52vh'
+  }[kind] || '68vh';
+  var s = spawn(emoji, {
+    left: '0',
+    top: y,
+    fontSize: fit('64px', '15vmin', '120px')
+  });
+  var frames = [];
+  var steps = kind === 'walk' ? 20 : 12;
+  for (var i = 0; i <= steps; i++) {
+    var lift = i % 2 ? -14 : 0;
+    if (kind === 'walk') lift = i % 2 ? -8 : 0;
+    if (kind === 'zoom') lift = 0;
+    if (kind === 'hop') lift = i % 2 ? -120 : 0;
+    if (kind === 'fly') lift = Math.sin(i / steps * Math.PI * 3) * 60;
+    if (kind === 'swim') lift = Math.sin(i / steps * Math.PI * 4) * 28;
+    frames.push({
+      transform: `translate(${-20 + i * (140 / steps)}vw, ${lift}px) scaleX(-1)`
+    });
+  }
+  var duration = {
+    run: 4400,
+    walk: 7000,
+    zoom: 2400,
+    hop: 5400,
+    fly: 5600,
+    swim: 5200
+  }[kind] || 4400;
+  anim(s, frames, {
+    duration,
+    delay,
+    easing: 'linear',
+    fill: 'backwards'
+  }).onfinish = () => s.remove();
+  // はやいのりものは、うしろに けむり
+  if (kind === 'zoom') {
+    for (var _i2 = 1; _i2 <= 5; _i2++) {
+      setTimeout(() => {
+        if (!room(1)) return;
+        var p = s.getBoundingClientRect();
+        var puff = spawn('💨', {
+          left: `${p.right - 10}px`,
+          top: `${p.top + p.height * .4}px`,
+          fontSize: '40px'
+        });
+        anim(puff, [{
+          transform: 'scale(.6)',
+          opacity: .9
+        }, {
+          transform: 'scale(1.4) translateX(30px)',
+          opacity: 0
+        }], {
+          duration: 700
+        }).onfinish = () => puff.remove();
+      }, delay + _i2 * 330);
+    }
+  }
+}
+function launch(el, emoji, {
+  duration = 4200,
+  wobble = true
+} = {}) {
+  var r = el.getBoundingClientRect();
+  var s = spawn(emoji, {
+    left: `${r.left + r.width / 2}px`,
+    top: `${r.top}px`,
+    fontSize: fit('70px', '15vmin', '120px')
+  });
+  anim(s, [{
+    transform: 'translate(-50%, 0) scale(.3)'
+  }, {
+    transform: 'translate(-50%, -30%) scale(1.1)',
+    offset: .25
+  }, {
+    transform: `translate(-50%, -40%) scale(1.1) rotate(${wobble ? -3 : -8}deg)`,
+    offset: .4
+  }, {
+    transform: `translate(-50%, -40%) scale(1.1) rotate(${wobble ? 3 : 8}deg)`,
+    offset: .5
+  }, {
+    transform: 'translate(-50%, -130vh) scale(1)'
+  }], {
+    duration,
+    easing: 'ease-in'
+  }).onfinish = () => s.remove();
+}
+// ある点から、まわりへ広がる
+function burst(x, y, items, n = 8, dist = 120, size = [18, 34]) {
+  var _loop4 = function _loop4() {
+    var s = spawn(pick(items), {
+      left: `${x}px`,
+      top: `${y}px`,
+      fontSize: `${size[0] + Math.random() * (size[1] - size[0])}px`
+    });
+    var a = i / k * Math.PI * 2 + Math.random() * .4,
+      d = dist * (.7 + Math.random() * .5);
+    anim(s, [{
+      transform: 'translate(-50%,-50%) scale(.2)',
+      opacity: 0
+    }, {
+      transform: `translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d}px)) scale(1)`,
+      opacity: 1,
+      offset: .5
+    }, {
+      transform: `translate(calc(-50% + ${Math.cos(a) * d * 1.25}px), calc(-50% + ${Math.sin(a) * d * 1.25 + 30}px)) scale(.6)`,
+      opacity: 0
+    }], {
+      duration: 1500
+    }).onfinish = () => s.remove();
+  };
+  for (var i = 0, k = room(n); i < k; i++) {
+    _loop4();
+  }
+}
+var sparkle = el => {
+  var c = center(el);
+  burst(c.x, c.y, ['✨', '💫', '⭐'], 8, c.w * .8);
+};
+var heartBurst = el => {
+  var c = center(el);
+  burst(c.x, c.y, ['💖', '💕', '💗'], 7, c.w * .75);
+};
+// わっか（ぽわん）
+function ring(el, color) {
+  if (!room(2)) return;
+  var c = center(el);
+  var _loop5 = function _loop5() {
+    var s = spawn('', {
+      left: `${c.x}px`,
+      top: `${c.y}px`,
+      width: `${c.w}px`,
+      height: `${c.w}px`,
+      marginLeft: `${-c.w / 2}px`,
+      marginTop: `${-c.w / 2}px`
+    });
+    s.className = 'ring';
+    s.style.setProperty('--c', color || '#fff59d');
+    anim(s, [{
+      transform: 'scale(.5)',
+      opacity: .9
+    }, {
+      transform: 'scale(2.2)',
+      opacity: 0
+    }], {
+      duration: 1100,
+      delay: i * 250,
+      fill: 'backwards'
+    }).onfinish = () => s.remove();
+  };
+  for (var i = 0; i < 2; i++) {
+    _loop5();
+  }
+}
+function fireworks() {
+  for (var i = 0; i < 3; i++) {
+    setTimeout(() => burst(innerWidth * (.2 + Math.random() * .6), innerHeight * (.15 + Math.random() * .3), ['✨', '🎇', '⭐', '💥'], 10, 110, [20, 36]), i * 500);
+  }
+}
+function confetti() {
+  var items = ['🎉', '⭐', '✨', '🌸', '🎈'];
+  var _loop6 = function _loop6() {
+    var s = spawn(items[i % items.length], {
+      left: '50vw',
+      top: '45vh',
+      fontSize: `${24 + Math.random() * 22}px`
+    });
+    var a = Math.random() * Math.PI * 2,
+      d = 25 + Math.random() * 30;
+    var x = Math.cos(a) * d,
+      y = Math.sin(a) * d;
+    anim(s, [{
+      transform: 'translate(-50%,-50%) scale(.3)',
+      opacity: 1
+    }, {
+      transform: `translate(calc(-50% + ${x}vmin), calc(-50% + ${y}vmin)) scale(1)`,
+      opacity: 1,
+      offset: .45
+    }, {
+      transform: `translate(calc(-50% + ${x}vmin), calc(-50% + ${y + 6}vmin)) scale(1)`,
+      opacity: 1,
+      offset: .75
+    }, {
+      transform: `translate(calc(-50% + ${x}vmin), calc(-50% + ${y + 14}vmin)) scale(1)`,
+      opacity: 0
+    }], {
+      duration: 3200,
+      easing: 'cubic-bezier(.2,.8,.3,1)'
+    }).onfinish = () => s.remove();
+  };
+  for (var i = 0, n = room(26); i < n; i++) {
+    _loop6();
+  }
+}
+// 風にのって よこへ流れる
+function wind(items) {
+  var _loop7 = function _loop7() {
+    var d = spawn(pick(items), {
+      left: '-8vw',
+      top: `${10 + Math.random() * 70}vh`,
+      fontSize: `${22 + Math.random() * 18}px`
+    });
+    anim(d, [{
+      transform: 'translate(0,0) rotate(0)'
+    }, {
+      transform: `translate(120vw, ${(Math.random() - .5) * 30}vh) rotate(${360 + Math.random() * 360}deg)`
+    }], {
+      duration: 2600 + Math.random() * 1400,
+      delay: Math.random() * 1200,
+      easing: 'ease-in-out',
+      fill: 'backwards'
+    }).onfinish = () => d.remove();
+  };
+  for (var i = 0, n = room(12); i < n; i++) {
+    _loop7();
+  }
+}
+
+// ことばごとの演出
+function wordAction(w, el) {
+  if (w.a === 'rocket') {
+    launch(el, w.e);
+    fall(['✨', '⭐'], 8);
+    return;
+  }
+  if (w.a === 'up') {
+    launch(el, w.e, {
+      duration: 6000,
+      wobble: false
+    });
+    return;
+  }
+  if (w.a === 'parade') {
+    for (var i = 0; i < 4; i++) across(w.e, 'walk', {
+      delay: i * 450
+    });
+    popAt(el, w.e);
+    return;
+  }
+  var s = popAt(el, w.e, w.a === 'grow' || w.a === 'sun' ? 1.5 : 1);
+  // { rotate, scale, translate } を transform の文字列にする
+  var tf = f => ({
+    transform: [f.translate && `translate(${f.translate.split(' ').join(',')})`, f.rotate && `rotate(${f.rotate})`, f.scale && `scale(${f.scale.split(' ').join(',')})`].filter(Boolean).join(' ') || 'none'
+  });
+  var twist = (frames, opts) => anim(s, frames.map(tf), _objectSpread({
+    easing: 'ease-in-out'
+  }, opts));
+  switch (w.a) {
+    case 'rain':
+      fall('💧');
+      break;
+    case 'snow':
+      fall('❄️');
+      break;
+    case 'petals':
+      fall('🌸');
+      break;
+    case 'leaves':
+      fall(['🍁', '🍂'], 16);
+      break;
+    case 'stars':
+      fall('⭐', 16);
+      break;
+    case 'wind':
+      wind(['🍃', '🍂', '🌸']);
+      break;
+    case 'splash':
+      fall('💧', 12);
+      rise('💦', 6);
+      break;
+    case 'hearts':
+      rise('❤️', 10);
+      rise('💕', 6);
+      break;
+    case 'notes':
+      rise('🎵', 8);
+      rise('🎶', 6);
+      twist([{
+        rotate: '-12deg'
+      }, {
+        rotate: '12deg'
+      }], {
+        duration: 400,
+        iterations: 8,
+        direction: 'alternate'
+      });
+      break;
+    case 'bubbles':
+      rise('◯', 16, {
+        color: '#8fd3ff',
+        fontWeight: '900'
+      });
+      break;
+    case 'thanks':
+      heartBurst(el);
+      rise(['💐', '🌸', '💖'], 8);
+      twist([{
+        rotate: '0deg'
+      }, {
+        rotate: '28deg'
+      }, {
+        rotate: '0deg'
+      }], {
+        duration: 1100,
+        iterations: 2
+      });
+      break;
+    case 'sun':
+      ring(el, '#ffd54f');
+      burst(center(el).x, center(el).top, ['✨', '🌟'], 10, 160);
+      break;
+    case 'party':
+      confetti();
+      break;
+    case 'sleep':
+      rise('💤', 6);
+      twist([{
+        rotate: '-8deg'
+      }, {
+        rotate: '8deg'
+      }], {
+        duration: 1400,
+        iterations: 3,
+        direction: 'alternate'
+      });
+      break;
+    case 'eat':
+      twist([{
+        scale: '1 1'
+      }, {
+        scale: '1.15 .8'
+      }], {
+        duration: 220,
+        iterations: 8,
+        direction: 'alternate'
+      });
+      burst(center(el).x, center(el).top, ['😋', '✨', '💛'], 6, 110);
+      break;
+    case 'dance':
+      twist([{
+        translate: '-24px 0',
+        rotate: '-14deg'
+      }, {
+        translate: '24px 0',
+        rotate: '14deg'
+      }], {
+        duration: 380,
+        iterations: 8,
+        direction: 'alternate'
+      });
+      rise(['🎵', '🎶'], 8);
+      break;
+    case 'cry':
+      fall('💧', 10);
+      twist([{
+        translate: '-6px 0'
+      }, {
+        translate: '6px 0'
+      }], {
+        duration: 120,
+        iterations: 14,
+        direction: 'alternate'
+      });
+      break;
+    case 'laugh':
+      twist([{
+        translate: '0 0'
+      }, {
+        translate: '0 -24px'
+      }], {
+        duration: 260,
+        iterations: 10,
+        direction: 'alternate'
+      });
+      burst(center(el).x, center(el).top, ['😆', '✨', '🎶'], 6, 120);
+      break;
+    case 'firework':
+      fireworks();
+      break;
+    case 'run':
+    case 'walk':
+    case 'zoom':
+    case 'hop':
+    case 'fly':
+    case 'swim':
+      across(w.e, w.a);
+      break;
+    case 'spin':
+      twist([{
+        rotate: '0deg'
+      }, {
+        rotate: '720deg'
+      }], {
+        duration: 3400
+      });
+      break;
+    case 'wave':
+      twist([{
+        rotate: '-25deg'
+      }, {
+        rotate: '25deg'
+      }], {
+        duration: 360,
+        iterations: 9,
+        direction: 'alternate'
+      });
+      break;
+    case 'grow':
+      twist([{
+        scale: '1'
+      }, {
+        scale: '1.3'
+      }], {
+        duration: 600,
+        iterations: 4,
+        direction: 'alternate'
+      });
+      break;
+    default:
+      twist([{
+        rotate: '-15deg'
+      }, {
+        rotate: '15deg'
+      }], {
+        duration: 480,
+        iterations: 7,
+        direction: 'alternate'
+      });
+      break;
+  }
+}
+// ことばの演出とは別に、ときどき おまけの演出
+var EXTRAS = [el => sparkle(el), el => heartBurst(el), el => ring(el, getComputedStyle(el).getPropertyValue('--c')), () => fall(['⭐', '✨'], 10), el => {
+  var c = center(el);
+  burst(c.x, c.y, ['🌈'], 1, 0, [70, 90]);
+}, () => wind(['🎈', '🎈', '🎈'])];
+
+// ---------- 画面の切り替え ----------
+var askAgain = null; // 👂ボタンで呼ぶ
+function show(id) {
+  flow++;
+  stopVoice();
+  closeSpot();
+  askAgain = null;
+  $('#fx').innerHTML = '';
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  document.querySelectorAll('.twinkle').forEach(t => t.remove());
+  nightQuiet = id === 'night';
+  if (nightQuiet) BGM.stop();else BGM.start();
+}
+
+// ---------- ホーム ----------
+function applyScript() {
+  $('#homeTitle').textContent = script === 'kata' ? 'モジモジの モリ' : 'もじもじの もり';
+  $('#scriptHira').setAttribute('aria-pressed', script === 'hira');
+  $('#scriptKata').setAttribute('aria-pressed', script === 'kata');
+  $('#pageSei').textContent = script === 'kata' ? 'ア' : 'あ';
+  $('#pageDaku').textContent = script === 'kata' ? 'ガ' : 'が';
+  renderParade();
+}
+function renderParade() {
+  var p = $('#parade');
+  p.innerHTML = '';
+  shuffle(SEI).slice(0, 5).forEach((e, i) => {
+    var el = makeFriend(e, {
+      delay: i * .4
+    });
+    el.addEventListener('click', () => {
+      var w = pick(wordsOf(e));
+      kanaSound(e);
+      moves[pick(TAP_MOVES)](el);
+      popAt(el, w.e);
+      var line = k => `${k}！　${w.w}の　${k}！`;
+      say(line(disp(e)), {
+        speech: line(spoken(e))
+      });
+    });
+    p.appendChild(el);
+  });
+}
+function renderBgmBtn() {
+  var b = $('#bgmBtn');
+  b.textContent = BGM.enabled ? '🎵' : '🔇';
+  b.classList.toggle('off', !BGM.enabled);
+  b.setAttribute('aria-pressed', BGM.enabled);
+}
+function goHome() {
+  show('home');
+  applyScript();
+  renderBgmBtn();
+}
+
+// ---------- ① ふれてみよう（五十音・濁音） ----------
+var page = 'sei';
+function renderGrid() {
+  var g = $('#kanaGrid');
+  g.className = `kana-grid ${page}`;
+  g.innerHTML = '';
+  var _iterator4 = _createForOfIteratorHelper(GROUPS[page]),
+    _step4;
+  try {
+    var _loop8 = function _loop8() {
+      var e = _step4.value;
+      var t = document.createElement('button');
       t.className = 'tile';
       t.dataset.id = e.id;
-      for (const k of ['lc', 'lr', 'pc', 'pr']) t.style.setProperty(`--${k}`, e[k]);
       t.style.setProperty('--c', e.color);
       t.setAttribute('aria-label', disp(e));
       t.innerHTML = `${disp(e)}<span class="badge" aria-hidden="true">⭐</span>`;
       t.addEventListener('click', () => openSpot(e));
       g.appendChild(t);
-    }
-    sizeGrid();
-    $('#pageSei').setAttribute('aria-pressed', page === 'sei');
-    $('#pageDaku').setAttribute('aria-pressed', page === 'daku');
-    updateTiles();
-  }
-  function sizeGrid() {
-    const g = $('#kanaGrid');
-    const w = innerWidth, h = innerHeight;
-    const land = w > h;
-    const top = h <= 520 ? 66 : 84;
-    const gap = Math.max(4, Math.min(10, Math.min(w, h) * .011));
-    const [nc, nr] = page === 'sei' ? (land ? [11, 5] : [5, 11]) : [5, 5];
-    const cell = Math.floor(Math.min(110, (w - 40 - (nc - 1) * gap) / nc, (h - top - 32 - (nr - 1) * gap) / nr));
-    g.style.setProperty('--cell', `${cell}px`);
-    g.style.setProperty('--gap', `${gap}px`);
-    g.style.setProperty('--top', `${top}px`);
-  }
-  addEventListener('resize', () => { if ($('#touch').classList.contains('active')) sizeGrid(); });
-  function updateTiles() {
-    document.querySelectorAll('.tile').forEach(t => t.classList.toggle('got', zukan[script].has(t.dataset.id)));
-    const list = GROUPS[page];
-    $('#touchCount').textContent = `${list.filter(has).length} / ${list.length}`;
-  }
-  function goTouch() {
-    show('touch');
-    renderGrid();
-    say(page === 'sei' ? 'すきな　もじに　さわってみよう！' : 'てんてん　と　まるの　もじだよ！');
-  }
-  document.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', () => {
-    if (page === b.dataset.page) return;
-    sfx.tap();
-    page = b.dataset.page;
-    closeSpot();
-    renderGrid();
-    say(page === 'sei' ? 'あいうえおの　ひょうだよ！' : 'てんてん　と　まるの　もじだよ！');
-  }));
-
-  // さわったときの言い方（毎回ちがう言い方になるように）
-  const LINES_FIRST = [
-    (k, w) => `${k}！　${w}の　${k}！`,
-    (k, w) => `${w}の　${k}！`,
-    (k, w) => `${k}、${k}、${w}！`,
-    (k, w) => `「${k}」は　${w}の　「${k}」だよ！`,
-    (k, w) => `${k}の　つく　ことば、${w}！`,
-    (k, w) => `${w}！　${k}から　はじまるよ！`,
-    (k, w) => `みつけた！　${w}の　${k}！`,
-  ];
-  // 「を」「ん」「ぢ」「づ」などは、ことばの先頭にこないので別の言い方
-  const LINES_INSIDE = [
-    (k, w) => `${k}！　${w}の　${k}！`,
-    (k, w) => `${w}の　${k}！`,
-    (k, w) => `${w}の　なかに　${k}が　いるよ！`,
-  ];
-  const TICKLE = ['くすぐったい〜！', 'えへへ、もっと　さわって！', 'わーい！　たのしいね！', 'きゃー！　うれしいな！', 'もう、くすぐったいってば〜！', 'いっしょに　あそぼ！'];
-
-  let spot = null;
-  let spotCloseTimer;
-  let lastTapAt = 0, lastId = null, streak = 0;
-  const wordIdx = {};
-  function openSpot(e) {
-    sfx.tap();
-    const card = $('#spotCard');
-    card.innerHTML = '';
-    card.style.setProperty('--c', e.color);
-    const fr = makeFriend(e, { asButton: false });
-    const word = document.createElement('div');
-    word.className = 'spot-word';
-    card.append(fr, word);
-    $('#spot').classList.add('open');
-    anim(card, [{ transform: 'scale(.4)', opacity: 0 }, { transform: 'scale(1.05)', opacity: 1, offset: .7 }, { transform: 'scale(1)' }], { duration: 380 });
-    spot = { e, fr, word, token: 0 };
-    lastTapAt = 0;
-    reactSpot();
-  }
-  function closeSpot() {
-    clearTimeout(spotCloseTimer);
-    spot = null;
-    $('#spot').classList.remove('open');
-  }
-  async function reactSpot() {
-    if (!spot) return;
-    const now = performance.now();
-    if (now - lastTapAt < 380) return; // 連打しすぎないように
-    lastTapAt = now;
-    clearTimeout(spotCloseTimer);
-    const { e, fr, word } = spot;
-    const token = ++spot.token;
-    const id = flow;
-
-    // ことばは、毎回ちがう順番でひとまわりする（同じことばが続かない）
-    const key = script + e.id;
-    const list = wordsOf(e);
-    if (!wordIdx[key] || !wordIdx[key].length) {
-      wordIdx[key] = shuffle(list.map((_, i) => i));
-      if (wordIdx.last && wordIdx.last.key === key && wordIdx[key][0] === wordIdx.last.i && list.length > 1) wordIdx[key].push(wordIdx[key].shift());
-    }
-    const wi = wordIdx[key].shift();
-    wordIdx.last = { key, i: wi };
-    const w = list[wi];
-    fr.querySelector('.hat').textContent = w.e;
-    word.innerHTML = highlight(w.w, disp(e));
-
-    streak = lastId === e.id ? streak + 1 : 1;
-    lastId = e.id;
-    kanaSound(e);
-    moves[pick(TAP_MOVES)](fr);
-    wordAction(w, fr);
-    if (Math.random() < .4) pick(EXTRAS)(fr);
-
-    let text, speech;
-    if (streak >= 4 && streak % 4 === 0) {
-      text = speech = pick(TICKLE);
-      moves.wiggle(fr);
-    } else {
-      const t = pick(w.w[0] === disp(e) ? LINES_FIRST : LINES_INSIDE);
-      text = t(disp(e), w.w);
-      speech = t(spoken(e), w.w);
-    }
-    const got = collect(e);
-    await say(text, { speech });
-    if (id !== flow || !spot || spot.token !== token) return;
-    if (got === 'all') {
-      await sleep(400);
-      if (id !== flow) return;
-      sfx.yay();
-      confetti();
-      await say(e.group === 'sei' ? 'ぜんぶの　もじと　なかよしに　なれたね！　すごい！' : 'てんてんと　まるの　もじも　ぜんぶ　なかよし！　すごい！');
-      if (id !== flow || !spot || spot.token !== token) return;
-    }
-    // しばらくさわらなければ、表にもどる
-    spotCloseTimer = setTimeout(() => { if (spot && spot.token === token) closeSpot(); }, 2600);
-  }
-  $('#spotCard').addEventListener('click', reactSpot);
-  // カードの外をさわったら閉じる。その下にもじがあれば、そのもじをひらく
-  $('#spot').addEventListener('click', ev => {
-    if (ev.target !== $('#spot')) return;
-    closeSpot();
-    const under = document.elementsFromPoint(ev.clientX, ev.clientY).find(n => n.classList && n.classList.contains('tile'));
-    if (under) openSpot(byId[under.dataset.id]);
-  });
-
-  // ---------- 進み具合の星 ----------
-  const ROUNDS = 5;
-  function renderProgress(done) {
-    const p = $('#progress');
-    p.innerHTML = '';
-    for (let i = 0; i < ROUNDS; i++) {
-      const s = document.createElement('span');
-      s.textContent = '⭐';
-      if (i >= done) s.className = 'dim';
-      p.appendChild(s);
-    }
-  }
-  // まちがえやすい字（形のにた字や、点・丸だけがちがう字）を、ときどきまぜる
-  function pickDistractors(e, n, round) {
-    const out = [];
-    const group = CONFUSABLE[script].map(g => [...toHira(g)]).find(g => g.includes(e.id));
-    const related = ENTRIES.filter(x => x !== e && baseOf(x.id) === baseOf(e.id));
-    if (round >= 1 && Math.random() < .6) {
-      const pool = [...(group || []).filter(x => x !== e.id).map(x => byId[x]), ...related];
-      if (pool.length) out.push(pick(pool));
-    }
-    // 清音の問題には清音を多めに、濁音の問題には濁音を多めにまぜる
-    const same = shuffle(GROUPS[e.group]), other = shuffle(ENTRIES);
-    for (const c of [...same.slice(0, 8), ...other]) {
-      if (out.length >= n) break;
-      if (c !== e && !out.includes(c)) out.push(c);
-    }
-    return out;
-  }
-  // しばらく何もさわらなかったら、ヒントを出す
-  function idleHints(id, isLocked, hints) {
-    let timer, count = 0;
-    const arm = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        if (id !== flow || isLocked()) return;
-        hints[Math.min(count, hints.length - 1)]();
-        count++;
-        if (count < 4) arm();
-      }, 8000);
     };
-    return { arm, stop: () => clearTimeout(timer) };
+    for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+      _loop8();
+    }
+  } catch (err) {
+    _iterator4.e(err);
+  } finally {
+    _iterator4.f();
   }
+  sizeGrid();
+  $('#pageSei').setAttribute('aria-pressed', page === 'sei');
+  $('#pageDaku').setAttribute('aria-pressed', page === 'daku');
+  updateTiles();
+}
+function sizeGrid() {
+  var g = $('#kanaGrid');
+  var w = innerWidth,
+    h = innerHeight;
+  var land = w > h;
+  var top = h <= 520 ? 66 : 84;
+  var gap = Math.max(4, Math.min(10, Math.min(w, h) * .011));
+  var _ref2 = page === 'sei' ? land ? [11, 5] : [5, 11] : [5, 5],
+    _ref3 = _slicedToArray(_ref2, 2),
+    nc = _ref3[0],
+    nr = _ref3[1];
+  var cell = Math.floor(Math.min(110, (w - 40 - (nc - 1) * gap) / nc, (h - top - 32 - (nr - 1) * gap) / nr));
+  g.style.setProperty('--cell', `${cell}px`);
+  g.style.setProperty('--top', `${top}px`);
+  g.style.width = `${nc * cell + (nc - 1) * gap}px`;
+  g.style.height = `${nr * cell + (nr - 1) * gap}px`;
+  // よこ長は昔ながらの五十音表（右から行がたてに並ぶ）、たて長は あいうえお を横に読む並び
+  g.querySelectorAll('.tile').forEach(t => {
+    var e = byId[t.dataset.id];
+    var col = land ? e.lc : e.pc;
+    var row = land ? e.lr : e.pr;
+    t.style.left = `${(col - 1) * (cell + gap)}px`;
+    t.style.top = `${(row - 1) * (cell + gap)}px`;
+  });
+}
+addEventListener('resize', () => {
+  if ($('#touch').classList.contains('active')) sizeGrid();
+});
+function updateTiles() {
+  document.querySelectorAll('.tile').forEach(t => t.classList.toggle('got', zukan[script].has(t.dataset.id)));
+  var list = GROUPS[page];
+  $('#touchCount').textContent = `${list.filter(has).length} / ${list.length}`;
+}
+function goTouch() {
+  show('touch');
+  renderGrid();
+  say(page === 'sei' ? 'すきな　もじに　さわってみよう！' : 'てんてん　と　まるの　もじだよ！');
+}
+document.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', () => {
+  if (page === b.dataset.page) return;
+  sfx.tap();
+  page = b.dataset.page;
+  closeSpot();
+  renderGrid();
+  say(page === 'sei' ? 'あいうえおの　ひょうだよ！' : 'てんてん　と　まるの　もじだよ！');
+}));
 
-  async function runSession(kind) {
-    show('play');
-    const id = flow;
-    $('#quizCard').hidden = kind !== 'quiz';
-    $('#stage').innerHTML = '';
-    let items;
-    if (kind === 'quiz') {
-      // 先頭のもじがそのもじで、絵だけで名前がわかることばから出す
-      const pool = shuffle(ENTRIES.filter(e => e.id !== 'を' && e.id !== 'ん').reduce((all, e) => all.concat(wordsOf(e).filter(w => w.quizOk && w.w[0] === disp(e)).map(w => ({ e, w }))), []));
-      items = [];
-      for (const it of pool) {
-        if (items.length >= ROUNDS) break;
-        if (!items.some(x => x.e === it.e || x.w.e === it.w.e)) items.push(it);
+// さわったときの言い方（毎回ちがう言い方になるように）
+var LINES_FIRST = [(k, w) => `${k}！　${w}の　${k}！`, (k, w) => `${w}の　${k}！`, (k, w) => `${k}、${k}、${w}！`, (k, w) => `「${k}」は　${w}の　「${k}」だよ！`, (k, w) => `${k}の　つく　ことば、${w}！`, (k, w) => `${w}！　${k}から　はじまるよ！`, (k, w) => `みつけた！　${w}の　${k}！`];
+// 「を」「ん」「ぢ」「づ」などは、ことばの先頭にこないので別の言い方
+var LINES_INSIDE = [(k, w) => `${k}！　${w}の　${k}！`, (k, w) => `${w}の　${k}！`, (k, w) => `${w}の　なかに　${k}が　いるよ！`];
+var TICKLE = ['くすぐったい〜！', 'えへへ、もっと　さわって！', 'わーい！　たのしいね！', 'きゃー！　うれしいな！', 'もう、くすぐったいってば〜！', 'いっしょに　あそぼ！'];
+var spot = null;
+var spotCloseTimer;
+var lastTapAt = 0,
+  lastId = null,
+  streak = 0;
+var wordIdx = {};
+function openSpot(e) {
+  sfx.tap();
+  var card = $('#spotCard');
+  card.innerHTML = '';
+  card.style.setProperty('--c', e.color);
+  var fr = makeFriend(e, {
+    asButton: false
+  });
+  var word = document.createElement('div');
+  word.className = 'spot-word';
+  card.append(fr, word);
+  $('#spot').classList.add('open');
+  anim(card, [{
+    transform: 'scale(.4)',
+    opacity: 0
+  }, {
+    transform: 'scale(1.05)',
+    opacity: 1,
+    offset: .7
+  }, {
+    transform: 'scale(1)'
+  }], {
+    duration: 380
+  });
+  spot = {
+    e,
+    fr,
+    word,
+    token: 0
+  };
+  lastTapAt = 0;
+  reactSpot();
+}
+function closeSpot() {
+  clearTimeout(spotCloseTimer);
+  spot = null;
+  $('#spot').classList.remove('open');
+}
+function reactSpot() {
+  return _reactSpot.apply(this, arguments);
+}
+function _reactSpot() {
+  _reactSpot = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+    var now, _spot, e, fr, word, token, id, key, list, wi, w, text, speech, t, got;
+    return _regenerator().w(function (_context3) {
+      while (1) switch (_context3.n) {
+        case 0:
+          if (spot) {
+            _context3.n = 1;
+            break;
+          }
+          return _context3.a(2);
+        case 1:
+          now = performance.now();
+          if (!(now - lastTapAt < 380)) {
+            _context3.n = 2;
+            break;
+          }
+          return _context3.a(2);
+        case 2:
+          // 連打しすぎないように
+          lastTapAt = now;
+          clearTimeout(spotCloseTimer);
+          _spot = spot, e = _spot.e, fr = _spot.fr, word = _spot.word;
+          token = ++spot.token;
+          id = flow; // ことばは、毎回ちがう順番でひとまわりする（同じことばが続かない）
+          key = script + e.id;
+          list = wordsOf(e);
+          if (!wordIdx[key] || !wordIdx[key].length) {
+            wordIdx[key] = shuffle(list.map((_, i) => i));
+            if (wordIdx.last && wordIdx.last.key === key && wordIdx[key][0] === wordIdx.last.i && list.length > 1) wordIdx[key].push(wordIdx[key].shift());
+          }
+          wi = wordIdx[key].shift();
+          wordIdx.last = {
+            key,
+            i: wi
+          };
+          w = list[wi];
+          fr.querySelector('.hat').textContent = w.e;
+          word.innerHTML = highlight(w.w, disp(e));
+          streak = lastId === e.id ? streak + 1 : 1;
+          lastId = e.id;
+          kanaSound(e);
+          moves[pick(TAP_MOVES)](fr);
+          wordAction(w, fr);
+          if (Math.random() < .4) pick(EXTRAS)(fr);
+          if (streak >= 4 && streak % 4 === 0) {
+            text = speech = pick(TICKLE);
+            moves.wiggle(fr);
+          } else {
+            t = pick(w.w[0] === disp(e) ? LINES_FIRST : LINES_INSIDE);
+            text = t(disp(e), w.w);
+            speech = t(spoken(e), w.w);
+          }
+          got = collect(e);
+          _context3.n = 3;
+          return say(text, {
+            speech
+          });
+        case 3:
+          if (!(id !== flow || !spot || spot.token !== token)) {
+            _context3.n = 4;
+            break;
+          }
+          return _context3.a(2);
+        case 4:
+          if (!(got === 'all')) {
+            _context3.n = 8;
+            break;
+          }
+          _context3.n = 5;
+          return sleep(400);
+        case 5:
+          if (!(id !== flow)) {
+            _context3.n = 6;
+            break;
+          }
+          return _context3.a(2);
+        case 6:
+          sfx.yay();
+          confetti();
+          _context3.n = 7;
+          return say(e.group === 'sei' ? 'ぜんぶの　もじと　なかよしに　なれたね！　すごい！' : 'てんてんと　まるの　もじも　ぜんぶ　なかよし！　すごい！');
+        case 7:
+          if (!(id !== flow || !spot || spot.token !== token)) {
+            _context3.n = 8;
+            break;
+          }
+          return _context3.a(2);
+        case 8:
+          // しばらくさわらなければ、表にもどる
+          spotCloseTimer = setTimeout(() => {
+            if (spot && spot.token === token) closeSpot();
+          }, 2600);
+        case 9:
+          return _context3.a(2);
       }
-    } else {
-      // 清音を多めに、濁音もときどき
-      items = shuffle([...shuffle(SEI).slice(0, 4), ...shuffle(DAKU).slice(0, 1 + (Math.random() < .5))]).slice(0, ROUNDS).map(e => ({ e }));
-    }
-    for (let round = 0; round < ROUNDS; round++) {
-      renderProgress(round);
-      await (kind === 'quiz' ? quizRound(id, items[round], round) : findRound(id, items[round].e, round));
-      if (id !== flow) return;
-    }
-    renderProgress(ROUNDS);
-    await sleep(800);
-    if (id !== flow) return;
-    goNight(items.map(x => x.e));
-  }
-
-  function placeChoices(choices, size, opts) {
-    const stage = $('#stage');
-    stage.innerHTML = '';
-    return choices.map((c, i) => {
-      const el = makeFriend(c, { delay: i * .6, ...opts });
-      el.style.setProperty('--friend', size);
-      anim(el, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 420, delay: i * 90, fill: 'backwards', easing: 'cubic-bezier(.3,1.4,.6,1)' });
-      stage.appendChild(el);
-      return el;
-    });
-  }
-  const PRAISE = ['ぴんぽーん！', 'せいかい！', 'やったね！', 'すごーい！', 'あたり！'];
-
-  // ---------- ② さがしてみよう ----------
-  const FIND_CHOICES = [2, 2, 3, 3, 4];
-  function findRound(id, target, round) {
-    return new Promise(resolve => {
-      const choices = shuffle([target, ...pickDistractors(target, FIND_CHOICES[round] - 1, round)]);
-      // 3問目からは帽子の絵をはずして、字だけで見つける
-      const els = placeChoices(choices, fit('84px', '23vmin', '190px'), { hat: round < 2 });
-      const targetEl = els[choices.indexOf(target)];
-      const K = disp(target), S = spoken(target);
-      let locked = false;
-      const ask = () => say(`「${K}」は　どーこだ？`, { speech: `${S}は　どーこだ？` });
-      const showMe = () => { sfx.hint(); moves.wave(targetEl); say(`「${K}」は　ここだよ！`, { speech: `${S}は　ここだよ！` }); };
-      const idle = idleHints(id, () => locked, [ask, showMe]);
-      askAgain = () => { idle.arm(); ask(); };
-
-      els.forEach((el, i) => el.addEventListener('click', async () => {
-        if (locked) return;
-        idle.arm();
-        if (choices[i] === target) {
-          locked = true;
-          idle.stop();
-          sfx.yay();
-          moves.happy(el);
-          wordAction(pick(wordsOf(target)), el);
-          els.forEach(o => { if (o !== el) setTimeout(() => { boing(); moves.zukko(o); }, 400); });
-          confetti();
-          collect(target);
-          // 声が早く終わっても、演出を最後まで見てから次へ進む
-          const p = pick(PRAISE);
-          await Promise.all([say(`${p}　「${K}」だね！`, { speech: `${p}　${S}だね！` }), sleep(3600)]);
-          if (id !== flow) return;
-          resolve();
-        } else {
-          // まちがいにはしない。正解のおともだちが手をふって教える
-          sfx.hint();
-          moves.shake(el);
-          moves.wave(targetEl);
-          say(`こっちだよ〜。「${K}」は　ここだよ！`, { speech: `こっちだよ〜。${S}は　ここだよ！` });
-        }
-      }));
-
-      sleep(450).then(() => { if (id === flow) { ask(); idle.arm(); } });
-    });
-  }
-
-  // ---------- ③ これなあに？（絵を見て、さいしょのもじをえらぶ） ----------
-  const QUIZ_CHOICES = [2, 2, 3, 3, 3];
-  function quizRound(id, { e: target, w }, round) {
-    return new Promise(resolve => {
-      const K = disp(target), S = spoken(target);
-      const pic = $('#quizPic'), wordEl = $('#quizWord');
-      pic.textContent = w.e;
-      wordEl.style.setProperty('--c', target.color);
-      wordEl.innerHTML = `<span class="blank"></span>${w.w.slice(1)}`;
-      wordEl.classList.add('hide');
-      anim($('#quizCard'), [{ transform: 'scale(.5) rotate(-6deg)', opacity: 0 }, { transform: 'scale(1.06)', opacity: 1, offset: .7 }, { transform: 'scale(1)' }], { duration: 500 });
-
-      const choices = shuffle([target, ...pickDistractors(target, QUIZ_CHOICES[round] - 1, round)]);
-      const els = placeChoices(choices, fit('76px', '20vmin', '160px'), { hat: false });
-      const targetEl = els[choices.indexOf(target)];
-      let locked = false;
-
-      const ask = () => say(pick(['これは　なにかな？', 'これ、なあに？', 'これは　なんだろう？']));
-      // ヒント1：なまえを言って、さいしょのもじを空けて見せる
-      const hintName = () => { wordEl.classList.remove('hide'); say(`${w.w}！　さいしょの　もじは　どれかな？`); };
-      // ヒント2：正解のおともだちが手をふる
-      const showMe = () => {
-        wordEl.classList.remove('hide');
-        sfx.hint();
-        moves.wave(targetEl);
-        say(`${w.w}の　「${K}」は　これだよ！`, { speech: `${w.w}の　${S}は　これだよ！` });
-      };
-      const idle = idleHints(id, () => locked, [hintName, showMe]);
-      askAgain = () => { idle.arm(); hintName(); };
-
-      els.forEach((el, i) => el.addEventListener('click', async () => {
-        if (locked) return;
-        idle.arm();
-        if (choices[i] === target) {
-          locked = true;
-          idle.stop();
-          wordEl.innerHTML = highlight(w.w, K);
-          wordEl.classList.remove('hide');
-          sfx.yay();
-          moves.happy(el);
-          wordAction(w, pic);
-          els.forEach(o => { if (o !== el) setTimeout(() => { boing(); moves.zukko(o); }, 400); });
-          confetti();
-          collect(target);
-          const p = pick(PRAISE);
-          await Promise.all([say(`${p}　${w.w}の　「${K}」！`, { speech: `${p}　${w.w}の　${S}！` }), sleep(3800)]);
-          if (id !== flow) return;
-          resolve();
-        } else {
-          moves.shake(el);
-          showMe();
-        }
-      }));
-
-      sleep(550).then(() => { if (id === flow) { ask(); idle.arm(); } });
-    });
-  }
-
-  // ---------- おやすみ ----------
-  function goNight(list) {
-    show('night');
-    const st = $('#nightStage');
-    st.innerHTML = '';
-    list.forEach((e, i) => {
-      const el = makeFriend(e, { asButton: false, delay: i * .7 });
-      el.classList.add('sleep');
-      el.style.setProperty('--friend', fit('64px', '15vmin', '120px'));
-      const z = document.createElement('span');
-      z.className = 'zzz';
-      z.textContent = 'z';
-      el.appendChild(z);
-      st.appendChild(el);
-    });
-    for (let i = 0; i < 14; i++) {
-      const t = document.createElement('span');
-      t.className = 'twinkle';
-      t.textContent = '✦';
-      Object.assign(t.style, { left: `${Math.random() * 100}vw`, top: `${Math.random() * 40}vh`, fontSize: `${10 + Math.random() * 14}px`, animationDelay: `${-Math.random() * 2.4}s` });
-      document.body.appendChild(t);
-    }
-    say('きょうは　ここまで。たくさん　あそんだね。おやすみ〜', { rate: .85, pitch: .9 });
-  }
-
-  // ---------- ボタン ----------
-  $('#startBtn').addEventListener('click', () => {
-    unlockAudio();
-    // iPhone/iPad では、最初の読み上げをタップの中で始めないと声が出ないことがある
-    try { speechSynthesis.speak(new SpeechSynthesisUtterance('')); } catch (err) {}
-    pickVoice();
-    sfx.yay();
-    goHome();
-    say(script === 'kata' ? 'モジモジの　モリへ　ようこそ！' : 'もじもじの　もりへ　ようこそ！');
-  });
-  document.querySelectorAll('[data-home]').forEach(b => b.addEventListener('click', () => { sfx.tap(); goHome(); }));
-  $('#askAgain').addEventListener('click', () => { sfx.tap(); if (askAgain) askAgain(); });
-  $('#bgmBtn').addEventListener('click', () => {
-    unlockAudio();
-    BGM.setEnabled(!BGM.enabled);
-    renderBgmBtn();
-    sfx.tap();
-  });
-  document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
-    unlockAudio();
-    sfx.tap();
-    const m = b.dataset.mode;
-    if (m === 'touch') goTouch(); else runSession(m);
+    }, _callee3);
   }));
-  document.querySelectorAll('[data-script]').forEach(b => b.addEventListener('click', () => {
-    sfx.tap();
-    script = b.dataset.script;
-    try { localStorage.setItem(SCRIPT_KEY, script); } catch (err) {}
-    applyScript();
-    say(script === 'kata' ? 'カタカナで　あそぼう！' : 'ひらがなで　あそぼう！');
+  return _reactSpot.apply(this, arguments);
+}
+$('#spotCard').addEventListener('click', reactSpot);
+// カードの外をさわったら閉じる。その下にもじがあれば、そのもじをひらく
+$('#spot').addEventListener('click', ev => {
+  if (ev.target !== $('#spot')) return;
+  closeSpot();
+  var under = document.elementsFromPoint(ev.clientX, ev.clientY).find(n => n.classList && n.classList.contains('tile'));
+  if (under) openSpot(byId[under.dataset.id]);
+});
+
+// ---------- 進み具合の星 ----------
+var ROUNDS = 5;
+function renderProgress(done) {
+  var p = $('#progress');
+  p.innerHTML = '';
+  for (var i = 0; i < ROUNDS; i++) {
+    var s = document.createElement('span');
+    s.textContent = '⭐';
+    if (i >= done) s.className = 'dim';
+    p.appendChild(s);
+  }
+}
+// まちがえやすい字（形のにた字や、点・丸だけがちがう字）を、ときどきまぜる
+function pickDistractors(e, n, round) {
+  var out = [];
+  var group = CONFUSABLE[script].map(g => [...toHira(g)]).find(g => g.includes(e.id));
+  var related = ENTRIES.filter(x => x !== e && baseOf(x.id) === baseOf(e.id));
+  if (round >= 1 && Math.random() < .6) {
+    var pool = [...(group || []).filter(x => x !== e.id).map(x => byId[x]), ...related];
+    if (pool.length) out.push(pick(pool));
+  }
+  // 清音の問題には清音を多めに、濁音の問題には濁音を多めにまぜる
+  var same = shuffle(GROUPS[e.group]),
+    other = shuffle(ENTRIES);
+  for (var _i3 = 0, _arr = [...same.slice(0, 8), ...other]; _i3 < _arr.length; _i3++) {
+    var c = _arr[_i3];
+    if (out.length >= n) break;
+    if (c !== e && !out.includes(c)) out.push(c);
+  }
+  return out;
+}
+// しばらく何もさわらなかったら、ヒントを出す
+function idleHints(id, isLocked, hints) {
+  var timer,
+    count = 0;
+  var arm = () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (id !== flow || isLocked()) return;
+      hints[Math.min(count, hints.length - 1)]();
+      count++;
+      if (count < 4) arm();
+    }, 8000);
+  };
+  return {
+    arm,
+    stop: () => clearTimeout(timer)
+  };
+}
+function runSession(_x) {
+  return _runSession.apply(this, arguments);
+}
+function _runSession() {
+  _runSession = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(kind) {
+    var id, items, pool, _iterator6, _step6, _loop9, round, _t;
+    return _regenerator().w(function (_context5) {
+      while (1) switch (_context5.p = _context5.n) {
+        case 0:
+          show('play');
+          id = flow;
+          $('#quizCard').hidden = kind !== 'quiz';
+          $('#stage').innerHTML = '';
+          if (!(kind === 'quiz')) {
+            _context5.n = 9;
+            break;
+          }
+          // 先頭のもじがそのもじで、絵だけで名前がわかることばから出す
+          pool = shuffle(ENTRIES.filter(e => e.id !== 'を' && e.id !== 'ん').reduce((all, e) => all.concat(wordsOf(e).filter(w => w.quizOk && w.w[0] === disp(e)).map(w => ({
+            e,
+            w
+          }))), []));
+          items = [];
+          _iterator6 = _createForOfIteratorHelper(pool);
+          _context5.p = 1;
+          _loop9 = /*#__PURE__*/_regenerator().m(function _loop9() {
+            var it;
+            return _regenerator().w(function (_context4) {
+              while (1) switch (_context4.n) {
+                case 0:
+                  it = _step6.value;
+                  if (!(items.length >= ROUNDS)) {
+                    _context4.n = 1;
+                    break;
+                  }
+                  return _context4.a(2, 1);
+                case 1:
+                  if (!items.some(x => x.e === it.e || x.w.e === it.w.e)) items.push(it);
+                case 2:
+                  return _context4.a(2);
+              }
+            }, _loop9);
+          });
+          _iterator6.s();
+        case 2:
+          if ((_step6 = _iterator6.n()).done) {
+            _context5.n = 5;
+            break;
+          }
+          return _context5.d(_regeneratorValues(_loop9()), 3);
+        case 3:
+          if (!_context5.v) {
+            _context5.n = 4;
+            break;
+          }
+          return _context5.a(3, 5);
+        case 4:
+          _context5.n = 2;
+          break;
+        case 5:
+          _context5.n = 7;
+          break;
+        case 6:
+          _context5.p = 6;
+          _t = _context5.v;
+          _iterator6.e(_t);
+        case 7:
+          _context5.p = 7;
+          _iterator6.f();
+          return _context5.f(7);
+        case 8:
+          _context5.n = 10;
+          break;
+        case 9:
+          // 清音を多めに、濁音もときどき
+          items = shuffle([...shuffle(SEI).slice(0, 4), ...shuffle(DAKU).slice(0, 1 + (Math.random() < .5))]).slice(0, ROUNDS).map(e => ({
+            e
+          }));
+        case 10:
+          round = 0;
+        case 11:
+          if (!(round < ROUNDS)) {
+            _context5.n = 14;
+            break;
+          }
+          renderProgress(round);
+          _context5.n = 12;
+          return kind === 'quiz' ? quizRound(id, items[round], round) : findRound(id, items[round].e, round);
+        case 12:
+          if (!(id !== flow)) {
+            _context5.n = 13;
+            break;
+          }
+          return _context5.a(2);
+        case 13:
+          round++;
+          _context5.n = 11;
+          break;
+        case 14:
+          renderProgress(ROUNDS);
+          _context5.n = 15;
+          return sleep(800);
+        case 15:
+          if (!(id !== flow)) {
+            _context5.n = 16;
+            break;
+          }
+          return _context5.a(2);
+        case 16:
+          goNight(items.map(x => x.e));
+        case 17:
+          return _context5.a(2);
+      }
+    }, _callee4, null, [[1, 6, 7, 8]]);
   }));
-
-  // 保護者メニュー：1.5秒の長押しで開く（子どもが偶然開かないように）
-  const pb = $('#parentBtn');
-  let holdTimer;
-  const holdStart = e => { e.preventDefault(); pb.classList.add('holding'); holdTimer = setTimeout(openPanel, 1500); };
-  const holdEnd = () => { pb.classList.remove('holding'); clearTimeout(holdTimer); };
-  pb.addEventListener('pointerdown', holdStart);
-  ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => pb.addEventListener(t, holdEnd));
-  function updateCounts() {
-    $('#countHira').textContent = zukan.hira.size;
-    $('#countKata').textContent = zukan.kata.size;
-  }
-  function renderVoicePanel() {
-    pickVoice();
-    const sel = $('#voiceSelect');
-    const ja = [...jaVoices()].sort((a, b) => scoreVoice(b) - scoreVoice(a));
-    sel.innerHTML = '';
-    const auto = new Option('おまかせ（いちばんなめらかな声）', '');
-    sel.add(auto);
-    for (const v of ja) sel.add(new Option(v.name, v.name));
-    sel.value = voiceSettings.name && ja.some(v => v.name === voiceSettings.name) ? voiceSettings.name : '';
-    $('#voicePitch').value = voiceSettings.pitch;
-    $('#voiceRate').value = voiceSettings.rate;
-    $('#pitchOut').textContent = (+voiceSettings.pitch).toFixed(1);
-    $('#rateOut').textContent = (+voiceSettings.rate).toFixed(2);
-    $('#bgmVolume').value = BGM.volume;
-    $('#bgmOut').textContent = Math.round(BGM.volume * 100);
-    $('#voiceInfo').textContent = !('speechSynthesis' in window)
-      ? 'このブラウザは音声読み上げに対応していません。画面下の字幕で内容を確認できます。'
-      : jaVoice
-        ? `いまの声：${jaVoice.name}`
-        : '日本語の読み上げ音声が見つかりません。端末の設定で日本語の音声を追加すると、声が出るようになります。';
-  }
-  function openPanel() {
-    holdEnd();
-    renderVoicePanel();
-    updateCounts();
-    disarmReset();
-    $('#panelBg').classList.add('open');
-  }
-  const saveVoice = () => store(VOICE_KEY, voiceSettings);
-  $('#voiceSelect').addEventListener('change', ev => { voiceSettings.name = ev.target.value; saveVoice(); renderVoicePanel(); });
-  $('#voicePitch').addEventListener('input', ev => { voiceSettings.pitch = +ev.target.value; saveVoice(); $('#pitchOut').textContent = voiceSettings.pitch.toFixed(1); });
-  $('#voiceRate').addEventListener('input', ev => { voiceSettings.rate = +ev.target.value; saveVoice(); $('#rateOut').textContent = voiceSettings.rate.toFixed(2); });
-  $('#bgmVolume').addEventListener('input', ev => { unlockAudio(); BGM.setVolume(+ev.target.value); $('#bgmOut').textContent = Math.round(BGM.volume * 100); });
-  $('#closePanel').addEventListener('click', () => $('#panelBg').classList.remove('open'));
-  $('#voiceTest').addEventListener('click', () => { unlockAudio(); say('こんにちは！　いっしょに　あそぼうね！'); });
-  // リセットは2回押したときだけ（1回目で確認の表示に変わる）
-  const resetBtn = $('#resetZukan');
-  let resetTimer;
-  function disarmReset() {
-    clearTimeout(resetTimer);
-    resetBtn.classList.remove('danger');
-    resetBtn.textContent = 'ずかんをリセット';
-  }
-  resetBtn.addEventListener('click', () => {
-    if (!resetBtn.classList.contains('danger')) {
-      resetBtn.classList.add('danger');
-      resetBtn.textContent = 'もう一度押すと全部消えます';
-      resetTimer = setTimeout(disarmReset, 4000);
-      return;
-    }
-    zukan = { hira: new Set(), kata: new Set() };
-    saveZukan();
-    updateCounts();
-    updateTiles();
-    disarmReset();
-    resetBtn.textContent = '消しました';
-    resetTimer = setTimeout(disarmReset, 2000);
+  return _runSession.apply(this, arguments);
+}
+function placeChoices(choices, size, opts) {
+  var stage = $('#stage');
+  stage.innerHTML = '';
+  return choices.map((c, i) => {
+    var el = makeFriend(c, _objectSpread({
+      delay: i * .6
+    }, opts));
+    el.style.setProperty('--friend', size);
+    anim(el, [{
+      transform: 'scale(.3)',
+      opacity: 0
+    }, {
+      transform: 'scale(1)',
+      opacity: 1
+    }], {
+      duration: 420,
+      delay: i * 90,
+      fill: 'backwards',
+      easing: 'cubic-bezier(.3,1.4,.6,1)'
+    });
+    stage.appendChild(el);
+    return el;
   });
+}
+var PRAISE = ['ぴんぽーん！', 'せいかい！', 'やったね！', 'すごーい！', 'あたり！'];
 
-  // ダブルタップでの拡大や長押しメニューを防ぐ
-  document.addEventListener('dblclick', e => e.preventDefault());
-  document.addEventListener('contextmenu', e => e.preventDefault());
+// ---------- ② さがしてみよう ----------
+var FIND_CHOICES = [2, 2, 3, 3, 4];
+function findRound(id, target, round) {
+  return new Promise(resolve => {
+    var choices = shuffle([target, ...pickDistractors(target, FIND_CHOICES[round] - 1, round)]);
+    // 3問目からは帽子の絵をはずして、字だけで見つける
+    var els = placeChoices(choices, fit('84px', '23vmin', '190px'), {
+      hat: round < 2
+    });
+    var targetEl = els[choices.indexOf(target)];
+    var K = disp(target),
+      S = spoken(target);
+    var locked = false;
+    var ask = () => say(`「${K}」は　どーこだ？`, {
+      speech: `${S}は　どーこだ？`
+    });
+    var showMe = () => {
+      sfx.hint();
+      moves.wave(targetEl);
+      say(`「${K}」は　ここだよ！`, {
+        speech: `${S}は　ここだよ！`
+      });
+    };
+    var idle = idleHints(id, () => locked, [ask, showMe]);
+    askAgain = () => {
+      idle.arm();
+      ask();
+    };
+    els.forEach((el, i) => el.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
+      var p;
+      return _regenerator().w(function (_context) {
+        while (1) switch (_context.n) {
+          case 0:
+            if (!locked) {
+              _context.n = 1;
+              break;
+            }
+            return _context.a(2);
+          case 1:
+            idle.arm();
+            if (!(choices[i] === target)) {
+              _context.n = 4;
+              break;
+            }
+            locked = true;
+            idle.stop();
+            sfx.yay();
+            moves.happy(el);
+            wordAction(pick(wordsOf(target)), el);
+            els.forEach(o => {
+              if (o !== el) setTimeout(() => {
+                boing();
+                moves.zukko(o);
+              }, 400);
+            });
+            confetti();
+            collect(target);
+            // 声が早く終わっても、演出を最後まで見てから次へ進む
+            p = pick(PRAISE);
+            _context.n = 2;
+            return Promise.all([say(`${p}　「${K}」だね！`, {
+              speech: `${p}　${S}だね！`
+            }), sleep(3600)]);
+          case 2:
+            if (!(id !== flow)) {
+              _context.n = 3;
+              break;
+            }
+            return _context.a(2);
+          case 3:
+            resolve();
+            _context.n = 5;
+            break;
+          case 4:
+            // まちがいにはしない。正解のおともだちが手をふって教える
+            sfx.hint();
+            moves.shake(el);
+            moves.wave(targetEl);
+            say(`こっちだよ〜。「${K}」は　ここだよ！`, {
+              speech: `こっちだよ〜。${S}は　ここだよ！`
+            });
+          case 5:
+            return _context.a(2);
+        }
+      }, _callee);
+    }))));
+    sleep(450).then(() => {
+      if (id === flow) {
+        ask();
+        idle.arm();
+      }
+    });
+  });
+}
+
+// ---------- ③ これなあに？（絵を見て、さいしょのもじをえらぶ） ----------
+var QUIZ_CHOICES = [2, 2, 3, 3, 3];
+function quizRound(id, {
+  e: target,
+  w
+}, round) {
+  return new Promise(resolve => {
+    var K = disp(target),
+      S = spoken(target);
+    var pic = $('#quizPic'),
+      wordEl = $('#quizWord');
+    pic.textContent = w.e;
+    wordEl.style.setProperty('--c', target.color);
+    wordEl.innerHTML = `<span class="blank"></span>${w.w.slice(1)}`;
+    wordEl.classList.add('hide');
+    anim($('#quizCard'), [{
+      transform: 'scale(.5) rotate(-6deg)',
+      opacity: 0
+    }, {
+      transform: 'scale(1.06)',
+      opacity: 1,
+      offset: .7
+    }, {
+      transform: 'scale(1)'
+    }], {
+      duration: 500
+    });
+    var choices = shuffle([target, ...pickDistractors(target, QUIZ_CHOICES[round] - 1, round)]);
+    var els = placeChoices(choices, fit('76px', '20vmin', '160px'), {
+      hat: false
+    });
+    var targetEl = els[choices.indexOf(target)];
+    var locked = false;
+    var ask = () => say(pick(['これは　なにかな？', 'これ、なあに？', 'これは　なんだろう？']));
+    // ヒント1：なまえを言って、さいしょのもじを空けて見せる
+    var hintName = () => {
+      wordEl.classList.remove('hide');
+      say(`${w.w}！　さいしょの　もじは　どれかな？`);
+    };
+    // ヒント2：正解のおともだちが手をふる
+    var showMe = () => {
+      wordEl.classList.remove('hide');
+      sfx.hint();
+      moves.wave(targetEl);
+      say(`${w.w}の　「${K}」は　これだよ！`, {
+        speech: `${w.w}の　${S}は　これだよ！`
+      });
+    };
+    var idle = idleHints(id, () => locked, [hintName, showMe]);
+    askAgain = () => {
+      idle.arm();
+      hintName();
+    };
+    els.forEach((el, i) => el.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+      var p;
+      return _regenerator().w(function (_context2) {
+        while (1) switch (_context2.n) {
+          case 0:
+            if (!locked) {
+              _context2.n = 1;
+              break;
+            }
+            return _context2.a(2);
+          case 1:
+            idle.arm();
+            if (!(choices[i] === target)) {
+              _context2.n = 4;
+              break;
+            }
+            locked = true;
+            idle.stop();
+            wordEl.innerHTML = highlight(w.w, K);
+            wordEl.classList.remove('hide');
+            sfx.yay();
+            moves.happy(el);
+            wordAction(w, pic);
+            els.forEach(o => {
+              if (o !== el) setTimeout(() => {
+                boing();
+                moves.zukko(o);
+              }, 400);
+            });
+            confetti();
+            collect(target);
+            p = pick(PRAISE);
+            _context2.n = 2;
+            return Promise.all([say(`${p}　${w.w}の　「${K}」！`, {
+              speech: `${p}　${w.w}の　${S}！`
+            }), sleep(3800)]);
+          case 2:
+            if (!(id !== flow)) {
+              _context2.n = 3;
+              break;
+            }
+            return _context2.a(2);
+          case 3:
+            resolve();
+            _context2.n = 5;
+            break;
+          case 4:
+            moves.shake(el);
+            showMe();
+          case 5:
+            return _context2.a(2);
+        }
+      }, _callee2);
+    }))));
+    sleep(550).then(() => {
+      if (id === flow) {
+        ask();
+        idle.arm();
+      }
+    });
+  });
+}
+
+// ---------- おやすみ ----------
+function goNight(list) {
+  show('night');
+  var st = $('#nightStage');
+  st.innerHTML = '';
+  list.forEach((e, i) => {
+    var el = makeFriend(e, {
+      asButton: false,
+      delay: i * .7
+    });
+    el.classList.add('sleep');
+    el.style.setProperty('--friend', fit('64px', '15vmin', '120px'));
+    var z = document.createElement('span');
+    z.className = 'zzz';
+    z.textContent = 'z';
+    el.appendChild(z);
+    st.appendChild(el);
+  });
+  for (var i = 0; i < 14; i++) {
+    var t = document.createElement('span');
+    t.className = 'twinkle';
+    t.textContent = '✦';
+    Object.assign(t.style, {
+      left: `${Math.random() * 100}vw`,
+      top: `${Math.random() * 40}vh`,
+      fontSize: `${10 + Math.random() * 14}px`,
+      animationDelay: `${-Math.random() * 2.4}s`
+    });
+    document.body.appendChild(t);
+  }
+  say('きょうは　ここまで。たくさん　あそんだね。おやすみ〜', {
+    rate: .85,
+    pitch: .9
+  });
+}
+
+// ---------- ボタン ----------
+$('#startBtn').addEventListener('click', () => {
+  unlockAudio();
+  // iPhone/iPad では、最初の読み上げをタップの中で始めないと声が出ないことがある
+  try {
+    speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+  } catch (err) {}
+  pickVoice();
+  sfx.yay();
+  goHome();
+  say(script === 'kata' ? 'モジモジの　モリへ　ようこそ！' : 'もじもじの　もりへ　ようこそ！');
+});
+document.querySelectorAll('[data-home]').forEach(b => b.addEventListener('click', () => {
+  sfx.tap();
+  goHome();
+}));
+$('#askAgain').addEventListener('click', () => {
+  sfx.tap();
+  if (askAgain) askAgain();
+});
+$('#bgmBtn').addEventListener('click', () => {
+  unlockAudio();
+  BGM.setEnabled(!BGM.enabled);
+  renderBgmBtn();
+  sfx.tap();
+});
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+  unlockAudio();
+  sfx.tap();
+  var m = b.dataset.mode;
+  if (m === 'touch') goTouch();else runSession(m);
+}));
+document.querySelectorAll('[data-script]').forEach(b => b.addEventListener('click', () => {
+  sfx.tap();
+  script = b.dataset.script;
+  try {
+    localStorage.setItem(SCRIPT_KEY, script);
+  } catch (err) {}
+  applyScript();
+  say(script === 'kata' ? 'カタカナで　あそぼう！' : 'ひらがなで　あそぼう！');
+}));
+
+// 保護者メニュー：1.5秒の長押しで開く（子どもが偶然開かないように）
+var pb = $('#parentBtn');
+var holdTimer;
+var holdStart = e => {
+  e.preventDefault();
+  pb.classList.add('holding');
+  holdTimer = setTimeout(openPanel, 1500);
+};
+var holdEnd = () => {
+  pb.classList.remove('holding');
+  clearTimeout(holdTimer);
+};
+pb.addEventListener('pointerdown', holdStart);
+['pointerup', 'pointerleave', 'pointercancel'].forEach(t => pb.addEventListener(t, holdEnd));
+function updateCounts() {
+  $('#countHira').textContent = zukan.hira.size;
+  $('#countKata').textContent = zukan.kata.size;
+}
+function renderVoicePanel() {
+  pickVoice();
+  var sel = $('#voiceSelect');
+  var ja = [...jaVoices()].sort((a, b) => scoreVoice(b) - scoreVoice(a));
+  sel.innerHTML = '';
+  var auto = new Option('おまかせ（いちばんなめらかな声）', '');
+  sel.add(auto);
+  var _iterator5 = _createForOfIteratorHelper(ja),
+    _step5;
+  try {
+    for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+      var v = _step5.value;
+      sel.add(new Option(v.name, v.name));
+    }
+  } catch (err) {
+    _iterator5.e(err);
+  } finally {
+    _iterator5.f();
+  }
+  sel.value = voiceSettings.name && ja.some(v => v.name === voiceSettings.name) ? voiceSettings.name : '';
+  $('#voicePitch').value = voiceSettings.pitch;
+  $('#voiceRate').value = voiceSettings.rate;
+  $('#pitchOut').textContent = (+voiceSettings.pitch).toFixed(1);
+  $('#rateOut').textContent = (+voiceSettings.rate).toFixed(2);
+  $('#bgmVolume').value = BGM.volume;
+  $('#bgmOut').textContent = Math.round(BGM.volume * 100);
+  $('#browserInfo').textContent = `ブラウザ：${BROWSER}`;
+  $('#voiceInfo').textContent = !('speechSynthesis' in window) ? 'このブラウザは音声読み上げに対応していません。画面下の字幕で内容を確認できます。' : jaVoice ? `いまの声：${jaVoice.name}` : '日本語の読み上げ音声が見つかりません。端末の設定で日本語の音声を追加すると、声が出るようになります。';
+}
+function openPanel() {
+  holdEnd();
+  renderVoicePanel();
+  updateCounts();
+  disarmReset();
+  $('#panelBg').classList.add('open');
+}
+var saveVoice = () => store(VOICE_KEY, voiceSettings);
+$('#voiceSelect').addEventListener('change', ev => {
+  voiceSettings.name = ev.target.value;
+  saveVoice();
+  renderVoicePanel();
+});
+$('#voicePitch').addEventListener('input', ev => {
+  voiceSettings.pitch = +ev.target.value;
+  saveVoice();
+  $('#pitchOut').textContent = voiceSettings.pitch.toFixed(1);
+});
+$('#voiceRate').addEventListener('input', ev => {
+  voiceSettings.rate = +ev.target.value;
+  saveVoice();
+  $('#rateOut').textContent = voiceSettings.rate.toFixed(2);
+});
+$('#bgmVolume').addEventListener('input', ev => {
+  unlockAudio();
+  BGM.setVolume(+ev.target.value);
+  $('#bgmOut').textContent = Math.round(BGM.volume * 100);
+});
+$('#closePanel').addEventListener('click', () => $('#panelBg').classList.remove('open'));
+$('#voiceTest').addEventListener('click', () => {
+  unlockAudio();
+  say('こんにちは！　いっしょに　あそぼうね！');
+});
+// リセットは2回押したときだけ（1回目で確認の表示に変わる）
+var resetBtn = $('#resetZukan');
+var resetTimer;
+function disarmReset() {
+  clearTimeout(resetTimer);
+  resetBtn.classList.remove('danger');
+  resetBtn.textContent = 'ずかんをリセット';
+}
+resetBtn.addEventListener('click', () => {
+  if (!resetBtn.classList.contains('danger')) {
+    resetBtn.classList.add('danger');
+    resetBtn.textContent = 'もう一度押すと全部消えます';
+    resetTimer = setTimeout(disarmReset, 4000);
+    return;
+  }
+  zukan = {
+    hira: new Set(),
+    kata: new Set()
+  };
+  saveZukan();
+  updateCounts();
+  updateTiles();
+  disarmReset();
+  resetBtn.textContent = '消しました';
+  resetTimer = setTimeout(disarmReset, 2000);
+});
+
+// ダブルタップでの拡大や長押しメニューを防ぐ
+document.addEventListener('dblclick', e => e.preventDefault());
+document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 </body>
 </html>

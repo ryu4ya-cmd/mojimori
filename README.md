@@ -23,9 +23,15 @@ iPhone・iPad の Safari で開いて「共有 → ホーム画面に追加」�
 - ホーム右上の 🎵 で BGM を消せます。
 - ずかん（集めた字の記録）は、その端末のブラウザの中だけに保存されます。
 
+## 古いタブレットで遊ぶとき
+
+Android 5 の Chrome（バージョン95）など、古いブラウザでも動くようにしています（目安は Chrome 49 以降）。
+うまく動かないときは画面の上に案内が出ます。保護者メニューの下のほうに、使っているブラウザのバージョンが出ます。
+
 ## ファイル
 
-- `src/game.html`：ゲーム本体。直すときはこのファイルを編集します。
-- `tools/build.py`：`src/game.html` から `index.html` を作ります（`python3 tools/build.py`）。
+- `src/game.html`：ゲーム本体。直すときはこのファイルを編集します（claude.ai の公開ページもこのファイル）。
+- `tools/build.js`：`src/game.html` から `index.html` を作ります。古いブラウザでも動くように、スクリプトの書き方を Babel で変換します。
+  はじめの1回だけ `npm install`、そのあとは直すたびに `npm run build`。
 - `index.html`：公開用のページ（自動で作られるので、直接は編集しません）。
 - `icons/`、`manifest.webmanifest`：ホーム画面に追加したときのアイコンと設定。

@@ -1,0 +1,12 @@
+{
+  "name": "mojimori",
+  "private": true,
+  "description": "もじもじの もり（幼児向けのもじあそび）",
+  "scripts": {
+    "build": "node tools/build.js"
+  },
+  "devDependencies": {
+    "@babel/core": "7.24.7",
+    "@babel/preset-env": "7.24.7"
+  }
+}
