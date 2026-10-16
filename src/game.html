@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Zen+Maru+Gothic:wght@700;900&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
 <style>
   /* 森の中の一枚絵。空と草はらの上に、もじのおともだちが並ぶ（昼の色だけで作る） */
   :root {
@@ -17,13 +17,14 @@
     --night-top: #1d2b5c;
     --night-bottom: #3b4a86;
     /* 子どもが学校で習う字の形に近い「教科書体」を優先する */
-    --kana-font: "UD デジタル 教科書体 NK-B", "UD デジタル 教科書体 N-B", "UD Digi Kyokasho NK-B", "UD Digi Kyokasho N-B", "Klee One", "Hiragino Maru Gothic ProN", sans-serif;
-    --ui-font: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Yu Gothic", sans-serif;
+    --kana-font: "UD デジタル 教科書体 NK-B", "UD デジタル 教科書体 N-B", "UD Digi Kyokasho NK-B", "UD Digi Kyokasho N-B", "Klee One", "Hiragino Maru Gothic ProN", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+    --ui-font: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Yu Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
     --friend: clamp(96px, 26vmin, 170px);
     --vh: 100vh;
   }
   @supports (height: 100dvh) { :root { --vh: 100dvh; } }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   html, body { margin: 0; height: 100%; overflow: hidden; }
   body {
     font-family: var(--ui-font);
@@ -38,18 +39,18 @@
   button:focus-visible { outline: 4px solid #fff; outline-offset: 3px; }
 
   /* ---------- 森の背景 ---------- */
-  .scenery { position: fixed; inset: 0; pointer-events: none; }
+  .scenery { position: fixed; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; }
   .scenery span { position: absolute; line-height: 1; }
   .cloud { animation: drift 40s linear infinite; opacity: .95; }
   @keyframes drift { from { transform: translateX(-20vw); } to { transform: translateX(120vw); } }
 
   /* ---------- 画面の切り替え ---------- */
-  .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding-block: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .screen { position: fixed; top: 0; right: 0; bottom: 0; left: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding-top: 16px; padding-top: max(16px, env(safe-area-inset-top, 0px)); padding-bottom: 16px; padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)); padding-left: 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   .screen.active { display: flex; }
 
   .title {
     font-family: var(--kana-font);
-    font-size: clamp(36px, 10vmin, 84px);
+    font-size: 10vmin; font-size: clamp(36px, 10vmin, 84px);
     margin: 0 0 3vmin;
     color: var(--accent);
     -webkit-text-stroke: 2px #fff;
@@ -61,7 +62,7 @@
 
   /* はじめる（音を出すために最初の1タップが必要） */
   .start-btn {
-    width: clamp(140px, 36vmin, 220px); height: clamp(140px, 36vmin, 220px);
+    width: 36vmin; width: clamp(140px, 36vmin, 220px); height: 36vmin; height: clamp(140px, 36vmin, 220px);
     border-radius: 50%;
     background: #ff8a65;
     box-shadow: 0 10px 0 #d9643f, 0 18px 30px rgba(0,0,0,.2);
@@ -72,18 +73,18 @@
   @keyframes pulse { 50% { transform: scale(1.07); } }
 
   /* ---------- ホーム ---------- */
-  .home-corner { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); }
+  .home-corner { position: absolute; top: 12px; top: max(12px, env(safe-area-inset-top, 0px)); right: 16px; right: max(16px, env(safe-area-inset-right, 0px)); }
   .script-toggle { display: flex; gap: 10px; background: rgba(255,255,255,.6); padding: 6px; border-radius: 40px; margin-bottom: 3.5vmin; }
   .script-toggle button {
     display: flex; align-items: center; gap: 8px;
     padding: 6px 18px 6px 8px; border-radius: 34px;
-    font-size: clamp(16px, 3.6vmin, 22px); font-weight: 900; color: var(--ink);
+    font-size: 3.6vmin; font-size: clamp(16px, 3.6vmin, 22px); font-weight: 900; color: var(--ink);
     transition: background .2s, transform .12s;
   }
   .script-toggle button b {
-    width: clamp(40px, 8vmin, 52px); height: clamp(40px, 8vmin, 52px); border-radius: 50%;
+    width: 8vmin; width: clamp(40px, 8vmin, 52px); height: 8vmin; height: clamp(40px, 8vmin, 52px); border-radius: 50%;
     display: grid; place-items: center;
-    font-family: var(--kana-font); font-size: clamp(24px, 5vmin, 32px);
+    font-family: var(--kana-font); font-size: 5vmin; font-size: clamp(24px, 5vmin, 32px);
     background: rgba(74,59,51,.1);
   }
   .script-toggle button[aria-pressed="true"] { background: var(--paper); box-shadow: 0 4px 0 rgba(0,0,0,.12); }
@@ -91,8 +92,8 @@
 
   .menu { display: flex; gap: 3.5vmin; flex-wrap: wrap; justify-content: center; }
   .big-btn {
-    width: clamp(108px, 29vmin, 230px);
-    aspect-ratio: 1; max-width: 100%;
+    width: 29vmin; width: clamp(108px, 29vmin, 230px);
+    height: 29vmin; height: clamp(108px, 29vmin, 230px); max-width: 100%;
     border-radius: 32px;
     background: var(--paper);
     box-shadow: 0 10px 0 rgba(0,0,0,.12), 0 16px 28px rgba(0,0,0,.12);
@@ -100,8 +101,8 @@
     transition: transform .12s;
   }
   .big-btn:active { transform: translateY(6px); box-shadow: 0 4px 0 rgba(0,0,0,.12); }
-  .big-btn .icon { font-size: clamp(48px, 14vmin, 108px); line-height: 1; }
-  .big-btn .label { font-size: clamp(14px, 3.6vmin, 26px); font-weight: 900; }
+  .big-btn .icon { font-size: 14vmin; font-size: clamp(48px, 14vmin, 108px); line-height: 1; }
+  .big-btn .label { font-size: 3.6vmin; font-size: clamp(14px, 3.6vmin, 26px); font-weight: 900; }
   .big-btn.touch { border: 6px solid #ffb74d; }
   .big-btn.find { border: 6px solid #64b5f6; }
   .big-btn.quiz { border: 6px solid #81c784; }
@@ -113,8 +114,8 @@
   .topbar {
     position: absolute; top: 0; left: 0; right: 0; z-index: 2;
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 12px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px));
-    padding-top: max(12px, env(safe-area-inset-top, 0px));
+    padding: 12px 16px 0 16px; padding: 12px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px));
+    padding-top: 12px; padding-top: max(12px, env(safe-area-inset-top, 0px));
   }
   .round-btn {
     width: 64px; height: 64px; border-radius: 50%;
@@ -123,8 +124,8 @@
   }
   .round-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.14); }
   .round-btn.off { opacity: .55; }
-  .pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.75); padding: 6px 14px; border-radius: 40px; font-weight: 900; font-size: clamp(16px, 3.8vmin, 24px); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .progress { display: flex; gap: 4px; font-size: clamp(22px, 5vmin, 32px); }
+  .pill { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.75); padding: 6px 14px; border-radius: 40px; font-weight: 900; font-size: 3.8vmin; font-size: clamp(16px, 3.8vmin, 24px); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .progress { display: flex; gap: 4px; font-size: 5vmin; font-size: clamp(22px, 5vmin, 32px); }
   .progress .dim { filter: grayscale(1); opacity: .3; }
   /* 清音・濁音の切りかえ */
   .page-toggle { display: flex; gap: 6px; background: rgba(255,255,255,.6); padding: 5px; border-radius: 40px; }
@@ -137,7 +138,7 @@
   .page-toggle button[aria-pressed="true"] { background: var(--accent); color: #fff; box-shadow: 0 4px 0 rgba(0,0,0,.14); }
   .touch-head { display: flex; align-items: center; gap: 10px; margin-inline: auto; }
   @media (max-height: 520px) {
-    .topbar { padding-top: max(8px, env(safe-area-inset-top, 0px)); }
+    .topbar { padding-top: 8px; padding-top: max(8px, env(safe-area-inset-top, 0px)); }
     .round-btn { width: 52px; height: 52px; font-size: 28px; }
     .page-toggle button { width: 44px; height: 44px; font-size: 24px; }
   }
@@ -145,14 +146,13 @@
   /* ---------- ふれてみよう：五十音を1画面に ---------- */
   #touch { --top: 84px; }
   @media (max-height: 520px) { #touch { --top: 66px; } }
-  .kana-grid { display: grid; --gap: clamp(4px, 1.1vmin, 10px); gap: var(--gap); margin-top: var(--top); }
+  .kana-grid { display: grid; --gap: clamp(4px, 1.1vmin, 10px); grid-gap: var(--gap); gap: var(--gap); margin-top: var(--top); }
   /* よこ長のときの 列×行（--nl × --ml）と、たて長のときの 列×行（--np × --mp） */
   .kana-grid.sei { --nl: 11; --ml: 5; --np: 5; --mp: 11; }
   .kana-grid.daku { --nl: 5; --ml: 5; --np: 5; --mp: 5; }
   /* よこ長の画面は昔ながらの五十音表（右から あ・か・さ…の行がたてに並ぶ） */
   @media (orientation: landscape) {
     .kana-grid {
-      --cell: min(110px, calc((100vw - 40px - (var(--nl) - 1) * var(--gap)) / var(--nl)), calc((var(--vh) - var(--top) - 32px - (var(--ml) - 1) * var(--gap)) / var(--ml)));
       grid-template-columns: repeat(var(--nl), var(--cell)); grid-template-rows: repeat(var(--ml), var(--cell));
     }
     .tile { grid-column: var(--lc); grid-row: var(--lr); }
@@ -160,7 +160,6 @@
   /* たて長の画面は、あいうえお を横に読む並び */
   @media (orientation: portrait) {
     .kana-grid {
-      --cell: min(110px, calc((100vw - 40px - (var(--np) - 1) * var(--gap)) / var(--np)), calc((var(--vh) - var(--top) - 32px - (var(--mp) - 1) * var(--gap)) / var(--mp)));
       grid-template-columns: repeat(var(--np), var(--cell)); grid-template-rows: repeat(var(--mp), var(--cell));
     }
     .tile { grid-column: var(--pc); grid-row: var(--pr); }
@@ -181,7 +180,7 @@
   .tile.got .badge { display: block; }
 
   /* さわったもじを大きく見せる */
-  .spot { position: fixed; inset: 0; z-index: 15; display: none; align-items: center; justify-content: center; background: rgba(255,253,247,.5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+  .spot { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 15; display: none; align-items: center; justify-content: center; background: rgba(255,253,247,.5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
   .spot.open { display: flex; }
   .spot-card {
     --friend: clamp(112px, 32vmin, 230px);
@@ -191,7 +190,7 @@
     max-width: calc(100vw - 32px);
   }
   .spot-card .friend .hat { font-size: calc(var(--friend) * .42); margin-bottom: calc(var(--friend) * -.06); }
-  .spot-word { font-family: var(--kana-font); font-size: clamp(26px, 7.5vmin, 64px); letter-spacing: .06em; line-height: 1.2; text-align: center; }
+  .spot-word { font-family: var(--kana-font); font-size: 7.5vmin; font-size: clamp(26px, 7.5vmin, 64px); letter-spacing: .06em; line-height: 1.2; text-align: center; }
   .spot-word b, .quiz-word b { color: var(--c); font-weight: inherit; }
 
   /* ---------- もじのおともだち ---------- */
@@ -211,10 +210,10 @@
     transition: box-shadow .3s;
   }
   @keyframes bob { 50% { transform: translateY(-6px) scale(1.02, .98); } }
-  .friend .eyes { position: absolute; top: 18%; left: 0; right: 0; display: flex; justify-content: center; gap: 22%; }
+  .friend .eyes { position: absolute; top: 18%; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 30%; }
   .friend .eyes i { width: calc(var(--friend) * .09); height: calc(var(--friend) * .12); background: #3a2b25; border-radius: 50%; animation: blink 4s infinite; animation-delay: var(--d, 0s); }
   @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
-  .friend .cheeks { position: absolute; top: 31%; left: 0; right: 0; display: flex; justify-content: center; gap: 44%; }
+  .friend .cheeks { position: absolute; top: 31%; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 16%; }
   .friend .cheeks i { width: calc(var(--friend) * .12); height: calc(var(--friend) * .07); background: rgba(255,120,120,.45); border-radius: 50%; }
   .friend .kana {
     position: absolute; left: 0; right: 0; bottom: 6%;
@@ -238,14 +237,14 @@
     padding: 1.5vmin 6vmin 2vmin;
     box-shadow: 0 8px 0 rgba(0,0,0,.1);
   }
-  .quiz-pic { font-size: clamp(64px, 20vmin, 160px); line-height: 1.15; }
-  .quiz-word { font-family: var(--kana-font); font-size: clamp(24px, 6.5vmin, 54px); letter-spacing: .1em; line-height: 1.2; min-height: 1.2em; }
+  .quiz-pic { font-size: 20vmin; font-size: clamp(64px, 20vmin, 160px); line-height: 1.15; }
+  .quiz-word { font-family: var(--kana-font); font-size: 6.5vmin; font-size: clamp(24px, 6.5vmin, 54px); letter-spacing: .1em; line-height: 1.2; min-height: 1.2em; }
   .quiz-word.hide { visibility: hidden; }
   .quiz-word .blank { display: inline-block; width: .95em; height: .95em; border: 3px dashed rgba(74,59,51,.45); border-radius: 12px; vertical-align: -.1em; margin-right: .05em; }
 
   /* ---------- 夜（おやすみ） ---------- */
   #night { background: linear-gradient(var(--night-top), var(--night-bottom)); color: #fff; }
-  #night .moon { font-size: clamp(60px, 16vmin, 120px); margin-bottom: 2vmin; }
+  #night .moon { font-size: 16vmin; font-size: clamp(60px, 16vmin, 120px); margin-bottom: 2vmin; }
   #night .stage { margin-top: 2vmin; }
   .zzz { position: absolute; right: -6%; top: 6%; font-weight: 900; font-size: calc(var(--friend) * .2); color: #fff; opacity: 0; animation: zzz 3s ease-in-out infinite; animation-delay: var(--d, 0s); }
   @keyframes zzz { 0% { opacity: 0; transform: translate(0, 10px) scale(.6); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(14px, -30px) scale(1.1); } }
@@ -255,11 +254,11 @@
 
   /* ---------- 字幕（声が出ない環境や、大人の確認用） ---------- */
   .caption {
-    position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); z-index: 25;
+    position: fixed; left: 50%; bottom: 18px; bottom: max(18px, env(safe-area-inset-bottom, 0px)); z-index: 25;
     transform: translateX(-50%);
     background: rgba(255,255,255,.94); color: var(--ink);
     padding: 10px 22px; border-radius: 30px;
-    font-size: clamp(16px, 4vmin, 26px); font-weight: 700;
+    font-size: 4vmin; font-size: clamp(16px, 4vmin, 26px); font-weight: 700;
     box-shadow: 0 6px 16px rgba(0,0,0,.12);
     max-width: calc(100vw - 120px); text-align: center;
     opacity: 0; transition: opacity .3s; pointer-events: none;
@@ -267,22 +266,22 @@
   .caption.show { opacity: 1; }
 
   /* ---------- 演出 ---------- */
-  #fx { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
-  #fx span { position: absolute; line-height: 1; will-change: transform; }
+  #fx { position: fixed; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+  #fx > span { position: absolute; line-height: 1; will-change: transform; }
   #fx .ring { border-radius: 50%; border: 8px solid var(--c, #fff59d); }
 
   /* ---------- 保護者用 ---------- */
   .parent-btn {
-    position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    position: fixed; right: 12px; right: max(12px, env(safe-area-inset-right, 0px)); bottom: 12px; bottom: max(12px, env(safe-area-inset-bottom, 0px));
     width: 44px; height: 44px; border-radius: 50%;
     background: rgba(255,255,255,.55); font-size: 22px; z-index: 30;
     display: grid; place-items: center;
   }
-  .parent-btn .ring { position: absolute; inset: -4px; border-radius: 50%; border: 4px solid #ff8a65; clip-path: inset(0 100% 0 0); }
+  .parent-btn .ring { position: absolute; top: -4px; right: -4px; bottom: -4px; left: -4px; border-radius: 50%; border: 4px solid #ff8a65; clip-path: inset(0 100% 0 0); }
   .parent-btn.holding .ring { transition: clip-path 1.5s linear; clip-path: inset(0 0 0 0); }
-  .panel-bg { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none; align-items: center; justify-content: center; z-index: 40; padding: 16px; }
+  .panel-bg { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0,0,0,.35); display: none; align-items: center; justify-content: center; z-index: 40; padding: 16px; }
   .panel-bg.open { display: flex; }
-  .panel { background: #fff; border-radius: 20px; padding: 22px 24px; width: min(460px, 100%); max-height: calc(var(--vh) - 32px); overflow-y: auto; font-size: 15px; line-height: 1.65; user-select: text; -webkit-user-select: text; }
+  .panel { background: #fff; border-radius: 20px; padding: 22px 24px; width: 100%; max-width: 460px; max-height: calc(var(--vh) - 32px); overflow-y: auto; font-size: 15px; line-height: 1.65; user-select: text; -webkit-user-select: text; }
   .panel h2 { margin: 0 0 8px; font-size: 20px; }
   .panel h3 { margin: 14px 0 4px; font-size: 16px; }
   .panel p { margin: 6px 0; }
@@ -296,6 +295,21 @@
   .panel .row button.primary { background: #ff8a65; color: #fff; }
   .panel .row button.danger { background: #e53935; color: #fff; }
 
+  /* ---------- 古いブラウザ（Android の古い Chrome など）向け ---------- */
+  @supports not (width: clamp(1px, 2px, 3px)) {
+    :root { --friend: 26vmin; }
+    .parade .friend { --friend: 12vmin; }
+    .spot-card { --friend: 32vmin; }
+  }
+  /* flex の gap が効かないときは、余白で間をあける */
+  .nogap .menu > *, .nogap .parade > *, .nogap .stage > * { margin: 1.6vmin; }
+  .nogap .script-toggle > * + *, .nogap .page-toggle > * + *, .nogap .touch-head > * + *, .nogap .pill > * + * { margin-left: 8px; }
+  .nogap .progress > * + * { margin-left: 4px; }
+  .nogap .script-toggle button b { margin-right: 8px; }
+  .nogap .big-btn > * + *, .nogap .spot-card > * + *, .nogap .play-body > * + * { margin-top: 2vmin; }
+  .nogap .panel .row > * { margin: 0 8px 8px 0; }
+  .old-msg { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 60; background: #fff3cd; color: #5d4500; border-radius: 14px; padding: 12px 16px; font-size: 15px; line-height: 1.6; box-shadow: 0 6px 16px rgba(0,0,0,.15); }
+
   @media (prefers-reduced-motion: reduce) {
     .cloud, .start-btn, .friend .body { animation: none; }
   }
@@ -304,10 +318,10 @@
 <div class="scenery" aria-hidden="true">
   <span class="cloud" style="top:6vh;font-size:64px;animation-delay:-6s">☁️</span>
   <span class="cloud" style="top:16vh;font-size:44px;animation-delay:-22s;animation-duration:55s">☁️</span>
-  <span style="left:2vw;top:44vh;font-size:clamp(70px,16vmin,130px)">🌳</span>
-  <span style="right:3vw;top:40vh;font-size:clamp(80px,18vmin,150px)">🌲</span>
-  <span style="left:16vw;top:52vh;font-size:clamp(40px,8vmin,70px)">🌳</span>
-  <span style="right:20vw;top:51vh;font-size:clamp(40px,8vmin,70px)">🌲</span>
+  <span style="left:2vw;top:44vh;font-size:16vmin;font-size:clamp(70px,16vmin,130px)">🌳</span>
+  <span style="right:3vw;top:40vh;font-size:18vmin;font-size:clamp(80px,18vmin,150px)">🌲</span>
+  <span style="left:16vw;top:52vh;font-size:8vmin;font-size:clamp(40px,8vmin,70px)">🌳</span>
+  <span style="right:20vw;top:51vh;font-size:8vmin;font-size:clamp(40px,8vmin,70px)">🌲</span>
   <span style="left:8vw;bottom:6vh;font-size:34px">🌷</span>
   <span style="right:10vw;bottom:9vh;font-size:30px">🍄</span>
   <span style="left:45vw;bottom:3vh;font-size:28px">🌼</span>
@@ -401,6 +415,26 @@
   </div>
 </div>
 
+<div class="old-msg" id="oldMsg" hidden>このブラウザでは、うまく動かないところがあります。Chrome を最新にするか、ほかのブラウザで開いてみてください。（さわると消えます）</div>
+<script>
+  window.onerror = function () { var m = document.getElementById('oldMsg'); if (m) m.hidden = false; };
+  document.getElementById('oldMsg').onclick = function () { this.hidden = true; };
+</script>
+<script>
+  // flex の gap に対応していないブラウザかどうか
+  (function () {
+    var d = document.createElement('div');
+    d.style.cssText = 'display:flex;flex-direction:column;row-gap:1px;position:absolute;visibility:hidden';
+    d.appendChild(document.createElement('div'));
+    d.appendChild(document.createElement('div'));
+    document.body.appendChild(d);
+    if (d.scrollHeight !== 1) document.documentElement.classList.add('nogap');
+    document.body.removeChild(d);
+  })();
+  // clamp() が使えないブラウザでは、まん中の値（画面の大きさに合わせた値）だけを使う
+  var CLAMP_OK = !!(window.CSS && CSS.supports && CSS.supports('width', 'clamp(1px, 2px, 3px)'));
+  function fit(lo, v, hi) { return CLAMP_OK ? 'clamp(' + lo + ', ' + v + ', ' + hi + ')' : v; }
+</script>
 <script>
   // ---------- 五十音表・濁音表 ----------
   // 色は母音（あ・い・う・え・お の段）ごとにそろえる。「ん」だけ特別な色
@@ -611,7 +645,8 @@
   const DAKU = buildTable(TABLE_DAKU, 'daku');
   const ENTRIES = [...SEI, ...DAKU];
   const GROUPS = { sei: SEI, daku: DAKU };
-  const byId = Object.fromEntries(ENTRIES.map(e => [e.id, e]));
+  const byId = {};
+  ENTRIES.forEach(e => { byId[e.id] = e; });
   // 「か」と「が」、「は」と「ば」「ぱ」のように、点や丸がちがうだけの字
   const baseOf = id => id.normalize('NFD')[0];
 
@@ -619,13 +654,13 @@
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const shuffle = a => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
   const pick = a => a[Math.floor(Math.random() * a.length)];
-  const load = (key, fallback) => { try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback; } catch { return fallback; } };
-  const store = (key, v) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} };
+  const load = (key, fallback) => { try { const v = JSON.parse(localStorage.getItem(key)); return v === null || v === undefined ? fallback : v; } catch (err) { return fallback; } };
+  const store = (key, v) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch (err) {} };
 
   // ---------- ひらがな／カタカナ ----------
   const SCRIPT_KEY = 'mojimori.v2.script';
   let script = 'hira';
-  try { if (localStorage.getItem(SCRIPT_KEY) === 'kata') script = 'kata'; } catch {}
+  try { if (localStorage.getItem(SCRIPT_KEY) === 'kata') script = 'kata'; } catch (err) {}
   const disp = e => script === 'kata' ? toKata(e.id) : e.id;
   // 読み上げでは1文字をカタカナで渡す（「は」が「わ」、「へ」が「え」と助詞の読みになるのを防ぐ）
   const spoken = e => toKata(e.id);
@@ -657,7 +692,7 @@
   // ---------- BGM（オルゴールの音を、その場で作って鳴らす） ----------
   let ac = null;
   function unlockAudio() {
-    try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch {}
+    try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (err) {}
   }
   const BGM = (() => {
     const BEAT = 60 / 96;
@@ -972,7 +1007,11 @@
   const center = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, top: r.top }; };
   function popAt(el, emoji, scale = 1) {
     const r = el.getBoundingClientRect();
-    const s = spawn(emoji, { left: `${r.left + r.width / 2}px`, top: `${r.top}px`, fontSize: `${Math.max(80, r.width * .8) * scale}px` });
+    const s = spawn('', { left: `${r.left + r.width / 2}px`, top: `${r.top}px`, fontSize: `${Math.max(80, r.width * .8) * scale}px` });
+    const inner = document.createElement('span');
+    inner.textContent = emoji;
+    inner.style.display = 'inline-block';
+    s.appendChild(inner);
     anim(s, [
       { transform: 'translate(-50%,0) scale(.2)', opacity: 0 },
       { transform: 'translate(-50%,-70%) scale(1.25)', opacity: 1, offset: .2 },
@@ -980,7 +1019,7 @@
       { transform: 'translate(-50%,-95%) scale(1)', opacity: 1, offset: .85 },
       { transform: 'translate(-50%,-115%) scale(.9)', opacity: 0 },
     ], { duration: 3400, easing: 'ease-in-out' }).onfinish = () => s.remove();
-    return s;
+    return inner;
   }
   // 上からふってくる（あめ・ゆき・はな・ほし・はっぱ）
   function fall(emoji, count = 22) {
@@ -1004,7 +1043,7 @@
   function across(emoji, kind, { delay = 0, top } = {}) {
     if (!room(1)) return;
     const y = top || { fly: '24vh', swim: '52vh' }[kind] || '68vh';
-    const s = spawn(emoji, { left: '0', top: y, fontSize: 'clamp(64px, 15vmin, 120px)' });
+    const s = spawn(emoji, { left: '0', top: y, fontSize: fit('64px', '15vmin', '120px') });
     const frames = [];
     const steps = kind === 'walk' ? 20 : 12;
     for (let i = 0; i <= steps; i++) {
@@ -1032,7 +1071,7 @@
   }
   function launch(el, emoji, { duration = 4200, wobble = true } = {}) {
     const r = el.getBoundingClientRect();
-    const s = spawn(emoji, { left: `${r.left + r.width / 2}px`, top: `${r.top}px`, fontSize: 'clamp(70px, 15vmin, 120px)' });
+    const s = spawn(emoji, { left: `${r.left + r.width / 2}px`, top: `${r.top}px`, fontSize: fit('70px', '15vmin', '120px') });
     anim(s, [
       { transform: 'translate(-50%, 0) scale(.3)' },
       { transform: 'translate(-50%, -30%) scale(1.1)', offset: .25 },
@@ -1100,7 +1139,13 @@
     if (w.a === 'up') { launch(el, w.e, { duration: 6000, wobble: false }); return; }
     if (w.a === 'parade') { for (let i = 0; i < 4; i++) across(w.e, 'walk', { delay: i * 450 }); popAt(el, w.e); return; }
     const s = popAt(el, w.e, w.a === 'grow' || w.a === 'sun' ? 1.5 : 1);
-    const twist = (frames, opts) => anim(s, frames, { composite: 'add', easing: 'ease-in-out', ...opts });
+    // { rotate, scale, translate } を transform の文字列にする
+    const tf = f => ({ transform: [
+      f.translate && `translate(${f.translate.split(' ').join(',')})`,
+      f.rotate && `rotate(${f.rotate})`,
+      f.scale && `scale(${f.scale.split(' ').join(',')})`,
+    ].filter(Boolean).join(' ') || 'none' });
+    const twist = (frames, opts) => anim(s, frames.map(tf), { easing: 'ease-in-out', ...opts });
     switch (w.a) {
       case 'rain':     fall('💧'); break;
       case 'snow':     fall('❄️'); break;
@@ -1211,10 +1256,24 @@
       t.addEventListener('click', () => openSpot(e));
       g.appendChild(t);
     }
+    sizeGrid();
     $('#pageSei').setAttribute('aria-pressed', page === 'sei');
     $('#pageDaku').setAttribute('aria-pressed', page === 'daku');
     updateTiles();
   }
+  function sizeGrid() {
+    const g = $('#kanaGrid');
+    const w = innerWidth, h = innerHeight;
+    const land = w > h;
+    const top = h <= 520 ? 66 : 84;
+    const gap = Math.max(4, Math.min(10, Math.min(w, h) * .011));
+    const [nc, nr] = page === 'sei' ? (land ? [11, 5] : [5, 11]) : [5, 5];
+    const cell = Math.floor(Math.min(110, (w - 40 - (nc - 1) * gap) / nc, (h - top - 32 - (nr - 1) * gap) / nr));
+    g.style.setProperty('--cell', `${cell}px`);
+    g.style.setProperty('--gap', `${gap}px`);
+    g.style.setProperty('--top', `${top}px`);
+  }
+  addEventListener('resize', () => { if ($('#touch').classList.contains('active')) sizeGrid(); });
   function updateTiles() {
     document.querySelectorAll('.tile').forEach(t => t.classList.toggle('got', zukan[script].has(t.dataset.id)));
     const list = GROUPS[page];
@@ -1390,7 +1449,7 @@
     let items;
     if (kind === 'quiz') {
       // 先頭のもじがそのもじで、絵だけで名前がわかることばから出す
-      const pool = shuffle(ENTRIES.filter(e => e.id !== 'を' && e.id !== 'ん').flatMap(e => wordsOf(e).filter(w => w.quizOk && w.w[0] === disp(e)).map(w => ({ e, w }))));
+      const pool = shuffle(ENTRIES.filter(e => e.id !== 'を' && e.id !== 'ん').reduce((all, e) => all.concat(wordsOf(e).filter(w => w.quizOk && w.w[0] === disp(e)).map(w => ({ e, w }))), []));
       items = [];
       for (const it of pool) {
         if (items.length >= ROUNDS) break;
@@ -1430,7 +1489,7 @@
     return new Promise(resolve => {
       const choices = shuffle([target, ...pickDistractors(target, FIND_CHOICES[round] - 1, round)]);
       // 3問目からは帽子の絵をはずして、字だけで見つける
-      const els = placeChoices(choices, 'clamp(84px, 23vmin, 190px)', { hat: round < 2 });
+      const els = placeChoices(choices, fit('84px', '23vmin', '190px'), { hat: round < 2 });
       const targetEl = els[choices.indexOf(target)];
       const K = disp(target), S = spoken(target);
       let locked = false;
@@ -1482,7 +1541,7 @@
       anim($('#quizCard'), [{ transform: 'scale(.5) rotate(-6deg)', opacity: 0 }, { transform: 'scale(1.06)', opacity: 1, offset: .7 }, { transform: 'scale(1)' }], { duration: 500 });
 
       const choices = shuffle([target, ...pickDistractors(target, QUIZ_CHOICES[round] - 1, round)]);
-      const els = placeChoices(choices, 'clamp(76px, 20vmin, 160px)', { hat: false });
+      const els = placeChoices(choices, fit('76px', '20vmin', '160px'), { hat: false });
       const targetEl = els[choices.indexOf(target)];
       let locked = false;
 
@@ -1535,7 +1594,7 @@
     list.forEach((e, i) => {
       const el = makeFriend(e, { asButton: false, delay: i * .7 });
       el.classList.add('sleep');
-      el.style.setProperty('--friend', 'clamp(64px, 15vmin, 120px)');
+      el.style.setProperty('--friend', fit('64px', '15vmin', '120px'));
       const z = document.createElement('span');
       z.className = 'zzz';
       z.textContent = 'z';
@@ -1556,7 +1615,7 @@
   $('#startBtn').addEventListener('click', () => {
     unlockAudio();
     // iPhone/iPad では、最初の読み上げをタップの中で始めないと声が出ないことがある
-    try { speechSynthesis.speak(new SpeechSynthesisUtterance('')); } catch {}
+    try { speechSynthesis.speak(new SpeechSynthesisUtterance('')); } catch (err) {}
     pickVoice();
     sfx.yay();
     goHome();
@@ -1579,7 +1638,7 @@
   document.querySelectorAll('[data-script]').forEach(b => b.addEventListener('click', () => {
     sfx.tap();
     script = b.dataset.script;
-    try { localStorage.setItem(SCRIPT_KEY, script); } catch {}
+    try { localStorage.setItem(SCRIPT_KEY, script); } catch (err) {}
     applyScript();
     say(script === 'kata' ? 'カタカナで　あそぼう！' : 'ひらがなで　あそぼう！');
   }));
