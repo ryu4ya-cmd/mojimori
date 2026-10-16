@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Zen+Maru+Gothic:wght@700;900&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
 <style>
   /* 森の中の一枚絵。空と草はらの上に、もじのおともだちが並ぶ（昼の色だけで作る） */
   :root {
@@ -23,6 +23,17 @@
     --vh: 100vh;
   }
   @supports (height: 100dvh) { :root { --vh: 100dvh; } }
+  /* 端末に新しい絵文字がないとき（古い Android など）だけ使う。数字や英字には使わない */
+  @font-face {
+    font-family: "Mojimori Emoji";
+    src: url("fonts/emoji.ttf") format("truetype");
+    font-display: swap;
+    unicode-range: U+A9, U+AE, U+200D, U+20E3, U+2190-2BFF, U+3030, U+303D, U+3297, U+3299, U+FE0F, U+1F000-1FAFF;
+  }
+  html.old-emoji {
+    --kana-font: "Mojimori Emoji", "UD デジタル 教科書体 NK-B", "UD デジタル 教科書体 N-B", "Klee One", "Hiragino Maru Gothic ProN", sans-serif;
+    --ui-font: "Mojimori Emoji", "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Yu Gothic", sans-serif;
+  }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   html, body { margin: 0; height: 100%; overflow: hidden; }
@@ -431,6 +442,26 @@
     document.body.appendChild(d);
     if (d.scrollHeight !== 1) document.documentElement.classList.add('nogap');
     document.body.removeChild(d);
+  })();
+  // 端末が新しい絵文字を色つきで出せるか（出せないと□になる）。出せないときは、ゲームについている絵文字フォントを使う
+  (function () {
+    function colorEmoji(ch) {
+      try {
+        var c = document.createElement('canvas');
+        c.width = c.height = 32;
+        var x = c.getContext('2d');
+        x.textBaseline = 'top';
+        x.font = '28px sans-serif';
+        x.fillText(ch, 0, 0);
+        var d = x.getImageData(0, 0, 32, 32).data;
+        for (var i = 0; i < d.length; i += 4) {
+          if (d[i + 3] > 100 && (Math.abs(d[i] - d[i + 1]) > 40 || Math.abs(d[i] - d[i + 2]) > 40)) return true;
+        }
+      } catch (err) {}
+      return false;
+    }
+    // 🦒（2017年の絵文字）と 🪑（2019年の絵文字）
+    if (!colorEmoji('\uD83E\uDD92') || !colorEmoji('\uD83E\uDE91')) document.documentElement.classList.add('old-emoji');
   })();
   // clamp() が使えないブラウザでは、まん中の値（画面の大きさに合わせた値）だけを使う
   var CLAMP_OK = !!(window.CSS && CSS.supports && CSS.supports('width', 'clamp(1px, 2px, 3px)'));
@@ -933,7 +964,20 @@
   const highlight = (word, k) => [...word].map(c => c === k ? `<b>${c}</b>` : c).join('');
 
   // ---------- 動き（子どもが目で追えるよう、ゆっくりめ） ----------
-  const anim = (el, frames, opts) => el.animate(frames, { easing: 'ease-out', ...opts });
+  // 古い Chrome（84 より前）は、最初と最後の場面で同じ項目がそろっていないとエラーになるので、
+  // 抜けている項目は となりの場面の値で補う
+  function fillKeyframes(frames) {
+    const out = frames.map(f => Object.assign({}, f));
+    const props = [];
+    out.forEach(f => Object.keys(f).forEach(k => { if (k !== 'offset' && k !== 'easing' && props.indexOf(k) < 0) props.push(k); }));
+    props.forEach(k => {
+      const firstWith = out.find(f => k in f), lastWith = [...out].reverse().find(f => k in f);
+      if (!(k in out[0])) out[0][k] = firstWith[k];
+      if (!(k in out[out.length - 1])) out[out.length - 1][k] = lastWith[k];
+    });
+    return out;
+  }
+  const anim = (el, frames, opts) => el.animate(fillKeyframes(frames), { easing: 'ease-out', ...opts });
   const moves = {
     bounce: el => anim(el, [
       { transform: 'translateY(0) scale(1)' },
