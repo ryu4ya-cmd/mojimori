@@ -290,6 +290,9 @@
   .panel p { margin: 6px 0; }
   .panel .note { font-size: 13px; color: #6d6058; }
   .panel label { display: grid; grid-template-columns: 6.5em 1fr 3em; align-items: center; gap: 8px; margin: 6px 0; }
+  .panel label.check { display: flex; align-items: center; font-weight: 700; }
+  .panel label.check input { width: 22px; height: 22px; margin: 0 10px 0 0; accent-color: #ff8a65; }
+  .credit { position: absolute; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom, 0px)); margin: 0; text-align: center; font-size: 12px; color: rgba(74,59,51,.7); }
   .panel select { grid-column: 2 / 4; font: inherit; padding: 6px 8px; border-radius: 10px; border: 1px solid #d8cfc6; background: #fff; color: var(--ink); min-width: 0; }
   .panel input[type=range] { width: 100%; accent-color: #ff8a65; }
   .panel output { font-variant-numeric: tabular-nums; text-align: right; }
@@ -336,6 +339,7 @@
   <button class="start-btn" id="startBtn" aria-label="はじめる">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5Z"/></svg>
   </button>
+  <p class="credit">声：Style-Bert-VITS2 モデル「小春音アミ」、あみたろの声素材工房（https://amitaro.net/）</p>
 </section>
 
 <!-- ホーム -->
@@ -406,13 +410,17 @@
 <div class="panel-bg" id="panelBg">
   <div class="panel" role="dialog" aria-label="保護者メニュー">
     <h2>保護者の方へ</h2>
-    <h3>読み上げの声</h3>
+    <h3>声</h3>
+    <label class="check" for="useGameVoice"><input type="checkbox" id="useGameVoice">ゲームの声（小春音アミ）をつかう</label>
+    <p class="note" id="gameVoiceInfo"></p>
+    <h3>端末の読み上げ（ゲームの声がないときに使います）</h3>
     <label for="voiceSelect"><span>声の種類</span><select id="voiceSelect"></select></label>
     <label for="voicePitch"><span>声の高さ</span><input type="range" id="voicePitch" min="0.8" max="2" step="0.1"><output id="pitchOut"></output></label>
     <label for="voiceRate"><span>話す速さ</span><input type="range" id="voiceRate" min="0.6" max="1.4" step="0.05"><output id="rateOut"></output></label>
     <p class="note" id="voiceInfo"></p>
     <p class="note" id="browserInfo"></p>
     <p class="note">声は端末に入っている読み上げ音声を使います。Microsoft Edge の「Nanami（ナチュラル）」や、iPhone・iPad で追加できる「O-ren（拡張）」「Kyoko（拡張）」を選ぶと、よりなめらかになります。iPhone・iPad では「設定 → アクセシビリティ → 読み上げコンテンツ → 声 → 日本語」から追加できます。</p>
+    <p class="note">ゲームの声：Style-Bert-VITS2 モデル「小春音アミ」、あみたろの声素材工房（https://amitaro.net/）の声をもとにした音声モデルを使っています。</p>
     <h3>おんがく</h3>
     <label for="bgmVolume"><span>BGMの音量</span><input type="range" id="bgmVolume" min="0" max="1" step="0.05"><output id="bgmOut"></output></label>
     <h3>ずかん</h3>
@@ -874,26 +882,77 @@
     captionTimer = setTimeout(() => c.classList.remove('show'), ms);
   }
 
-  // text は字幕、speech は読み上げ用（省略時は同じ）
+  // ---------- ゲームの声（前もって作った声のファイル） ----------
+  // セリフは「りんごの、リ！」のような部品に分けて、部品ごとに voice/ に mp3 を置いている。
+  // 部品の名前（キー）は、ひらがなにして空白と「」をのぞいたもの。voice/index.json がキー → ファイル名の表
+  const clipKey = t => toHira(t).replace(/[\s　「」]/g, '').replace(/〜/g, 'ー');
+  const GAME_VOICE_KEY = 'mojimori.v2.gameVoice';
+  const VOICE = { map: null, cache: {}, order: [], sources: [], gain: null, token: 0, use: load(GAME_VOICE_KEY, true) };
+  try {
+    fetch('voice/index.json').then(r => (r.ok ? r.json() : null)).then(m => { if (m && m.clips) VOICE.map = m.clips; }).catch(() => {});
+  } catch (err) {}
+  function loadClip(file) {
+    if (VOICE.cache[file]) return Promise.resolve(VOICE.cache[file]);
+    return fetch(`voice/${file}`)
+      .then(r => { if (!r.ok) throw new Error('voice'); return r.arrayBuffer(); })
+      .then(buf => new Promise((res, rej) => ac.decodeAudioData(buf, res, rej)))
+      .then(b => {
+        VOICE.cache[file] = b;
+        VOICE.order.push(file);
+        if (VOICE.order.length > 150) delete VOICE.cache[VOICE.order.shift()];
+        return b;
+      });
+  }
+
+  // text は字幕。clips は声の部品（省略時は text がひとつの部品）。speech は端末の読み上げ用（省略時は部品をつなげたもの）
   let speakTimer = null;
   let pendingFinish = null;
   function stopVoice() {
     clearTimeout(speakTimer);
+    VOICE.token++;
+    VOICE.sources.forEach(src => { try { src.onended = null; src.stop(); } catch (err) {} });
+    VOICE.sources = [];
     if (pendingFinish) pendingFinish();
     if ('speechSynthesis' in window) speechSynthesis.cancel();
   }
-  function say(text, { speech = text, rate = 1, pitch = 1 } = {}) {
+  function say(text, { clips, speech, rate = 1, pitch = 1 } = {}) {
     // 前の声がまだ待っているなら、ここで終わらせる（連打で声がたまらないように）
     stopVoice();
+    const segs = clips || [text];
+    if (!speech) speech = segs.join('');
     const r = voiceSettings.rate * rate;
     const estimate = (700 + text.length * 210) / r;
     showCaption(text, estimate + 800);
     BGM.duck(true);
+    const files = VOICE.use && VOICE.map && ac ? segs.map(t => VOICE.map[clipKey(t)]) : null;
     return new Promise(resolve => {
       let done = false;
       const finish = () => { if (done) return; done = true; if (pendingFinish === finish) pendingFinish = null; BGM.duck(false); resolve(); };
       pendingFinish = finish;
-      setTimeout(finish, estimate + 1500); // 声が出ない環境でも先へ進める
+      let safety = setTimeout(finish, estimate + 1500); // 声が出ない環境でも先へ進める
+      const token = VOICE.token;
+      if (files && files.every(Boolean)) {
+        Promise.all(files.map(loadClip)).then(bufs => {
+          if (done || token !== VOICE.token) return;
+          if (!VOICE.gain) { VOICE.gain = ac.createGain(); VOICE.gain.connect(ac.destination); }
+          let t = ac.currentTime + .03;
+          bufs.forEach((b, i) => {
+            const src = ac.createBufferSource();
+            src.buffer = b;
+            src.connect(VOICE.gain);
+            src.start(t);
+            if (i === bufs.length - 1) src.onended = finish;
+            VOICE.sources.push(src);
+            t += b.duration + .05;
+          });
+          clearTimeout(safety);
+          safety = setTimeout(finish, (t - ac.currentTime) * 1000 + 600);
+          showCaption(text, (t - ac.currentTime) * 1000 + 900);
+        }).catch(() => { if (!done && token === VOICE.token) speak(); });
+        return;
+      }
+      speak();
+      function speak() {
       if (!('speechSynthesis' in window)) return;
       // 全角スペースは読み上げで間があいて、とぎれとぎれに聞こえるので取りのぞく
       const u = new SpeechSynthesisUtterance(speech.replace(/[「」　]/g, ''));
@@ -905,6 +964,7 @@
       u.onerror = finish;
       // cancel 直後の speak が無視されるブラウザがあるので、少し待つ
       speakTimer = setTimeout(() => { if (!done) speechSynthesis.speak(u); }, 60);
+      }
     });
   }
 
@@ -1401,8 +1461,7 @@
         kanaSound(e);
         moves[pick(TAP_MOVES)](el);
         popAt(el, w.e);
-        const line = k => `${k}！　${w.w}の　${k}！`;
-        say(line(disp(e)), { speech: line(spoken(e)) });
+        say(`${disp(e)}！　${w.w}の　${disp(e)}！`, { clips: [VL.kana(spoken(e)), VL.wordOf(w.w, spoken(e))] });
       });
       p.appendChild(el);
     });
@@ -1470,7 +1529,7 @@
   function goTouch() {
     show('touch');
     renderGrid();
-    say(page === 'sei' ? 'すきな　もじに　さわってみよう！' : 'てんてん　と　まるの　もじだよ！');
+    say(page === 'sei' ? P.touchSei : P.touchDaku);
   }
   document.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', () => {
     if (page === b.dataset.page) return;
@@ -1478,24 +1537,61 @@
     page = b.dataset.page;
     closeSpot();
     renderGrid();
-    say(page === 'sei' ? 'あいうえおの　ひょうだよ！' : 'てんてん　と　まるの　もじだよ！');
+    say(page === 'sei' ? P.pageSei : P.touchDaku);
   }));
 
-  // さわったときの言い方（毎回ちがう言い方になるように）
+  // 声の部品（s は字をカタカナにしたもの。は→ハ のように、読みがぶれないように）
+  const nos = w => w.replace(/[　\s]/g, '');
+  const VL = {
+    kana: s => `${s}！`,
+    wordOf: (w, s) => `${nos(w)}の、${s}！`,
+    word: w => `${nos(w)}！`,
+    stutter: (w, s) => `${s}、${s}、${nos(w)}！`,
+    isWord: (w, s) => `${s}は、${nos(w)}の、${s}だよ！`,
+    tsuku: s => `${s}の、つく、ことば。`,
+    hajimaru: s => `${s}から、はじまるよ！`,
+    inside: (w, s) => `${nos(w)}の、なかに、${s}が、いるよ！`,
+    where: s => `${s}は、どーこだ？`,
+    here: s => `${s}は、ここだよ！`,
+    dane: s => `${s}だね！`,
+    streak: n => `${n}かい、れんぞく！`,
+  };
+  // 決まったセリフ
+  const P = {
+    welcome: 'もじもじの　もりへ　ようこそ！',
+    welcomeKata: 'モジモジの　モリへ　ようこそ！',
+    playHira: 'ひらがなで　あそぼう！',
+    playKata: 'カタカナで　あそぼう！',
+    touchSei: 'すきな　もじに　さわってみよう！',
+    touchDaku: 'てんてん　と　まるの　もじだよ！',
+    pageSei: 'あいうえおの　ひょうだよ！',
+    allSei: 'ぜんぶの　もじと　なかよしに　なれたね！　すごい！',
+    allDaku: 'てんてんと　まるの　もじも　ぜんぶ　なかよし！　すごい！',
+    found: 'みつけた！',
+    thisWay: 'こっちだよー。',
+    firstLetter: 'さいしょの　もじは　どれかな？',
+    thisOne: 'これだよ！',
+    finale: 'ぜんぶ　できたね！　すごい　すごい！　はなまる　いっぱい！',
+    night: 'きょうは　ここまで。たくさん　あそんだね。おやすみ〜',
+    hello: 'こんにちは！　いっしょに　あそぼうね！',
+  };
+  const QUIZ_ASK = ['これは　なにかな？', 'これ、なあに？', 'これは　なんだろう？'];
+
+  // さわったときの言い方（毎回ちがう言い方になるように）。text は字幕、clips は声の部品
   const LINES_FIRST = [
-    (k, w) => `${k}！　${w}の　${k}！`,
-    (k, w) => `${w}の　${k}！`,
-    (k, w) => `${k}、${k}、${w}！`,
-    (k, w) => `「${k}」は　${w}の　「${k}」だよ！`,
-    (k, w) => `${k}の　つく　ことば、${w}！`,
-    (k, w) => `${w}！　${k}から　はじまるよ！`,
-    (k, w) => `みつけた！　${w}の　${k}！`,
+    [(k, w) => `${k}！　${w}の　${k}！`, (s, w) => [VL.kana(s), VL.wordOf(w, s)]],
+    [(k, w) => `${w}の　${k}！`, (s, w) => [VL.wordOf(w, s)]],
+    [(k, w) => `${k}、${k}、${w}！`, (s, w) => [VL.stutter(w, s)]],
+    [(k, w) => `「${k}」は　${w}の　「${k}」だよ！`, (s, w) => [VL.isWord(w, s)]],
+    [(k, w) => `${k}の　つく　ことば、${w}！`, (s, w) => [VL.tsuku(s), VL.word(w)]],
+    [(k, w) => `${w}！　${k}から　はじまるよ！`, (s, w) => [VL.word(w), VL.hajimaru(s)]],
+    [(k, w) => `みつけた！　${w}の　${k}！`, (s, w) => [P.found, VL.wordOf(w, s)]],
   ];
   // 「を」「ん」「ぢ」「づ」などは、ことばの先頭にこないので別の言い方
   const LINES_INSIDE = [
-    (k, w) => `${k}！　${w}の　${k}！`,
-    (k, w) => `${w}の　${k}！`,
-    (k, w) => `${w}の　なかに　${k}が　いるよ！`,
+    [(k, w) => `${k}！　${w}の　${k}！`, (s, w) => [VL.kana(s), VL.wordOf(w, s)]],
+    [(k, w) => `${w}の　${k}！`, (s, w) => [VL.wordOf(w, s)]],
+    [(k, w) => `${w}の　なかに　${k}が　いるよ！`, (s, w) => [VL.inside(w, s)]],
   ];
   const TICKLE = ['くすぐったい〜！', 'えへへ、もっと　さわって！', 'わーい！　たのしいね！', 'きゃー！　うれしいな！', 'もう、くすぐったいってば〜！', 'いっしょに　あそぼ！'];
 
@@ -1553,24 +1649,24 @@
     wordAction(w, fr);
     if (Math.random() < .4) pick(EXTRAS)(fr);
 
-    let text, speech;
+    let text, clips;
     if (streak >= 4 && streak % 4 === 0) {
-      text = speech = pick(TICKLE);
+      text = pick(TICKLE);
       moves.wiggle(fr);
     } else {
-      const t = pick(w.w[0] === disp(e) ? LINES_FIRST : LINES_INSIDE);
+      const [t, c] = pick(w.w[0] === disp(e) ? LINES_FIRST : LINES_INSIDE);
       text = t(disp(e), w.w);
-      speech = t(spoken(e), w.w);
+      clips = c(spoken(e), w.w);
     }
     const got = collect(e);
-    await say(text, { speech });
+    await say(text, { clips });
     if (id !== flow || !spot || spot.token !== token) return;
     if (got === 'all') {
       await sleep(400);
       if (id !== flow) return;
       sfx.yay();
       confetti();
-      await say(e.group === 'sei' ? 'ぜんぶの　もじと　なかよしに　なれたね！　すごい！' : 'てんてんと　まるの　もじも　ぜんぶ　なかよし！　すごい！');
+      await say(e.group === 'sei' ? P.allSei : P.allDaku);
       if (id !== flow || !spot || spot.token !== token) return;
     }
     // しばらくさわらなければ、表にもどる
@@ -1659,7 +1755,7 @@
     await sleep(300);
     if (id !== flow) return;
     cheer('ぜんぶ できたね！', { stamp: '🏆', sub: '⭐⭐⭐⭐⭐', big: true });
-    await Promise.all([say('ぜんぶ　できたね！　すごい　すごい！　はなまる　いっぱい！'), sleep(CHEER_MS + 1700)]);
+    await Promise.all([say(P.finale), sleep(CHEER_MS + 1700)]);
     if (id !== flow) return;
     goNight(items.map(x => x.e));
   }
@@ -1697,7 +1793,7 @@
     ], { duration: 2200, easing: 'ease-in-out' });
     sparkle(el);
     others.forEach((o, i) => setTimeout(() => { moves.jumpjump(o); popAt(o, '👏', .6); }, 250 + i * 120));
-    return (sub ? `${line}　${st.streak}かい　れんぞく！` : line);
+    return sub ? { text: `${line}　${st.streak}かい　れんぞく！`, clips: [line, VL.streak(st.streak)] } : { text: line, clips: [line] };
   }
 
   // ---------- ② さがしてみよう ----------
@@ -1711,8 +1807,8 @@
       const targetEl = els[choices.indexOf(target)];
       const K = disp(target), S = spoken(target);
       let locked = false;
-      const ask = () => say(`「${K}」は　どーこだ？`, { speech: `${S}は　どーこだ？` });
-      const showMe = () => { sfx.hint(); moves.wave(targetEl); say(`「${K}」は　ここだよ！`, { speech: `${S}は　ここだよ！` }); };
+      const ask = () => say(`「${K}」は　どーこだ？`, { clips: [VL.where(S)] });
+      const showMe = () => { sfx.hint(); moves.wave(targetEl); say(`「${K}」は　ここだよ！`, { clips: [VL.here(S)] }); };
       const idle = idleHints(id, () => locked, [ask, showMe]);
       askAgain = () => { idle.arm(); ask(); };
 
@@ -1726,7 +1822,7 @@
           const line = praise(st, el, els.filter(o => o !== el));
           collect(target);
           // 声が早く終わっても、演出を最後まで見てから次へ進む
-          await Promise.all([say(`${line}　「${K}」だね！`, { speech: `${line}　${S}だね！` }), sleep(CHEER_MS + 900)]);
+          await Promise.all([say(`${line.text}　「${K}」だね！`, { clips: [...line.clips, VL.dane(S)] }), sleep(CHEER_MS + 900)]);
           if (id !== flow) return;
           resolve();
         } else {
@@ -1735,7 +1831,7 @@
           sfx.hint();
           moves.shake(el);
           moves.wave(targetEl);
-          say(`こっちだよ〜。「${K}」は　ここだよ！`, { speech: `こっちだよ〜。${S}は　ここだよ！` });
+          say(`こっちだよ〜。「${K}」は　ここだよ！`, { clips: [P.thisWay, VL.here(S)] });
         }
       }));
 
@@ -1761,15 +1857,15 @@
       const targetEl = els[choices.indexOf(target)];
       let locked = false;
 
-      const ask = () => say(pick(['これは　なにかな？', 'これ、なあに？', 'これは　なんだろう？']));
+      const ask = () => say(pick(QUIZ_ASK));
       // ヒント1：なまえを言って、さいしょのもじを空けて見せる
-      const hintName = () => { wordEl.classList.remove('hide'); say(`${w.w}！　さいしょの　もじは　どれかな？`); };
+      const hintName = () => { wordEl.classList.remove('hide'); say(`${w.w}！　さいしょの　もじは　どれかな？`, { clips: [VL.word(w.w), P.firstLetter] }); };
       // ヒント2：正解のおともだちが手をふる
       const showMe = () => {
         wordEl.classList.remove('hide');
         sfx.hint();
         moves.wave(targetEl);
-        say(`${w.w}の　「${K}」は　これだよ！`, { speech: `${w.w}の　${S}は　これだよ！` });
+        say(`${w.w}の　「${K}」！　これだよ！`, { clips: [VL.wordOf(w.w, S), P.thisOne] });
       };
       const idle = idleHints(id, () => locked, [hintName, showMe]);
       askAgain = () => { idle.arm(); hintName(); };
@@ -1786,7 +1882,7 @@
           wordAction(w, pic);
           const line = praise(st, el, els.filter(o => o !== el));
           collect(target);
-          await Promise.all([say(`${line}　${w.w}の　「${K}」！`, { speech: `${line}　${w.w}の　${S}！` }), sleep(CHEER_MS + 1100)]);
+          await Promise.all([say(`${line.text}　${w.w}の　「${K}」！`, { clips: [...line.clips, VL.wordOf(w.w, S)] }), sleep(CHEER_MS + 1100)]);
           if (id !== flow) return;
           resolve();
         } else {
@@ -1822,7 +1918,7 @@
       Object.assign(t.style, { left: `${Math.random() * 100}vw`, top: `${Math.random() * 40}vh`, fontSize: `${10 + Math.random() * 14}px`, animationDelay: `${-Math.random() * 2.4}s` });
       document.body.appendChild(t);
     }
-    say('きょうは　ここまで。たくさん　あそんだね。おやすみ〜', { rate: .85, pitch: .9 });
+    say(P.night, { rate: .85, pitch: .9 });
   }
 
   // ---------- ボタン ----------
@@ -1833,7 +1929,7 @@
     pickVoice();
     sfx.yay();
     goHome();
-    say(script === 'kata' ? 'モジモジの　モリへ　ようこそ！' : 'もじもじの　もりへ　ようこそ！');
+    say(script === 'kata' ? P.welcomeKata : P.welcome);
   });
   document.querySelectorAll('[data-home]').forEach(b => b.addEventListener('click', () => { sfx.tap(); goHome(); }));
   $('#askAgain').addEventListener('click', () => { sfx.tap(); if (askAgain) askAgain(); });
@@ -1854,7 +1950,7 @@
     script = b.dataset.script;
     try { localStorage.setItem(SCRIPT_KEY, script); } catch (err) {}
     applyScript();
-    say(script === 'kata' ? 'カタカナで　あそぼう！' : 'ひらがなで　あそぼう！');
+    say(script === 'kata' ? P.playKata : P.playHira);
   }));
 
   // 保護者メニュー：1.5秒の長押しで開く（子どもが偶然開かないように）
@@ -1884,6 +1980,10 @@
     $('#bgmVolume').value = BGM.volume;
     $('#bgmOut').textContent = Math.round(BGM.volume * 100);
     $('#browserInfo').textContent = `ブラウザ：${BROWSER}`;
+    $('#useGameVoice').checked = VOICE.use;
+    $('#gameVoiceInfo').textContent = VOICE.map
+      ? 'ゲームの声が使えます。'
+      : 'この場所ではゲームの声が使えないので、端末の読み上げを使います。';
     $('#voiceInfo').textContent = !('speechSynthesis' in window)
       ? 'このブラウザは音声読み上げに対応していません。画面下の字幕で内容を確認できます。'
       : jaVoice
@@ -1898,12 +1998,13 @@
     $('#panelBg').classList.add('open');
   }
   const saveVoice = () => store(VOICE_KEY, voiceSettings);
+  $('#useGameVoice').addEventListener('change', ev => { VOICE.use = ev.target.checked; store(GAME_VOICE_KEY, VOICE.use); });
   $('#voiceSelect').addEventListener('change', ev => { voiceSettings.name = ev.target.value; saveVoice(); renderVoicePanel(); });
   $('#voicePitch').addEventListener('input', ev => { voiceSettings.pitch = +ev.target.value; saveVoice(); $('#pitchOut').textContent = voiceSettings.pitch.toFixed(1); });
   $('#voiceRate').addEventListener('input', ev => { voiceSettings.rate = +ev.target.value; saveVoice(); $('#rateOut').textContent = voiceSettings.rate.toFixed(2); });
   $('#bgmVolume').addEventListener('input', ev => { unlockAudio(); BGM.setVolume(+ev.target.value); $('#bgmOut').textContent = Math.round(BGM.volume * 100); });
   $('#closePanel').addEventListener('click', () => $('#panelBg').classList.remove('open'));
-  $('#voiceTest').addEventListener('click', () => { unlockAudio(); say('こんにちは！　いっしょに　あそぼうね！'); });
+  $('#voiceTest').addEventListener('click', () => { unlockAudio(); say(P.hello); });
   // リセットは2回押したときだけ（1回目で確認の表示に変わる）
   const resetBtn = $('#resetZukan');
   let resetTimer;
@@ -1927,6 +2028,28 @@
     resetBtn.textContent = '消しました';
     resetTimer = setTimeout(disarmReset, 2000);
   });
+
+  // ゲームで使う声の部品をぜんぶ並べる（tools/make_voice.py が使う）
+  window.voiceLines = function () {
+    const out = {};
+    const add = (t, style) => {
+      const k = clipKey(t);
+      if (!out[k]) out[k] = { key: k, text: t.replace(/[\s　「」]/g, '').replace(/〜/g, 'ー'), style: style || 'るんるん' };
+    };
+    ['hira', 'kata'].forEach(sc => ENTRIES.forEach(e => {
+      const s = toKata(e.id), k = sc === 'kata' ? toKata(e.id) : e.id;
+      [VL.kana, VL.tsuku, VL.hajimaru, VL.where, VL.here, VL.dane].forEach(f => add(f(s)));
+      WORDS[sc][e.id].forEach(w => {
+        add(VL.wordOf(w.w, s));
+        add(VL.word(w.w));
+        if (w.w[0] === k) { add(VL.stutter(w.w, s)); add(VL.isWord(w.w, s)); } else add(VL.inside(w.w, s));
+      });
+    }));
+    for (let n = 2; n <= ROUNDS; n++) add(VL.streak(n));
+    Object.keys(P).forEach(k => add(P[k], k === 'night' ? 'よふかし' : undefined));
+    TICKLE.concat(QUIZ_ASK, PRAISE.map(p => p[1])).forEach(t => add(t));
+    return Object.keys(out).map(k => out[k]);
+  };
 
   // ダブルタップでの拡大や長押しメニューを防ぐ
   document.addEventListener('dblclick', e => e.preventDefault());
