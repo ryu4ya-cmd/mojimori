@@ -275,6 +275,13 @@
   .caption.show { opacity: 1; }
 
   /* ---------- 演出 ---------- */
+  /* 正解したときの大きなお祝い（光の帯・はなまる・ほめ言葉） */
+  .cheer { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 18; pointer-events: none; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .cheer-rays { position: absolute; left: 50%; top: 50%; width: 170vmax; height: 170vmax; margin-left: -85vmax; margin-top: -85vmax; opacity: 0; }
+  .cheer-stamp { position: relative; font-size: 34vmin; line-height: 1; filter: drop-shadow(0 8px 10px rgba(0,0,0,.18)); }
+  .cheer-word { position: relative; font-family: var(--kana-font); color: var(--accent); /* 白いふちどりは影で描く（古い Chrome は paint-order が効かず、ふちが字をおおってしまう） */ text-shadow: 4px 0 0 #fff, -4px 0 0 #fff, 0 4px 0 #fff, 0 -4px 0 #fff, 3px 3px 0 #fff, -3px 3px 0 #fff, 3px -3px 0 #fff, -3px -3px 0 #fff, 0 8px 0 #fff, 0 14px 22px rgba(0,0,0,.22); white-space: nowrap; line-height: 1.2; }
+  .cheer-word span { display: inline-block; }
+  .cheer-sub { position: relative; margin-top: 1vmin; font-size: 6vmin; font-weight: 900; color: #fff; background: #ff8a65; border-radius: 999px; padding: .1em .8em; box-shadow: 0 5px 0 rgba(0,0,0,.12); }
   #fx { position: fixed; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; overflow: hidden; z-index: 20; }
   #fx > span { position: absolute; line-height: 1; will-change: transform; }
   #fx .ring { border-radius: 50%; border: 8px solid var(--c, #fff59d); }
@@ -400,6 +407,12 @@
 </section>
 
 <div class="spot" id="spot"><div class="spot-card" id="spotCard"></div></div>
+<div class="cheer" id="cheer" hidden aria-hidden="true">
+  <svg class="cheer-rays" id="cheerRays" viewBox="-100 -100 200 200"></svg>
+  <div class="cheer-stamp" id="cheerStamp"></div>
+  <div class="cheer-word" id="cheerWord"></div>
+  <div class="cheer-sub" id="cheerSub" hidden></div>
+</div>
 <div id="fx" aria-hidden="true"></div>
 <div class="caption" id="caption" aria-live="polite"></div>
 
@@ -1160,6 +1173,66 @@ function sweep(from, to, dur, vol = .18) {
   o.stop(t + dur + .05);
 }
 var boing = () => sweep(180, 520, .75);
+// 拍手（ノイズを短く切って、ぱちぱち鳴らす）
+var clapBuf = null;
+function claps(start, count = 18, spread = 1.4) {
+  if (!ac) return;
+  if (!clapBuf) {
+    var n = Math.floor(ac.sampleRate * .07);
+    clapBuf = ac.createBuffer(1, n, ac.sampleRate);
+    var d = clapBuf.getChannelData(0);
+    for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+  }
+  for (var _i2 = 0; _i2 < count; _i2++) {
+    var t = start + Math.random() * spread;
+    var src = ac.createBufferSource(),
+      f = ac.createBiquadFilter(),
+      g = ac.createGain();
+    src.buffer = clapBuf;
+    f.type = 'bandpass';
+    f.frequency.value = 1200 + Math.random() * 1400;
+    f.Q.value = .9;
+    g.gain.value = .35 * (1 - (t - start) / (spread * 1.3));
+    src.connect(f).connect(g).connect(ac.destination);
+    src.start(t);
+  }
+}
+// ファンファーレ（ド・ミ・ソ・ドー、ソ・ドーーー）と拍手
+function fanfare(big) {
+  if (!ac) return;
+  var t0 = ac.currentTime + .02;
+  var notes = big ? [[523, 0, .14], [523, .15, .14], [523, .3, .14], [659, .45, .45], [587, .9, .14], [659, 1.05, .14], [784, 1.2, 1.2]] : [[523, 0, .12], [659, .12, .12], [784, .24, .12], [1047, .36, .4], [784, .62, .12], [1047, .74, .9]];
+  notes.forEach(([f, t, d]) => {
+    [['square', .05, 1], ['triangle', .14, 1], ['sine', .06, 2]].forEach(([type, vol, mul]) => {
+      var o = ac.createOscillator(),
+        g = ac.createGain();
+      o.type = type;
+      o.frequency.value = f * mul;
+      g.gain.setValueAtTime(0, t0 + t);
+      g.gain.linearRampToValueAtTime(vol, t0 + t + .02);
+      g.gain.setValueAtTime(vol, t0 + t + d * .7);
+      g.gain.exponentialRampToValueAtTime(.001, t0 + t + d + .15);
+      o.connect(g).connect(ac.destination);
+      o.start(t0 + t);
+      o.stop(t0 + t + d + .2);
+    });
+  });
+  // 最後の音に和音を重ねる
+  var last = notes[notes.length - 1];
+  [1, 1.25, 1.5].forEach(m => {
+    var o = ac.createOscillator(),
+      g = ac.createGain();
+    o.type = 'triangle';
+    o.frequency.value = last[0] * m / 2;
+    g.gain.setValueAtTime(0, t0 + last[1]);
+    g.gain.linearRampToValueAtTime(.08, t0 + last[1] + .03);
+    g.gain.exponentialRampToValueAtTime(.001, t0 + last[1] + last[2] + .5);
+    o.connect(g).connect(ac.destination);
+    o.start(t0 + last[1]);
+    o.stop(t0 + last[1] + last[2] + .6);
+  });
+  claps(t0 + .25, big ? 30 : 18, big ? 2.2 : 1.4);
+}
 var sfx = {
   pop: () => tones([660, 990], {
     gap: .09
@@ -1560,7 +1633,7 @@ function across(emoji, kind, {
   }).onfinish = () => s.remove();
   // はやいのりものは、うしろに けむり
   if (kind === 'zoom') {
-    for (var _i2 = 1; _i2 <= 5; _i2++) {
+    for (var _i3 = 1; _i3 <= 5; _i3++) {
       setTimeout(() => {
         if (!room(1)) return;
         var p = s.getBoundingClientRect();
@@ -1578,7 +1651,7 @@ function across(emoji, kind, {
         }], {
           duration: 700
         }).onfinish = () => puff.remove();
-      }, delay + _i2 * 330);
+      }, delay + _i3 * 330);
     }
   }
 }
@@ -1739,6 +1812,163 @@ function wind(items) {
   for (var i = 0, n = room(12); i < n; i++) {
     _loop7();
   }
+}
+
+// 光の帯（SVG で16本）
+(function () {
+  var d = '';
+  for (var i = 0; i < 16; i += 2) {
+    var a1 = i / 16 * Math.PI * 2,
+      a2 = (i + 1) / 16 * Math.PI * 2;
+    d += `M0 0 L${(Math.cos(a1) * 100).toFixed(1)} ${(Math.sin(a1) * 100).toFixed(1)} L${(Math.cos(a2) * 100).toFixed(1)} ${(Math.sin(a2) * 100).toFixed(1)} Z `;
+  }
+  $('#cheerRays').innerHTML = `<defs><radialGradient id="rayFade"><stop offset="0" stop-color="#fff7c2" stop-opacity="1"/><stop offset="1" stop-color="#ffe082" stop-opacity="0"/></radialGradient></defs><path d="${d}" fill="url(#rayFade)"/>`;
+})();
+// 先生がつける赤い「はなまる」（渦巻きと、まわりの花びら）
+var HANAMARU = function () {
+  var P = 10,
+    R = 72,
+    pts = [];
+  for (var i = 0; i <= P; i++) {
+    var a = i / P * Math.PI * 2 - Math.PI / 2;
+    pts.push(`${(Math.cos(a) * R).toFixed(1)} ${(Math.sin(a) * R).toFixed(1)}`);
+  }
+  var petals = `M${pts[0]}`;
+  for (var _i4 = 1; _i4 <= P; _i4++) petals += ` A26 26 0 1 1 ${pts[_i4]}`;
+  var spiral = '';
+  for (var _i5 = 0; _i5 <= 120; _i5++) {
+    var t = _i5 / 120,
+      _a = t * Math.PI * 2 * 2.4 - Math.PI / 2,
+      r = 6 + t * 46;
+    spiral += `${_i5 ? 'L' : 'M'}${(Math.cos(_a) * r).toFixed(1)} ${(Math.sin(_a) * r).toFixed(1)} `;
+  }
+  return `<svg viewBox="-110 -110 220 220" width="1em" height="1em" style="display:block"><g fill="none" stroke="#e53935" stroke-linecap="round" stroke-linejoin="round"><path d="${petals}" stroke-width="8"/><path d="${spiral}" stroke-width="9"/></g></svg>`;
+}();
+var CHEER_MS = 2800;
+var cheerTimer;
+// 画面いっぱいのお祝い。word は大きく出すほめ言葉、sub は「3れんぞく！」など
+function cheer(word, {
+  stamp = 'hanamaru',
+  sub = '',
+  big = false
+} = {}) {
+  var box = $('#cheer'),
+    rays = $('#cheerRays'),
+    st = $('#cheerStamp'),
+    wd = $('#cheerWord'),
+    sb = $('#cheerSub');
+  clearTimeout(cheerTimer);
+  box.hidden = false;
+  if (stamp === 'hanamaru') st.innerHTML = HANAMARU;else st.textContent = stamp;
+  wd.innerHTML = [...word].map(c => `<span>${c}</span>`).join('');
+  wd.style.fontSize = `${Math.min(15, 88 / word.length)}vmin`;
+  sb.hidden = !sub;
+  sb.textContent = sub;
+  var ms = big ? CHEER_MS + 1400 : CHEER_MS;
+  anim(rays, [{
+    transform: 'rotate(0deg) scale(.4)',
+    opacity: 0
+  }, {
+    transform: 'rotate(30deg) scale(1)',
+    opacity: .75,
+    offset: .15
+  }, {
+    transform: 'rotate(150deg) scale(1.05)',
+    opacity: .75,
+    offset: .85
+  }, {
+    transform: 'rotate(190deg) scale(1.1)',
+    opacity: 0
+  }], {
+    duration: ms,
+    easing: 'linear'
+  });
+  anim(st, [{
+    transform: 'scale(3) rotate(-35deg)',
+    opacity: 0
+  }, {
+    transform: 'scale(.85) rotate(8deg)',
+    opacity: 1,
+    offset: .14
+  }, {
+    transform: 'scale(1.1) rotate(-4deg)',
+    opacity: 1,
+    offset: .22
+  }, {
+    transform: 'scale(1) rotate(0deg)',
+    opacity: 1,
+    offset: .3
+  }, {
+    transform: 'scale(1.06) rotate(0deg)',
+    opacity: 1,
+    offset: .55
+  }, {
+    transform: 'scale(1) rotate(0deg)',
+    opacity: 1,
+    offset: .85
+  }, {
+    transform: 'scale(1.3) rotate(0deg)',
+    opacity: 0
+  }], {
+    duration: ms,
+    easing: 'ease-out'
+  });
+  wd.querySelectorAll('span').forEach((sp, i) => anim(sp, [{
+    transform: 'translateY(50px) scale(.2)',
+    opacity: 0
+  }, {
+    transform: 'translateY(-36px) scale(1.25)',
+    opacity: 1,
+    offset: .2
+  }, {
+    transform: 'translateY(0) scale(1)',
+    opacity: 1,
+    offset: .32
+  }, {
+    transform: 'translateY(-10px) scale(1.05)',
+    opacity: 1,
+    offset: .55
+  }, {
+    transform: 'translateY(0) scale(1)',
+    opacity: 1,
+    offset: .85
+  }, {
+    transform: 'translateY(-24px) scale(1)',
+    opacity: 0
+  }], {
+    duration: ms,
+    delay: 150 + i * 70,
+    fill: 'backwards',
+    easing: 'ease-out'
+  }));
+  if (sub) anim(sb, [{
+    transform: 'scale(0)',
+    opacity: 0
+  }, {
+    transform: 'scale(1.2)',
+    opacity: 1,
+    offset: .3
+  }, {
+    transform: 'scale(1)',
+    opacity: 1,
+    offset: .85
+  }, {
+    transform: 'scale(1)',
+    opacity: 0
+  }], {
+    duration: ms,
+    delay: 500,
+    fill: 'backwards'
+  });
+  fanfare(big);
+  confetti();
+  fireworks();
+  fall(['🎉', '🎊', '⭐', '💖', '🌟', '🌸'], big ? 40 : 26);
+  rise('🎈', big ? 12 : 7);
+  if (big) setTimeout(fireworks, 1500);
+  cheerTimer = setTimeout(() => {
+    box.hidden = true;
+  }, ms + 200);
 }
 
 // ことばごとの演出
@@ -1968,6 +2198,8 @@ function show(id) {
   closeSpot();
   askAgain = null;
   $('#fx').innerHTML = '';
+  clearTimeout(cheerTimer);
+  $('#cheer').hidden = true;
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
   document.querySelectorAll('.twinkle').forEach(t => t.remove());
   nightQuiet = id === 'night';
@@ -2280,8 +2512,8 @@ function pickDistractors(e, n, round) {
   // 清音の問題には清音を多めに、濁音の問題には濁音を多めにまぜる
   var same = shuffle(GROUPS[e.group]),
     other = shuffle(ENTRIES);
-  for (var _i3 = 0, _arr = [...same.slice(0, 8), ...other]; _i3 < _arr.length; _i3++) {
-    var c = _arr[_i3];
+  for (var _i6 = 0, _arr = [...same.slice(0, 8), ...other]; _i6 < _arr.length; _i6++) {
+    var c = _arr[_i6];
     if (out.length >= n) break;
     if (c !== e && !out.includes(c)) out.push(c);
   }
@@ -2310,7 +2542,7 @@ function runSession(_x) {
 }
 function _runSession() {
   _runSession = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(kind) {
-    var id, items, pool, _iterator6, _step6, _loop9, round, _t;
+    var id, items, pool, _iterator6, _step6, _loop9, st, round, _t;
     return _regenerator().w(function (_context5) {
       while (1) switch (_context5.p = _context5.n) {
         case 0:
@@ -2384,6 +2616,10 @@ function _runSession() {
             e
           }));
         case 10:
+          st = {
+            streak: 0,
+            missed: false
+          };
           round = 0;
         case 11:
           if (!(round < ROUNDS)) {
@@ -2392,7 +2628,7 @@ function _runSession() {
           }
           renderProgress(round);
           _context5.n = 12;
-          return kind === 'quiz' ? quizRound(id, items[round], round) : findRound(id, items[round].e, round);
+          return kind === 'quiz' ? quizRound(id, items[round], round, st) : findRound(id, items[round].e, round, st);
         case 12:
           if (!(id !== flow)) {
             _context5.n = 13;
@@ -2405,8 +2641,10 @@ function _runSession() {
           break;
         case 14:
           renderProgress(ROUNDS);
+          $('#stage').innerHTML = '';
+          $('#quizCard').hidden = true;
           _context5.n = 15;
-          return sleep(800);
+          return sleep(300);
         case 15:
           if (!(id !== flow)) {
             _context5.n = 16;
@@ -2414,8 +2652,22 @@ function _runSession() {
           }
           return _context5.a(2);
         case 16:
-          goNight(items.map(x => x.e));
+          cheer('ぜんぶ できたね！', {
+            stamp: '🏆',
+            sub: '⭐⭐⭐⭐⭐',
+            big: true
+          });
+          _context5.n = 17;
+          return Promise.all([say('ぜんぶ　できたね！　すごい　すごい！　はなまる　いっぱい！'), sleep(CHEER_MS + 1700)]);
         case 17:
+          if (!(id !== flow)) {
+            _context5.n = 18;
+            break;
+          }
+          return _context5.a(2);
+        case 18:
+          goNight(items.map(x => x.e));
+        case 19:
           return _context5.a(2);
       }
     }, _callee4, null, [[1, 6, 7, 8]]);
@@ -2446,11 +2698,50 @@ function placeChoices(choices, size, opts) {
     return el;
   });
 }
-var PRAISE = ['ぴんぽーん！', 'せいかい！', 'やったね！', 'すごーい！', 'あたり！'];
+// 大きく出すほめ言葉と、そのあとに声で言うことば
+var PRAISE = [['すごーい！', 'すごーい！'], ['やったね！', 'やったね！'], ['せいかい！', 'ぴんぽーん！　だいせいかい！'], ['てんさい！', 'てんさいだね！'], ['かんぺき！', 'かんぺき！'], ['ばっちり！', 'ばっちり！'], ['よくできました！', 'よくできました！'], ['はなまる！', 'はなまる　あげる！'], ['じょうず！', 'じょうず　じょうず！']];
+var STAMPS = ['hanamaru', 'hanamaru', 'hanamaru', '🌟', '👑', '🏅'];
+// 正解したときの、お祝いと声。streak は 何問つづけて一回で当てたか
+function praise(st, el, others) {
+  var _pick = pick(PRAISE),
+    _pick2 = _slicedToArray(_pick, 2),
+    big = _pick2[0],
+    line = _pick2[1];
+  var sub = st.streak >= 2 ? `${st.streak}れんぞく！` : '';
+  cheer(big, {
+    stamp: pick(STAMPS),
+    sub
+  });
+  // 当てたおともだちは、大きくジャンプ。ほかのおともだちは拍手
+  anim(el, [{
+    transform: 'translateY(0) scale(1) rotate(0deg)'
+  }, {
+    transform: 'translateY(-90px) scale(1.35) rotate(-10deg)',
+    offset: .25
+  }, {
+    transform: 'translateY(0) scale(1.15) rotate(0deg)',
+    offset: .45
+  }, {
+    transform: 'translateY(-60px) scale(1.3) rotate(360deg)',
+    offset: .7
+  }, {
+    transform: 'translateY(0) scale(1) rotate(360deg)'
+  }], {
+    duration: 2200,
+    easing: 'ease-in-out'
+  });
+  sparkle(el);
+  others.forEach((o, i) => setTimeout(() => {
+    moves.jumpjump(o);
+    popAt(o, '👏', .6);
+  }, 250 + i * 120));
+  return sub ? `${line}　${st.streak}かい　れんぞく！` : line;
+}
 
 // ---------- ② さがしてみよう ----------
 var FIND_CHOICES = [2, 2, 3, 3, 4];
-function findRound(id, target, round) {
+function findRound(id, target, round, st) {
+  st.missed = false;
   return new Promise(resolve => {
     var choices = shuffle([target, ...pickDistractors(target, FIND_CHOICES[round] - 1, round)]);
     // 3問目からは帽子の絵をはずして、字だけで見つける
@@ -2477,7 +2768,7 @@ function findRound(id, target, round) {
       ask();
     };
     els.forEach((el, i) => el.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-      var p;
+      var line;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.n) {
           case 0:
@@ -2494,23 +2785,14 @@ function findRound(id, target, round) {
             }
             locked = true;
             idle.stop();
-            sfx.yay();
-            moves.happy(el);
-            wordAction(pick(wordsOf(target)), el);
-            els.forEach(o => {
-              if (o !== el) setTimeout(() => {
-                boing();
-                moves.zukko(o);
-              }, 400);
-            });
-            confetti();
+            st.streak = st.missed ? 0 : st.streak + 1;
+            line = praise(st, el, els.filter(o => o !== el));
             collect(target);
             // 声が早く終わっても、演出を最後まで見てから次へ進む
-            p = pick(PRAISE);
             _context.n = 2;
-            return Promise.all([say(`${p}　「${K}」だね！`, {
-              speech: `${p}　${S}だね！`
-            }), sleep(3600)]);
+            return Promise.all([say(`${line}　「${K}」だね！`, {
+              speech: `${line}　${S}だね！`
+            }), sleep(CHEER_MS + 900)]);
           case 2:
             if (!(id !== flow)) {
               _context.n = 3;
@@ -2523,6 +2805,7 @@ function findRound(id, target, round) {
             break;
           case 4:
             // まちがいにはしない。正解のおともだちが手をふって教える
+            st.missed = true;
             sfx.hint();
             moves.shake(el);
             moves.wave(targetEl);
@@ -2548,7 +2831,8 @@ var QUIZ_CHOICES = [2, 2, 3, 3, 3];
 function quizRound(id, {
   e: target,
   w
-}, round) {
+}, round, st) {
+  st.missed = false;
   return new Promise(resolve => {
     var K = disp(target),
       S = spoken(target);
@@ -2597,7 +2881,7 @@ function quizRound(id, {
       hintName();
     };
     els.forEach((el, i) => el.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-      var p;
+      var line;
       return _regenerator().w(function (_context2) {
         while (1) switch (_context2.n) {
           case 0:
@@ -2616,22 +2900,14 @@ function quizRound(id, {
             idle.stop();
             wordEl.innerHTML = highlight(w.w, K);
             wordEl.classList.remove('hide');
-            sfx.yay();
-            moves.happy(el);
+            st.streak = st.missed ? 0 : st.streak + 1;
             wordAction(w, pic);
-            els.forEach(o => {
-              if (o !== el) setTimeout(() => {
-                boing();
-                moves.zukko(o);
-              }, 400);
-            });
-            confetti();
+            line = praise(st, el, els.filter(o => o !== el));
             collect(target);
-            p = pick(PRAISE);
             _context2.n = 2;
-            return Promise.all([say(`${p}　${w.w}の　「${K}」！`, {
-              speech: `${p}　${w.w}の　${S}！`
-            }), sleep(3800)]);
+            return Promise.all([say(`${line}　${w.w}の　「${K}」！`, {
+              speech: `${line}　${w.w}の　${S}！`
+            }), sleep(CHEER_MS + 1100)]);
           case 2:
             if (!(id !== flow)) {
               _context2.n = 3;
@@ -2643,6 +2919,7 @@ function quizRound(id, {
             _context2.n = 5;
             break;
           case 4:
+            st.missed = true;
             moves.shake(el);
             showMe();
           case 5:
