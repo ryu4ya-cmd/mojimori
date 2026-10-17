@@ -292,12 +292,12 @@
   .car-card .text { font-size: 4.4vmin; font-size: clamp(17px, 4.4vmin, 34px); font-weight: 900; text-align: center; }
   .cars-area .progress { margin-bottom: 1.5vmin; }
   /* 道を走るくるまと、まわりの小物 */
-  .drive { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+  .drive { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 3; pointer-events: none; overflow: hidden; }
   .drive > span { position: absolute; left: 0; top: 0; line-height: 1; white-space: nowrap; }
-  .drive .rumble { display: inline-block; animation: rumble .22s linear infinite; }
+  .drive .rumble { display: inline-block; animation: rumble .3s linear infinite; }
   @keyframes rumble { 50% { transform: translateY(-3px); } }
-  /* くるまの なまえは、道のすぐ上に出す（字幕は、この画面では上に出す） */
-  .car-name { position: absolute; z-index: 3; left: 50%; bottom: calc(var(--road) + 8px); transform: translateX(-50%); font-family: var(--kana-font); font-size: var(--name); background: rgba(255,253,247,.94); padding: .05em .6em; border-radius: 999px; box-shadow: 0 6px 0 rgba(0,0,0,.1); white-space: nowrap; pointer-events: none; }
+  /* くるまの なまえは、道のすぐ上の右はしに出す。道の上の絵（.drive）より うしろ（字幕は、この画面では上に出す） */
+  .car-name { position: absolute; z-index: 2; right: 16px; bottom: calc(var(--road) + 8px); transform-origin: 100% 50%; font-family: var(--kana-font); font-size: var(--name); background: rgba(255,253,247,.94); padding: .05em .6em; border-radius: 999px; box-shadow: 0 6px 0 rgba(0,0,0,.1); white-space: nowrap; pointer-events: none; }
 
   /* ---------- 夜（おやすみ） ---------- */
   #night { background: linear-gradient(var(--night-top), var(--night-bottom)); color: #fff; }
@@ -1231,20 +1231,19 @@
   // どっどっど
   const engine = (t, n, f = 100) => { for (let i = 0; i < n; i++) ding(t + i * .13, f, .1, { type: 'square', vol: .05 }); };
   const CAR_SOUNDS = {
+    // 時間は、道の上の おしごと（carScene）に合わせてある
     fire: t => {
-      glide(t, [[0, 420], [1.1, 880], [2.3, 880], [3.2, 480]], { type: 'sawtooth', vol: .04, filter: 1800 });
-      for (let i = 0; i < 8; i++) { ding(t + .2 + i * .38, 1760, .3, { type: 'square', vol: .03 }); ding(t + .2 + i * .38, 2637, .25, { vol: .04 }); }
+      glide(t, [[0, 420], [1.1, 880], [2.3, 880], [3.2, 480], [4.3, 880], [5.5, 880], [6.4, 480]], { type: 'sawtooth', vol: .04, filter: 1800 });
+      for (let i = 0; i < 16; i++) { ding(t + .2 + i * .38, 1760, .3, { type: 'square', vol: .03 }); ding(t + .2 + i * .38, 2637, .25, { vol: .04 }); }
     },
-    police: t => glide(t, [[0, 600], [.7, 1150], [1.4, 600], [2.1, 1150], [2.8, 600]], { type: 'sawtooth', vol: .035, filter: 1600 }),
-    ambulance: t => { for (let i = 0; i < 3; i++) { glide(t + i, [[0, 960], [.46, 960]], { vol: .035, filter: 2000 }); glide(t + i + .5, [[0, 770], [.46, 770]], { vol: .035, filter: 2000 }); } },
-    bus: t => { horn(t, [[0, .15], [.25, .5]]); hiss(t + 1.6, .8, 2600, .12); horn(t + 3, [[0, .15], [.25, .5]]); },
-    tractor: t => engine(t, 36),
-    truck: t => { horn(t, [[0, .8]]); engine(t + .9, 14, 80); },
-    crane: t => {
-      glide(t + .2, [[0, 260], [1.6, 520]], { type: 'triangle', vol: .07 });
-      [1.9, 2.5, 3.1].forEach(s => { hiss(t + s, .2, 900, .25, 2); ding(t + s, 1250, .25, { type: 'square', vol: .03 }); });
-    },
-    taxi: t => { horn(t, [[0, .12], [.22, .12]]); horn(t + 2.6, [[0, .12], [.22, .12]]); },
+    police: t => glide(t, [[0, 600], [.8, 1150], [1.6, 600], [2.4, 1150], [3.2, 600], [4, 1150], [4.8, 600]], { type: 'sawtooth', vol: .035, filter: 1600 }),
+    ambulance: t => { for (let i = 0; i < 5; i++) { glide(t + i, [[0, 960], [.46, 960]], { vol: .035, filter: 2000 }); glide(t + i + .5, [[0, 770], [.46, 770]], { vol: .035, filter: 2000 }); } },
+    bus: t => { horn(t, [[0, .15], [.25, .5]]); hiss(t + 2.9, .8, 2600, .12); horn(t + 5.5, [[0, .15], [.25, .5]]); },
+    tractor: t => engine(t, 68),
+    truck: t => { horn(t, [[0, .8]]); engine(t + .9, 20, 80); },
+    // つりあげる音と がしゃんは、carScene の中で鳴らす。ここでは ピーッ ピーッ
+    crane: t => { for (let i = 0; i < 3; i++) ding(t + i * .5, 1000, .3, { type: 'square', vol: .03 }); },
+    taxi: t => { horn(t, [[0, .12], [.22, .12]]); horn(t + 4.7, [[0, .12], [.22, .12]]); },
   };
 
   // ---------- おともだちの部品 ----------
@@ -2335,9 +2334,9 @@
     n.style.setProperty('--c', c.c);
     n.innerHTML = carNameHtml(c);
     n.hidden = false;
-    anim(n, [{ transform: 'translateX(-50%) scale(.3)', opacity: 0 }, { transform: 'translateX(-50%) scale(1.1)', opacity: 1, offset: .6 }, { transform: 'translateX(-50%) scale(1)', opacity: 1 }], { duration: 400 });
+    anim(n, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1.1)', opacity: 1, offset: .6 }, { transform: 'scale(1)', opacity: 1 }], { duration: 400 });
     clearTimeout(carNameTimer);
-    carNameTimer = setTimeout(() => { n.hidden = true; }, 3200);
+    carNameTimer = setTimeout(() => { n.hidden = true; }, 5000);
   }
   // なまえを言って、道を走らせる（走りおわったら resolve）
   function playCar(c) {
@@ -2348,6 +2347,8 @@
   }
 
   // 道の上の おしごと。べつのくるまをさわったら、前のくるまは消して はじめから
+  // 子どもが目で追えるよう、ゆっくり走らせる（ミリ秒）
+  const DRIVE_IN = 2800, DRIVE_OUT = 2400, PLOW = 9000;
   let carToken = 0;
   async function carScene(c) {
     const token = ++carToken, id = flow;
@@ -2377,55 +2378,75 @@
 
     // トラクター：はしからはしまで ゆっくり走って、うしろに 芽が出る
     if (c.act === 'plow') {
-      drive(car, W + size, -size, 5200, 'linear');
+      drive(car, W + size, -size, PLOW, 'linear');
       const gy = H - R - size * .22;
       const sprouts = [];
-      for (let i = 0; i < 13; i++) {
-        await sleep(380);
+      for (let i = 0; i < 22; i++) {
+        await sleep(400);
         if (!ok()) return;
         const r = car.getBoundingClientRect();
         const sx = r.right - r.width * .15;
-        if (sx < 0 || sx > W) continue;
+        if (sx < 0 || sx > W || sprouts.some(s => Math.abs(s.x - sx) < size * .4)) continue;
         const s = put('🌱', sx, gy, Math.round(size * .42));
         popIn(s, sx, gy);
-        sprouts.push(s);
+        sprouts.push({ el: s, x: sx });
       }
-      await sleep(500);
+      await sleep(600);
       if (!ok()) return;
       sprouts.forEach((s, i) => {
         if (i % 2) return;
-        s.textContent = pick(['🌷', '🌻', '🥕']);
-        const m = midOf(s);
+        s.el.textContent = pick(['🌷', '🌻', '🥕']);
+        const m = midOf(s.el);
         burst(m.x, m.y, ['✨'], 3, size * .4, [14, 22]);
       });
-      await sleep(1600);
+      await sleep(2200);
       if (ok()) layer.innerHTML = '';
       return;
     }
 
-    // クレーン：その場で、ブロックを 3つ つみあげて おうちにする
+    // クレーン：こうじちゅう。ブロックを ひとつずつ つりあげて、はこんで、つみあげて おうちにする
     if (c.act === 'build') {
-      const kx = W * .64, bx = W * .34, by = H - R * .35;
-      car.style.transform = at(kx, cy - size * .35);
-      car.style.fontSize = `${Math.round(size * 1.45)}px`;
-      popIn(car, kx, cy - size * .35);
+      // せまい画面では、クレーンを小さくする
+      const cs = Math.round(Math.min(size * 1.45, W * .4));
+      const kx = W * .68, bx = W * .3, by = H - R * .3, bs = Math.round(size * .45);
+      const ky = by - cs * .38;
+      const gx = kx - cs * .42;            // ブロックが おいてある ところ（クレーンの足もと）
+      const high = ky - cs * .3;           // つりあげる 高さ（クレーンの うでのあたり）
+      [Math.max(bx - size * .95, size * .3), Math.min(kx + cs * .6, W - size * .3)].forEach((x, i) => popIn(put('🚧', x, cy + size * .1, Math.round(size * .45)), x, cy + size * .1, i * 150));
+      car.style.transform = at(kx, ky);
+      car.style.fontSize = `${cs}px`;
+      popIn(car, kx, ky, 200);
+      await sleep(1000);
       const bricks = [];
       for (let i = 0; i < 3; i++) {
-        await sleep(i ? 600 : 1000);
         if (!ok()) return;
-        const y = by - i * size * .4;
-        const b = put('🧱', bx, y, Math.round(size * .45));
-        anim(b, [{ transform: at(kx - size * .3, cy - size * 1.1) }, { transform: at(bx, y - size * .5), offset: .7 }, { transform: at(bx, y) }], { duration: 600, easing: 'ease-in-out' });
+        const y = by - i * bs * .95;
+        const b = put('🧱', gx, by, bs);
+        popIn(b, gx, by);
+        await sleep(600);
+        if (!ok()) return;
+        if (ac) glide(ac.currentTime, [[0, 260], [1.4, 520]], { type: 'triangle', vol: .06 });
+        anim(b, [
+          { transform: at(gx, by) },
+          { transform: at(gx, high), offset: .35 },
+          { transform: at(bx, high), offset: .7 },
+          { transform: at(bx, y) },
+        ], { duration: 2400, easing: 'ease-in-out', fill: 'forwards' });
+        await sleep(2450);
+        if (!ok()) return;
+        if (ac) { hiss(ac.currentTime, .2, 900, .25, 2); ding(ac.currentTime, 1250, .25, { type: 'square', vol: .03 }); }
         bricks.push(b);
       }
-      await sleep(800);
+      await sleep(700);
       if (!ok()) return;
       bricks.forEach(b => b.remove());
-      const home = put(pick(['🏠', '🏡', '🏫']), bx, by - size * .45, Math.round(size * 1.3));
-      popIn(home, bx, by - size * .45);
+      const hs = Math.round(Math.min(size * 1.3, W * .34));
+      const home = put(pick(['🏠', '🏡', '🏫']), bx, by - hs * .35, hs);
+      popIn(home, bx, by - hs * .35);
       const m = midOf(home);
       burst(m.x, m.y, ['✨', '⭐', '🎉'], 10, size);
-      await sleep(2000);
+      sfx.yay();
+      await sleep(3000);
       if (ok()) layer.innerHTML = '';
       return;
     }
@@ -2435,52 +2456,52 @@
     const pxs = c.props.map((p, i) => px - i * size * .5);
     const props = c.props.map((p, i) => put(p, pxs[i], cy, Math.round(size * .55)));
     props.forEach((p, i) => popIn(p, pxs[i], cy, i * 120));
-    drive(car, W + size, stopX, 1500, 'ease-out');
-    await sleep(1550);
+    drive(car, W + size, stopX, DRIVE_IN, 'ease-out');
+    await sleep(DRIVE_IN + 100);
     if (!ok()) return;
     if (c.act === 'water') {
-      for (let i = 0; i < 9; i++) {
+      for (let i = 0; i < 12; i++) {
         const sx = stopX - size * .45, tx = px + (Math.random() - .5) * size * .4;
         const d = put(pick(['💦', '💧']), sx, cy - size * .2, Math.round(size * .3));
         anim(d, [
           { transform: at(sx, cy - size * .2), opacity: 1 },
-          { transform: at((sx + tx) / 2, cy - size * .8), opacity: 1, offset: .5 },
+          { transform: at((sx + tx) / 2, cy - size * .7), opacity: 1, offset: .5 },
           { transform: at(tx, cy, 'scale(.6)'), opacity: 0 },
-        ], { duration: 700, delay: i * 110, fill: 'backwards' }).onfinish = () => d.remove();
+        ], { duration: 900, delay: i * 150, fill: 'backwards' }).onfinish = () => d.remove();
       }
-      await sleep(1000);
+      await sleep(1700);
       if (!ok()) return;
       const m = midOf(props[0]);
       props[0].textContent = '💨';
-      anim(props[0], [{ transform: at(px, cy, 'scale(1)'), opacity: 1 }, { transform: at(px, cy - size * .5, 'scale(1.5)'), opacity: 0 }], { duration: 1000, fill: 'forwards' });
+      anim(props[0], [{ transform: at(px, cy, 'scale(1)'), opacity: 1 }, { transform: at(px, cy - size * .5, 'scale(1.5)'), opacity: 0 }], { duration: 1400, fill: 'forwards' });
       burst(m.x, m.y, ['✨', '⭐'], 8, size * .7);
-      await sleep(900);
+      await sleep(1500);
     } else if (c.act === 'help') {
-      const sy = cy - size * .7;
+      const sy = cy - size * .65;
       const light = put('🚨', stopX, sy, Math.round(size * .42));
-      anim(light, [{ transform: at(stopX, sy, 'scale(.8)') }, { transform: at(stopX, sy, 'scale(1.3)') }], { duration: 230, iterations: 6, direction: 'alternate' }).onfinish = () => light.remove();
-      await sleep(800);
+      anim(light, [{ transform: at(stopX, sy, 'scale(.8)') }, { transform: at(stopX, sy, 'scale(1.3)') }], { duration: 260, iterations: 10, direction: 'alternate' }).onfinish = () => light.remove();
+      await sleep(1300);
       if (!ok()) return;
       props[0].textContent = '😊';
-      anim(props[0], [{ transform: at(px, cy) }, { transform: at(px, cy - size * .5), offset: .4 }, { transform: at(px, cy) }], { duration: 700, easing: 'ease-in-out' });
+      anim(props[0], [{ transform: at(px, cy) }, { transform: at(px, cy - size * .45), offset: .4 }, { transform: at(px, cy) }], { duration: 900, easing: 'ease-in-out' });
       const m = midOf(props[0]);
       burst(m.x, m.y, ['💖', '💕', '✨'], 7, size * .7);
-      await sleep(1000);
+      await sleep(1600);
     } else {
       // のる（ひと・にもつが、ぴょんと くるまに入る）
       props.forEach((p, i) => anim(p, [
         { transform: at(pxs[i], cy, 'scale(1)'), opacity: 1 },
-        { transform: at((pxs[i] + stopX) / 2, cy - size * .7, 'scale(1)'), opacity: 1, offset: .5 },
+        { transform: at((pxs[i] + stopX) / 2, cy - size * .55, 'scale(1)'), opacity: 1, offset: .5 },
         { transform: at(stopX, cy - size * .1, 'scale(.3)'), opacity: 0 },
-      ], { duration: 650, delay: i * 280, fill: 'forwards', easing: 'ease-in-out' }));
-      await sleep(650 + props.length * 280);
+      ], { duration: 900, delay: i * 400, fill: 'forwards', easing: 'ease-in-out' }));
+      await sleep(900 + props.length * 400);
       if (!ok()) return;
-      anim(body, [{ transform: 'scale(1)' }, { transform: 'scale(1.15, .88)' }, { transform: 'scale(1)' }], { duration: 350 });
-      await sleep(400);
+      anim(body, [{ transform: 'scale(1)' }, { transform: 'scale(1.15, .88)' }, { transform: 'scale(1)' }], { duration: 450 });
+      await sleep(700);
     }
     if (!ok()) return;
-    drive(car, stopX, -size * 1.3, 1200, 'ease-in');
-    await sleep(1250);
+    drive(car, stopX, -size * 1.3, DRIVE_OUT, 'ease-in');
+    await sleep(DRIVE_OUT + 50);
     if (ok()) layer.innerHTML = '';
   }
 
