@@ -35,6 +35,7 @@
     --ui-font: "Mojimori Emoji", "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Yu Gothic", sans-serif;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   html, body { margin: 0; height: 100%; overflow: hidden; }
   body {
@@ -103,8 +104,8 @@
 
   .menu { display: flex; gap: 3.5vmin; flex-wrap: wrap; justify-content: center; }
   .big-btn {
-    width: 29vmin; width: clamp(108px, 29vmin, 230px);
-    height: 29vmin; height: clamp(108px, 29vmin, 230px); max-width: 100%;
+    width: 24vmin; width: clamp(96px, 24vmin, 200px);
+    height: 24vmin; height: clamp(96px, 24vmin, 200px); max-width: 100%;
     border-radius: 32px;
     background: var(--paper);
     box-shadow: 0 10px 0 rgba(0,0,0,.12), 0 16px 28px rgba(0,0,0,.12);
@@ -112,11 +113,14 @@
     transition: transform .12s;
   }
   .big-btn:active { transform: translateY(6px); box-shadow: 0 4px 0 rgba(0,0,0,.12); }
-  .big-btn .icon { font-size: 14vmin; font-size: clamp(48px, 14vmin, 108px); line-height: 1; }
-  .big-btn .label { font-size: 3.6vmin; font-size: clamp(14px, 3.6vmin, 26px); font-weight: 900; }
+  .big-btn .icon { font-size: 11.5vmin; font-size: clamp(42px, 11.5vmin, 92px); line-height: 1; }
+  .big-btn .label { font-size: 3vmin; font-size: clamp(11px, 3vmin, 23px); font-weight: 900; white-space: nowrap; }
   .big-btn.touch { border: 6px solid #ffb74d; }
   .big-btn.find { border: 6px solid #64b5f6; }
   .big-btn.quiz { border: 6px solid #81c784; }
+  .big-btn.bubble { border: 6px solid #4dd0e1; }
+  .big-btn.cars { border: 6px solid #e57373; }
+  .big-btn .ball { width: 2em; height: 2em; font-size: .5em; }
   .parade { display: flex; gap: 2vmin; margin-top: 4vmin; }
   .parade .friend { --friend: clamp(56px, 12vmin, 92px); }
   @media (max-height: 560px) { .parade { display: none; } }
@@ -238,6 +242,63 @@
   .quiz-word.hide { visibility: hidden; }
   .quiz-word .blank { display: inline-block; width: .95em; height: .95em; border: 3px dashed rgba(74,59,51,.45); border-radius: 12px; vertical-align: -.1em; margin-right: .05em; }
 
+  /* ---------- しゃぼんだま ぱちん ---------- */
+  /* しゃぼんだまの玉（ホームのボタンの絵にも使う） */
+  .ball {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%; border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 27%, rgba(255,255,255,.95) 0, rgba(255,255,255,.95) 6%, rgba(255,255,255,0) 17%),
+      radial-gradient(circle at 70% 76%, rgba(255,255,255,.6) 0, rgba(255,255,255,0) 12%),
+      radial-gradient(circle, rgba(255,255,255,.12) 55%, rgba(140,215,255,.4) 70%, rgba(255,170,235,.55) 84%, rgba(255,255,255,.9) 100%);
+    box-shadow: inset 0 0 12px rgba(255,255,255,.7), 0 6px 14px rgba(40,110,160,.12);
+    font-family: var(--kana-font); font-size: .5em; font-weight: normal; line-height: 1;
+    color: var(--c, #5aa9f0);
+    text-shadow: 3px 0 0 #fff, -3px 0 0 #fff, 0 3px 0 #fff, 0 -3px 0 #fff, 2px 2px 0 #fff, -2px 2px 0 #fff, 2px -2px 0 #fff, -2px -2px 0 #fff;
+  }
+  .bubble-field { position: absolute; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; }
+  .soap { position: absolute; left: 0; top: 0; border-radius: 50%; will-change: transform; }
+  .soap .ball { font-size: calc(var(--s) * .52); animation: jiggle 1.9s ease-in-out infinite; }
+  @keyframes jiggle { 33% { transform: scale(1.05, .95); } 66% { transform: scale(.96, 1.04); } }
+  .soap.glow .ball { box-shadow: inset 0 0 12px rgba(255,255,255,.7), 0 0 0 7px #fff59d, 0 0 32px 14px #fff176; }
+  .want { position: absolute; z-index: 3; left: 50%; top: 84px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.8); padding: 6px 18px 6px 8px; border-radius: 999px; box-shadow: 0 5px 0 rgba(0,0,0,.1); pointer-events: none; }
+  .want .ball { width: 64px; height: 64px; font-size: 34px; }
+  .want span { font-size: 30px; }
+  @media (max-height: 520px) { .want { top: 66px; } .want .ball { width: 48px; height: 48px; font-size: 26px; } }
+
+  /* ---------- はたらくくるま ---------- */
+  #cars { --top: 84px; --road: 160px; --strip: 64px; --name: 36px; }
+  @media (max-height: 520px) { #cars { --top: 66px; } }
+  .road { position: absolute; left: 0; right: 0; bottom: 0; height: var(--road); background: #808a93; border-top: 10px solid #d7dde1; }
+  .road::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: -3px; background: repeating-linear-gradient(90deg, #fff 0, #fff 40px, transparent 40px, transparent 80px); opacity: .85; }
+  .cars-area { position: absolute; z-index: 1; top: var(--top); left: 8px; right: 8px; bottom: calc(var(--road) + var(--strip)); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .car-grid { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; }
+  .car-tile {
+    position: relative;
+    width: var(--cell); height: var(--cell); margin: 6px;
+    border-radius: 26%; background: var(--paper);
+    border: 5px solid var(--c);
+    box-shadow: 0 7px 0 rgba(0,0,0,.12), 0 12px 20px rgba(0,0,0,.1);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: box-shadow .3s;
+  }
+  .car-tile:active { transform: translateY(4px); }
+  .car-tile .icon { font-size: calc(var(--cell) * .48); line-height: 1.1; }
+  .car-tile .name { font-family: var(--kana-font); line-height: 1.2; white-space: nowrap; }
+  .car-tile .name b, .car-name b { color: var(--c); font-weight: inherit; }
+  .car-tile.glow { box-shadow: 0 7px 0 rgba(0,0,0,.12), 0 0 0 8px #fff59d, 0 0 30px 12px #fff176; }
+  .car-card { display: flex; flex-direction: column; align-items: center; background: var(--paper); border-radius: 32px; padding: 1vmin 5vmin 1.5vmin; box-shadow: 0 8px 0 rgba(0,0,0,.1); margin-bottom: 2vmin; max-width: 100%; }
+  .car-card .pic { font-size: 15vmin; font-size: clamp(56px, 15vmin, 130px); line-height: 1.15; }
+  .car-card .text { font-size: 4.4vmin; font-size: clamp(17px, 4.4vmin, 34px); font-weight: 900; text-align: center; }
+  .cars-area .progress { margin-bottom: 1.5vmin; }
+  /* 道を走るくるまと、まわりの小物 */
+  .drive { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+  .drive > span { position: absolute; left: 0; top: 0; line-height: 1; white-space: nowrap; }
+  .drive .rumble { display: inline-block; animation: rumble .22s linear infinite; }
+  @keyframes rumble { 50% { transform: translateY(-3px); } }
+  /* くるまの なまえは、道のすぐ上に出す（字幕は、この画面では上に出す） */
+  .car-name { position: absolute; z-index: 3; left: 50%; bottom: calc(var(--road) + 8px); transform: translateX(-50%); font-family: var(--kana-font); font-size: var(--name); background: rgba(255,253,247,.94); padding: .05em .6em; border-radius: 999px; box-shadow: 0 6px 0 rgba(0,0,0,.1); white-space: nowrap; pointer-events: none; }
+
   /* ---------- 夜（おやすみ） ---------- */
   #night { background: linear-gradient(var(--night-top), var(--night-bottom)); color: #fff; }
   #night .moon { font-size: 16vmin; font-size: clamp(60px, 16vmin, 120px); margin-bottom: 2vmin; }
@@ -260,6 +321,7 @@
     opacity: 0; transition: opacity .3s; pointer-events: none;
   }
   .caption.show { opacity: 1; }
+  #cars.active ~ .caption { top: 14px; top: max(14px, env(safe-area-inset-top, 0px)); bottom: auto; max-width: calc(100vw - 180px); }
 
   /* ---------- 演出 ---------- */
   /* 正解したときの大きなお祝い（光の帯・はなまる・ほめ言葉） */
@@ -311,13 +373,14 @@
   .nogap .menu > *, .nogap .parade > *, .nogap .stage > * { margin: 1.6vmin; }
   .nogap .script-toggle > * + *, .nogap .page-toggle > * + *, .nogap .touch-head > * + *, .nogap .pill > * + * { margin-left: 8px; }
   .nogap .progress > * + * { margin-left: 4px; }
+  .nogap .want > * + * { margin-left: 10px; }
   .nogap .script-toggle button b { margin-right: 8px; }
   .nogap .big-btn > * + *, .nogap .spot-card > * + *, .nogap .play-body > * + * { margin-top: 2vmin; }
   .nogap .panel .row > * { margin: 0 8px 8px 0; }
   .old-msg { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 60; background: #fff3cd; color: #5d4500; border-radius: 14px; padding: 12px 16px; font-size: 15px; line-height: 1.6; box-shadow: 0 6px 16px rgba(0,0,0,.15); }
 
   @media (prefers-reduced-motion: reduce) {
-    .cloud, .start-btn, .friend .body { animation: none; }
+    .cloud, .start-btn, .friend .body, .soap .ball, .drive .rumble { animation: none; }
   }
 </style>
 
@@ -354,6 +417,8 @@
     <button class="big-btn touch" data-mode="touch"><span class="icon">👆</span><span class="label">ふれてみよう</span></button>
     <button class="big-btn find" data-mode="find"><span class="icon">🔍</span><span class="label">さがしてみよう</span></button>
     <button class="big-btn quiz" data-mode="quiz"><span class="icon">🍎</span><span class="label">これ なあに？</span></button>
+    <button class="big-btn bubble" data-mode="bubble"><span class="icon"><b class="ball" id="bubbleIcon">あ</b></span><span class="label">しゃぼんだま</span></button>
+    <button class="big-btn cars" data-mode="cars"><span class="icon">🚒</span><span class="label">はたらくくるま</span></button>
   </div>
   <div class="parade" id="parade"></div>
 </section>
@@ -386,6 +451,33 @@
       <div class="quiz-word hide" id="quizWord"></div>
     </div>
     <div class="stage" id="stage"></div>
+  </div>
+</section>
+
+<!-- しゃぼんだま ぱちん -->
+<section id="bubble" class="screen">
+  <div class="bubble-field" id="bubbleField"></div>
+  <div class="topbar">
+    <button class="round-btn" data-home aria-label="おうちにもどる">🏠</button>
+    <div class="progress" id="bubbleProgress"></div>
+    <button class="round-btn" data-ask aria-label="もういちど きく">👂</button>
+  </div>
+  <div class="want" id="bubbleWant" hidden><b class="ball"></b><span aria-hidden="true">👀</span></div>
+</section>
+
+<!-- はたらくくるま -->
+<section id="cars" class="screen">
+  <div class="road"></div>
+  <div class="cars-area" id="carsArea"></div>
+  <div class="drive" id="carLayer" aria-hidden="true"></div>
+  <div class="car-name" id="carName" hidden></div>
+  <div class="topbar">
+    <button class="round-btn" data-home aria-label="おうちにもどる">🏠</button>
+    <div class="page-toggle" role="group" aria-label="あそびかた">
+      <button data-carmode="free" aria-pressed="true" aria-label="さわってみよう">🚗</button>
+      <button data-carmode="quiz" aria-pressed="false" aria-label="どの くるまを よぶ？">❓</button>
+    </div>
+    <button class="round-btn" data-ask id="carsAsk" aria-label="もういちど きく">👂</button>
   </div>
 </section>
 
@@ -709,6 +801,14 @@
   const pick = a => a[Math.floor(Math.random() * a.length)];
   const load = (key, fallback) => { try { const v = JSON.parse(localStorage.getItem(key)); return v === null || v === undefined ? fallback : v; } catch (err) { return fallback; } };
   const store = (key, v) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch (err) {} };
+  // さわった瞬間に反応する（動いているものを、指をはなす前に つかまえたいとき）。古い Chrome には PointerEvent がない
+  function onPress(el, fn) {
+    if (window.PointerEvent) el.addEventListener('pointerdown', ev => { ev.preventDefault(); fn(); });
+    else {
+      el.addEventListener('touchstart', ev => { ev.preventDefault(); fn(); });
+      el.addEventListener('mousedown', fn);
+    }
+  }
 
   // ---------- ひらがな／カタカナ ----------
   const SCRIPT_KEY = 'mojimori.v2.script';
@@ -1067,6 +1167,85 @@
       () => tones([f * 1.5, f * 1.5, f * 2], { gap: .12, dur: .2, type: 'sine', vol: .14 }),
     ])();
   }
+  // しゃぼんだまが われる音（ぷちっ）
+  function plop() {
+    if (!ac) return;
+    const t = ac.currentTime + .005, o = ac.createOscillator(), g = ac.createGain();
+    const f = 320 + Math.random() * 260;
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f, t);
+    o.frequency.exponentialRampToValueAtTime(f * 4, t + .06);
+    g.gain.setValueAtTime(.3, t);
+    g.gain.exponentialRampToValueAtTime(.001, t + .13);
+    o.connect(g).connect(ac.destination);
+    o.start(t); o.stop(t + .15);
+  }
+
+  // ---------- くるまの音（サイレン・クラクション・エンジン） ----------
+  // t 秒に、f Hz の音を dur 秒だけ鳴らす
+  function ding(t, f, dur, { type = 'triangle', vol = .1 } = {}) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + .01);
+    g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    o.connect(g).connect(ac.destination);
+    o.start(t); o.stop(t + dur + .03);
+  }
+  // 音の高さを点でつないで鳴らす。pts は [秒, Hz] の並び
+  function glide(t, pts, { type = 'square', vol = .05, filter = 2400 } = {}) {
+    const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
+    const end = pts[pts.length - 1][0];
+    o.type = type;
+    f.type = 'lowpass'; f.frequency.value = filter;
+    o.frequency.setValueAtTime(pts[0][1], t);
+    pts.slice(1).forEach(([s, hz]) => o.frequency.linearRampToValueAtTime(hz, t + s));
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + .04);
+    g.gain.setValueAtTime(vol, t + Math.max(.05, end - .12));
+    g.gain.linearRampToValueAtTime(0, t + end);
+    o.connect(f).connect(g).connect(ac.destination);
+    o.start(t); o.stop(t + end + .05);
+  }
+  // ぷしゅー、がしゃん（ノイズを、ある高さのあたりだけ通す）
+  let noiseBuf = null;
+  function hiss(t, dur, freq, vol, q = .8) {
+    if (!noiseBuf) {
+      const n = ac.sampleRate;
+      noiseBuf = ac.createBuffer(1, n, n);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    }
+    const src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    src.buffer = noiseBuf; src.loop = true;
+    f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + .03);
+    g.gain.setValueAtTime(vol, t + dur * .6);
+    g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    src.connect(f).connect(g).connect(ac.destination);
+    src.start(t); src.stop(t + dur + .05);
+  }
+  // ぷっぷー。pattern は [はじまり, ながさ] の並び（秒）
+  const horn = (t, pattern) => pattern.forEach(([s, d]) => [311, 392].forEach(f => glide(t + s, [[0, f], [d, f]], { type: 'sawtooth', vol: .045, filter: 1500 })));
+  // どっどっど
+  const engine = (t, n, f = 100) => { for (let i = 0; i < n; i++) ding(t + i * .13, f, .1, { type: 'square', vol: .05 }); };
+  const CAR_SOUNDS = {
+    fire: t => {
+      glide(t, [[0, 420], [1.1, 880], [2.3, 880], [3.2, 480]], { type: 'sawtooth', vol: .04, filter: 1800 });
+      for (let i = 0; i < 8; i++) { ding(t + .2 + i * .38, 1760, .3, { type: 'square', vol: .03 }); ding(t + .2 + i * .38, 2637, .25, { vol: .04 }); }
+    },
+    police: t => glide(t, [[0, 600], [.7, 1150], [1.4, 600], [2.1, 1150], [2.8, 600]], { type: 'sawtooth', vol: .035, filter: 1600 }),
+    ambulance: t => { for (let i = 0; i < 3; i++) { glide(t + i, [[0, 960], [.46, 960]], { vol: .035, filter: 2000 }); glide(t + i + .5, [[0, 770], [.46, 770]], { vol: .035, filter: 2000 }); } },
+    bus: t => { horn(t, [[0, .15], [.25, .5]]); hiss(t + 1.6, .8, 2600, .12); horn(t + 3, [[0, .15], [.25, .5]]); },
+    tractor: t => engine(t, 36),
+    truck: t => { horn(t, [[0, .8]]); engine(t + .9, 14, 80); },
+    crane: t => {
+      glide(t + .2, [[0, 260], [1.6, 520]], { type: 'triangle', vol: .07 });
+      [1.9, 2.5, 3.1].forEach(s => { hiss(t + s, .2, 900, .25, 2); ding(t + s, 1250, .25, { type: 'square', vol: .03 }); });
+    },
+    taxi: t => { horn(t, [[0, .12], [.22, .12]]); horn(t + 2.6, [[0, .12], [.22, .12]]); },
+  };
 
   // ---------- おともだちの部品 ----------
   function makeFriend(e, { asButton = true, delay = 0, emoji, hat = true } = {}) {
@@ -1449,6 +1628,7 @@
     $('#scriptKata').setAttribute('aria-pressed', script === 'kata');
     $('#pageSei').textContent = script === 'kata' ? 'ア' : 'あ';
     $('#pageDaku').textContent = script === 'kata' ? 'ガ' : 'が';
+    $('#bubbleIcon').textContent = script === 'kata' ? 'ア' : 'あ';
     renderParade();
   }
   function renderParade() {
@@ -1574,6 +1754,10 @@
     finale: 'ぜんぶ　できたね！　すごい　すごい！　はなまる　いっぱい！',
     night: 'きょうは　ここまで。たくさん　あそんだね。おやすみ〜',
     hello: 'こんにちは！　いっしょに　あそぼうね！',
+    bubbleHello: 'しゃぼんだまを　ぱちんって　わってね！',
+    bubbleGlow: 'ひかってる　しゃぼんだまだよ！',
+    carsHello: 'はたらく　くるまに　さわってみよう！',
+    carWho: 'どの　くるまを　よぶ？',
   };
   const QUIZ_ASK = ['これは　なにかな？', 'これ、なあに？', 'これは　なんだろう？'];
 
@@ -1683,8 +1867,7 @@
 
   // ---------- 進み具合の星 ----------
   const ROUNDS = 5;
-  function renderProgress(done) {
-    const p = $('#progress');
+  function renderProgress(done, p = $('#progress')) {
     p.innerHTML = '';
     for (let i = 0; i < ROUNDS; i++) {
       const s = document.createElement('span');
@@ -1896,13 +2079,500 @@
     });
   }
 
+  // ---------- ④ しゃぼんだま ぱちん ----------
+  // 下からのぼってくる しゃぼんだまを わる。ときどき「『あ』は どーこだ？」と聞かれた字の しゃぼんだまを さがす
+  const BUBBLE_POOL = SEI.filter(e => e.id !== 'を');
+  let bub = null;
+  const bubbleSize = () => Math.max(88, Math.min(170, Math.min(innerWidth, innerHeight) * .22));
+  function goBubble() {
+    show('bubble');
+    const id = flow;
+    $('#bubbleField').innerHTML = '';
+    $('#bubbleWant').hidden = true;
+    renderProgress(0, $('#bubbleProgress'));
+    bub = { id, list: [], pops: 0, nextAsk: 4 + Math.floor(Math.random() * 3), target: null, locked: false, glow: false, found: [], quietUntil: 0, lastSpawn: 0, lanes: [], idle: null };
+    askAgain = () => say(P.bubbleHello);
+    say(P.bubbleHello);
+    let last = performance.now();
+    const step = now => {
+      if (id !== flow) return;
+      tickBubbles(now, Math.min(.05, Math.max(0, now - last) / 1000));
+      last = now;
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  function tickBubbles(now, dt) {
+    const b = bub;
+    // 古い端末で重くならないよう、小さい画面では数をへらす
+    const max = innerWidth * innerHeight > 600000 ? 7 : 5;
+    if (now > b.quietUntil && now - b.lastSpawn > 1100 && b.list.length < max) spawnBubble(now);
+    b.list.slice().forEach(o => {
+      o.y -= o.vy * dt;
+      o.t += dt;
+      o.el.style.transform = `translate(${o.x + Math.sin(o.t * o.f + o.p) * o.amp}px, ${o.y}px)`;
+      if (o.y < -o.s) removeBubble(o);
+    });
+  }
+  function spawnBubble(now) {
+    const b = bub, W = innerWidth, H = innerHeight;
+    const asking = b.target && !b.locked;
+    let e;
+    // 聞いている字が画面にないときは、すぐに出す。ほかは、形のにた字をときどきまぜる
+    if (asking && !b.list.some(o => o.e === b.target && !o.popped)) e = b.target;
+    else if (asking && Math.random() < .5) e = pickDistractors(b.target, 1, 1)[0];
+    else e = pick(BUBBLE_POOL);
+    const s = Math.round(bubbleSize() * (.85 + Math.random() * .3));
+    // 横の位置は、さっき出たところをさける
+    const n = Math.max(3, Math.floor((W - 24) / s));
+    let lane;
+    do { lane = Math.floor(Math.random() * n); } while (b.lanes.indexOf(lane) >= 0);
+    b.lanes = [lane].concat(b.lanes).slice(0, 2);
+    const x = 12 + s / 2 + lane * (W - 24 - s) / (n - 1);
+    const el = document.createElement('button');
+    el.className = 'soap' + (b.glow && e === b.target ? ' glow' : '');
+    el.setAttribute('aria-label', disp(e));
+    el.style.width = el.style.height = `${s}px`;
+    el.style.marginLeft = el.style.marginTop = `${-s / 2}px`;
+    el.style.setProperty('--s', `${s}px`);
+    const ball = document.createElement('b');
+    ball.className = 'ball';
+    ball.textContent = disp(e);
+    ball.style.setProperty('--c', e.color);
+    ball.style.animationDelay = `${-Math.random() * 2}s`;
+    el.appendChild(ball);
+    const o = { el, e, s, x, y: H + s / 2, vy: H / (6.5 + Math.random() * 2.5) * (e === b.target ? .85 : 1), t: 0, amp: 8 + Math.random() * 18, f: .7 + Math.random() * .6, p: Math.random() * 6.3 };
+    el.style.transform = `translate(${x}px, ${o.y}px)`;
+    onPress(el, () => popBubble(o));
+    $('#bubbleField').appendChild(el);
+    b.list.push(o);
+    b.lastSpawn = now;
+  }
+  function removeBubble(o) {
+    const i = bub ? bub.list.indexOf(o) : -1;
+    if (i >= 0) bub.list.splice(i, 1);
+    if (o.el.parentNode) o.el.parentNode.removeChild(o.el);
+  }
+  function popBubble(o) {
+    const b = bub;
+    if (!b || o.popped || b.id !== flow) return;
+    o.popped = true;
+    b.pops++;
+    plop();
+    const c = center(o.el);
+    ring(o.el, '#9fe0ff');
+    burst(c.x, c.y, ['💧', '✨', '💦'], 7, c.w * .65, [16, 30]);
+    const e = o.e, K = disp(e), S = spoken(e);
+    collect(e);
+    // お祝いのあいだは、声を出さずに音だけ
+    const quiet = performance.now() < b.quietUntil;
+    if (b.target === e && !b.locked) hitTarget(e);
+    else if (!quiet) {
+      if (b.target) {
+        b.idle.arm();
+        say(`${K}！`, { clips: [VL.kana(S)] });
+      } else {
+        const w = pick(wordsOf(e));
+        popAt(o.el, w.e, .7);
+        if (Math.random() < .5) say(`${K}！`, { clips: [VL.kana(S)] });
+        else say(`${w.w}の　${K}！`, { clips: [VL.wordOf(w.w, S)] });
+      }
+    }
+    anim(o.el.firstChild, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.4)', opacity: 0 }], { duration: 180, fill: 'forwards' }).onfinish = () => removeBubble(o);
+    if (!b.target && !quiet && b.pops >= b.nextAsk) setTimeout(() => { if (bub === b && b.id === flow && !b.target) startAsk(); }, 1300);
+  }
+  function startAsk() {
+    const b = bub;
+    const e = pick(BUBBLE_POOL.filter(x => b.found.indexOf(x) < 0));
+    const K = disp(e), S = spoken(e);
+    b.target = e;
+    const want = $('#bubbleWant'), ball = want.querySelector('.ball');
+    ball.textContent = K;
+    ball.style.setProperty('--c', e.color);
+    want.hidden = false;
+    anim(want, [{ transform: 'translateX(-50%) scale(.3)', opacity: 0 }, { transform: 'translateX(-50%) scale(1.1)', opacity: 1, offset: .7 }, { transform: 'translateX(-50%) scale(1)', opacity: 1 }], { duration: 450 });
+    const ask = () => say(`「${K}」は　どーこだ？`, { clips: [VL.where(S)] });
+    // ヒント：その字の しゃぼんだまを光らせる
+    const glow = () => {
+      sfx.hint();
+      b.glow = true;
+      b.list.forEach(o => { if (o.e === e) o.el.classList.add('glow'); });
+      say(`「${K}」は　どーこだ？　${P.bubbleGlow}`, { clips: [VL.where(S), P.bubbleGlow] });
+    };
+    b.idle = idleHints(b.id, () => b.target !== e || b.locked, [ask, glow]);
+    askAgain = () => { b.idle.arm(); ask(); };
+    ask();
+    b.idle.arm();
+  }
+  async function hitTarget(e) {
+    const b = bub, id = b.id, K = disp(e), S = spoken(e);
+    b.locked = true;
+    b.idle.stop();
+    b.glow = false;
+    b.list.forEach(o => o.el.classList.remove('glow'));
+    b.found.push(e);
+    $('#bubbleWant').hidden = true;
+    renderProgress(b.found.length, $('#bubbleProgress'));
+    const last = b.found.length >= ROUNDS;
+    // お祝いのあいだは、新しい しゃぼんだまを出さない
+    b.quietUntil = last ? Infinity : performance.now() + CHEER_MS;
+    const [big, line] = pick(PRAISE);
+    cheer(big, { stamp: pick(STAMPS) });
+    await Promise.all([say(`${line}　「${K}」だね！`, { clips: [line, VL.dane(S)] }), sleep(CHEER_MS + 600)]);
+    if (id !== flow) return;
+    b.target = null;
+    b.locked = false;
+    askAgain = () => say(P.bubbleHello);
+    if (!last) { b.nextAsk = b.pops + 3 + Math.floor(Math.random() * 3); return; }
+    await sleep(300);
+    if (id !== flow) return;
+    cheer('ぜんぶ できたね！', { stamp: '🏆', sub: '⭐⭐⭐⭐⭐', big: true });
+    await Promise.all([say(P.finale), sleep(CHEER_MS + 1700)]);
+    if (id !== flow) return;
+    goNight(b.found);
+  }
+
+  // ---------- ⑤ はたらくくるま ----------
+  // w は ひらがなで書く（カタカナのときは toKata にする）。line は くるまが言うこと。props は道で待っているもの
+  const CARS = [
+    { id: 'fire', e: '🚒', w: 'しょうぼうしゃ', c: '#e53935', line: 'かじを　けすよ！', act: 'water', props: ['🔥'] },
+    { id: 'police', e: '🚓', w: 'ぱとかー', c: '#3f51b5', line: 'まちを　まもるよ！', act: 'help', props: ['😢'] },
+    { id: 'ambulance', e: '🚑', w: 'きゅうきゅうしゃ', c: '#ec407a', line: 'びょういんへ　いそげ！', act: 'ride', props: ['🤕'] },
+    { id: 'bus', e: '🚌', w: 'ばす', c: '#f5a623', line: 'みんなを　のせて　しゅっぱつ！', act: 'ride', props: ['🧒', '👧', '👦'] },
+    { id: 'tractor', e: '🚜', w: 'とらくたー', c: '#43a047', line: 'はたけを　たがやすよ！', act: 'plow', props: [] },
+    { id: 'truck', e: '🚚', w: 'とらっく', c: '#1e88e5', line: 'にもつを　はこぶよ！', act: 'ride', props: ['📦', '📦'] },
+    { id: 'crane', e: '🏗️', w: 'くれーん', c: '#fb8c00', line: 'たかく　もちあげるよ！', act: 'build', props: [] },
+    { id: 'taxi', e: '🚕', w: 'たくしー', c: '#f9a825', line: 'どちらまで　いきますか？', act: 'ride', props: ['🙋'] },
+  ];
+  const carById = {};
+  CARS.forEach(c => { carById[c.id] = c; });
+  // 「どの くるまを よぶ？」の もんだい。not は、こたえと まぎらわしいので えらばせない くるま
+  const CAR_PROBLEMS = [
+    { car: 'fire', e: '🔥', t: 'たいへん！　かじだ！' },
+    { car: 'ambulance', e: '🤕', t: 'けがを　した　ひとが　いるよ！' },
+    { car: 'police', e: '😢', t: 'まいごの　こが　ないてるよ！' },
+    { car: 'bus', e: '🚏', t: 'みんなで　えんそくに　いきたいな！', not: ['taxi'] },
+    { car: 'tractor', e: '🌱', t: 'はたけを　たがやしたいな！' },
+    { car: 'truck', e: '📦', t: 'にもつを　とどけたいな！' },
+    { car: 'crane', e: '🧱', t: 'おもい　ものを　もちあげたいな！', not: ['truck'] },
+  ];
+  const carName = c => script === 'kata' ? toKata(c.w) : c.w;
+  const carNameHtml = c => { const n = carName(c); return `<b>${n[0]}</b>${n.slice(1)}`; };
+  const roadH = () => Math.round(Math.max(96, Math.min(210, innerHeight * .24)));
+  const carNameFont = () => Math.round(Math.max(24, Math.min(52, Math.min(innerWidth, innerHeight) * .06)));
+  const carStrip = () => Math.round(carNameFont() * 1.3) + 16;
+  const carsAreaH = () => innerHeight - (innerHeight <= 520 ? 66 : 84) - roadH() - carStrip();
+  function sizeCars() {
+    const el = $('#cars');
+    el.style.setProperty('--road', `${roadH()}px`);
+    el.style.setProperty('--strip', `${carStrip()}px`);
+    el.style.setProperty('--name', `${carNameFont()}px`);
+  }
+  let carMode = 'free';
+
+  function goCars(mode) {
+    carMode = mode;
+    show('cars');
+    document.querySelectorAll('[data-carmode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.carmode === mode));
+    $('#carsAsk').style.visibility = mode === 'quiz' ? 'visible' : 'hidden';
+    $('#carLayer').innerHTML = '';
+    $('#carName').hidden = true;
+    sizeCars();
+    if (mode === 'free') {
+      renderCarGrid();
+      say(P.carsHello);
+    } else runCarQuiz();
+  }
+  document.querySelectorAll('[data-carmode]').forEach(b => b.addEventListener('click', () => {
+    if (carMode === b.dataset.carmode) return;
+    sfx.tap();
+    goCars(b.dataset.carmode);
+  }));
+  addEventListener('resize', () => {
+    if (!$('#cars').classList.contains('active')) return;
+    sizeCars();
+    if (carMode === 'free') renderCarGrid();
+  });
+
+  function carTile(c, cell) {
+    const t = document.createElement('button');
+    const n = carName(c);
+    t.className = 'car-tile';
+    t.style.setProperty('--c', c.c);
+    t.style.setProperty('--cell', `${cell}px`);
+    t.setAttribute('aria-label', n);
+    t.innerHTML = `<span class="icon" aria-hidden="true">${c.e}</span><span class="name" style="font-size:${Math.round(cell * Math.min(.17, .8 / n.length))}px">${carNameHtml(c)}</span>`;
+    anim(t, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 420, delay: Math.random() * 200, fill: 'backwards', easing: 'cubic-bezier(.3,1.4,.6,1)' });
+    return t;
+  }
+  // count 個のマス（まわりに 6px ずつ余白）が、いちばん大きく入る並べ方
+  function carCells(count, w, h, maxCell) {
+    let best = { cell: 0, cols: count };
+    for (let cols = 1; cols <= count; cols++) {
+      const cell = Math.floor(Math.min(maxCell, w / cols - 12, h / Math.ceil(count / cols) - 12));
+      if (cell > best.cell) best = { cell, cols };
+    }
+    return best;
+  }
+  function renderCarGrid() {
+    const area = $('#carsArea');
+    area.innerHTML = '';
+    const { cell, cols } = carCells(CARS.length, innerWidth - 16, carsAreaH(), 190);
+    const grid = document.createElement('div');
+    grid.className = 'car-grid';
+    grid.style.width = `${cols * (cell + 12)}px`;
+    CARS.forEach(c => {
+      const t = carTile(c, cell);
+      t.addEventListener('click', () => { sfx.tap(); moves.bounce(t); playCar(c); });
+      grid.appendChild(t);
+    });
+    area.appendChild(grid);
+  }
+
+  let carNameTimer;
+  function showCarName(c) {
+    const n = $('#carName');
+    n.style.setProperty('--c', c.c);
+    n.innerHTML = carNameHtml(c);
+    n.hidden = false;
+    anim(n, [{ transform: 'translateX(-50%) scale(.3)', opacity: 0 }, { transform: 'translateX(-50%) scale(1.1)', opacity: 1, offset: .6 }, { transform: 'translateX(-50%) scale(1)', opacity: 1 }], { duration: 400 });
+    clearTimeout(carNameTimer);
+    carNameTimer = setTimeout(() => { n.hidden = true; }, 3200);
+  }
+  // なまえを言って、道を走らせる（走りおわったら resolve）
+  function playCar(c) {
+    showCarName(c);
+    if (ac) CAR_SOUNDS[c.id](ac.currentTime + .02);
+    say(`${carName(c)}！　${c.line}`, { clips: [VL.word(c.w), c.line] });
+    return carScene(c);
+  }
+
+  // 道の上の おしごと。べつのくるまをさわったら、前のくるまは消して はじめから
+  let carToken = 0;
+  async function carScene(c) {
+    const token = ++carToken, id = flow;
+    const ok = () => token === carToken && id === flow;
+    const layer = $('#carLayer');
+    layer.innerHTML = '';
+    const W = innerWidth, H = innerHeight, R = roadH();
+    const size = Math.round(R * .74);
+    const cy = H - R / 2 - size * .08;
+    const at = (x, y, extra = '') => `translate(${x}px, ${y}px) translate(-50%, -50%) ${extra}`;
+    const put = (txt, x, y, fs) => {
+      const s = document.createElement('span');
+      s.textContent = txt;
+      s.style.fontSize = `${fs}px`;
+      s.style.transform = at(x, y);
+      layer.appendChild(s);
+      return s;
+    };
+    const popIn = (el, x, y, delay = 0) => anim(el, [{ transform: at(x, y, 'scale(0)') }, { transform: at(x, y, 'scale(1)') }], { duration: 450, delay, fill: 'backwards', easing: 'cubic-bezier(.3,1.5,.6,1)' });
+    const drive = (el, x0, x1, ms, easing) => anim(el, [{ transform: at(x0, cy) }, { transform: at(x1, cy) }], { duration: ms, easing, fill: 'forwards' });
+    const midOf = el => center(el);
+    const car = put('', W + size, cy, size);
+    const body = document.createElement('span');
+    body.className = 'rumble';
+    body.textContent = c.e;
+    car.appendChild(body);
+
+    // トラクター：はしからはしまで ゆっくり走って、うしろに 芽が出る
+    if (c.act === 'plow') {
+      drive(car, W + size, -size, 5200, 'linear');
+      const gy = H - R - size * .22;
+      const sprouts = [];
+      for (let i = 0; i < 13; i++) {
+        await sleep(380);
+        if (!ok()) return;
+        const r = car.getBoundingClientRect();
+        const sx = r.right - r.width * .15;
+        if (sx < 0 || sx > W) continue;
+        const s = put('🌱', sx, gy, Math.round(size * .42));
+        popIn(s, sx, gy);
+        sprouts.push(s);
+      }
+      await sleep(500);
+      if (!ok()) return;
+      sprouts.forEach((s, i) => {
+        if (i % 2) return;
+        s.textContent = pick(['🌷', '🌻', '🥕']);
+        const m = midOf(s);
+        burst(m.x, m.y, ['✨'], 3, size * .4, [14, 22]);
+      });
+      await sleep(1600);
+      if (ok()) layer.innerHTML = '';
+      return;
+    }
+
+    // クレーン：その場で、ブロックを 3つ つみあげて おうちにする
+    if (c.act === 'build') {
+      const kx = W * .64, bx = W * .34, by = H - R * .35;
+      car.style.transform = at(kx, cy - size * .35);
+      car.style.fontSize = `${Math.round(size * 1.45)}px`;
+      popIn(car, kx, cy - size * .35);
+      const bricks = [];
+      for (let i = 0; i < 3; i++) {
+        await sleep(i ? 600 : 1000);
+        if (!ok()) return;
+        const y = by - i * size * .4;
+        const b = put('🧱', bx, y, Math.round(size * .45));
+        anim(b, [{ transform: at(kx - size * .3, cy - size * 1.1) }, { transform: at(bx, y - size * .5), offset: .7 }, { transform: at(bx, y) }], { duration: 600, easing: 'ease-in-out' });
+        bricks.push(b);
+      }
+      await sleep(800);
+      if (!ok()) return;
+      bricks.forEach(b => b.remove());
+      const home = put(pick(['🏠', '🏡', '🏫']), bx, by - size * .45, Math.round(size * 1.3));
+      popIn(home, bx, by - size * .45);
+      const m = midOf(home);
+      burst(m.x, m.y, ['✨', '⭐', '🎉'], 10, size);
+      await sleep(2000);
+      if (ok()) layer.innerHTML = '';
+      return;
+    }
+
+    // ほかのくるま：道のまんなかまで来て、おしごとをして、走っていく
+    const px = Math.round(W * .3), stopX = px + size * 1.05;
+    const pxs = c.props.map((p, i) => px - i * size * .5);
+    const props = c.props.map((p, i) => put(p, pxs[i], cy, Math.round(size * .55)));
+    props.forEach((p, i) => popIn(p, pxs[i], cy, i * 120));
+    drive(car, W + size, stopX, 1500, 'ease-out');
+    await sleep(1550);
+    if (!ok()) return;
+    if (c.act === 'water') {
+      for (let i = 0; i < 9; i++) {
+        const sx = stopX - size * .45, tx = px + (Math.random() - .5) * size * .4;
+        const d = put(pick(['💦', '💧']), sx, cy - size * .2, Math.round(size * .3));
+        anim(d, [
+          { transform: at(sx, cy - size * .2), opacity: 1 },
+          { transform: at((sx + tx) / 2, cy - size * .8), opacity: 1, offset: .5 },
+          { transform: at(tx, cy, 'scale(.6)'), opacity: 0 },
+        ], { duration: 700, delay: i * 110, fill: 'backwards' }).onfinish = () => d.remove();
+      }
+      await sleep(1000);
+      if (!ok()) return;
+      const m = midOf(props[0]);
+      props[0].textContent = '💨';
+      anim(props[0], [{ transform: at(px, cy, 'scale(1)'), opacity: 1 }, { transform: at(px, cy - size * .5, 'scale(1.5)'), opacity: 0 }], { duration: 1000, fill: 'forwards' });
+      burst(m.x, m.y, ['✨', '⭐'], 8, size * .7);
+      await sleep(900);
+    } else if (c.act === 'help') {
+      const sy = cy - size * .7;
+      const light = put('🚨', stopX, sy, Math.round(size * .42));
+      anim(light, [{ transform: at(stopX, sy, 'scale(.8)') }, { transform: at(stopX, sy, 'scale(1.3)') }], { duration: 230, iterations: 6, direction: 'alternate' }).onfinish = () => light.remove();
+      await sleep(800);
+      if (!ok()) return;
+      props[0].textContent = '😊';
+      anim(props[0], [{ transform: at(px, cy) }, { transform: at(px, cy - size * .5), offset: .4 }, { transform: at(px, cy) }], { duration: 700, easing: 'ease-in-out' });
+      const m = midOf(props[0]);
+      burst(m.x, m.y, ['💖', '💕', '✨'], 7, size * .7);
+      await sleep(1000);
+    } else {
+      // のる（ひと・にもつが、ぴょんと くるまに入る）
+      props.forEach((p, i) => anim(p, [
+        { transform: at(pxs[i], cy, 'scale(1)'), opacity: 1 },
+        { transform: at((pxs[i] + stopX) / 2, cy - size * .7, 'scale(1)'), opacity: 1, offset: .5 },
+        { transform: at(stopX, cy - size * .1, 'scale(.3)'), opacity: 0 },
+      ], { duration: 650, delay: i * 280, fill: 'forwards', easing: 'ease-in-out' }));
+      await sleep(650 + props.length * 280);
+      if (!ok()) return;
+      anim(body, [{ transform: 'scale(1)' }, { transform: 'scale(1.15, .88)' }, { transform: 'scale(1)' }], { duration: 350 });
+      await sleep(400);
+    }
+    if (!ok()) return;
+    drive(car, stopX, -size * 1.3, 1200, 'ease-in');
+    await sleep(1250);
+    if (ok()) layer.innerHTML = '';
+  }
+
+  // 「どの くるまを よぶ？」（こまっている絵を見て、たすけにいく くるまを えらぶ）
+  const CAR_CHOICES = [2, 2, 3, 3, 3];
+  async function runCarQuiz() {
+    const id = flow;
+    const probs = shuffle(CAR_PROBLEMS).slice(0, ROUNDS);
+    const st = { streak: 0, missed: false };
+    for (let round = 0; round < ROUNDS; round++) {
+      await carRound(id, probs[round], round, st);
+      if (id !== flow) return;
+    }
+    $('#carsArea').innerHTML = '';
+    await sleep(300);
+    if (id !== flow) return;
+    cheer('ぜんぶ できたね！', { stamp: '🏆', sub: '⭐⭐⭐⭐⭐', big: true });
+    await Promise.all([say(P.finale), sleep(CHEER_MS + 1700)]);
+    if (id !== flow) return;
+    // おやすみの画面では、くるまの なまえの さいしょの字のおともだちが、くるまの ぼうしを かぶって ねる
+    const cars = probs.map(p => carById[p.car]);
+    goNight(cars.map(c => byId[c.w[0]]), cars.map(c => c.e));
+  }
+  function carRound(id, prob, round, st) {
+    st.missed = false;
+    return new Promise(resolve => {
+      const target = carById[prob.car];
+      const area = $('#carsArea');
+      area.innerHTML = '';
+      const prog = document.createElement('div');
+      prog.className = 'progress';
+      renderProgress(round, prog);
+      const card = document.createElement('div');
+      card.className = 'car-card';
+      card.innerHTML = `<div class="pic" aria-hidden="true">${prob.e}</div><div class="text">${prob.t}</div>`;
+      const grid = document.createElement('div');
+      grid.className = 'car-grid';
+      area.appendChild(prog);
+      area.appendChild(card);
+      area.appendChild(grid);
+      anim(card, [{ transform: 'scale(.5) rotate(-6deg)', opacity: 0 }, { transform: 'scale(1.06)', opacity: 1, offset: .7 }, { transform: 'scale(1)', opacity: 1 }], { duration: 500 });
+
+      const others = shuffle(CARS.filter(c => c !== target && (prob.not || []).indexOf(c.id) < 0));
+      const choices = shuffle([target, ...others.slice(0, CAR_CHOICES[round] - 1)]);
+      const cell = Math.floor(Math.min(180, (innerWidth - 16) / choices.length - 12, carsAreaH() - prog.offsetHeight - card.offsetHeight - 40));
+      const els = choices.map(c => { const t = carTile(c, cell); grid.appendChild(t); return t; });
+      const targetEl = els[choices.indexOf(target)];
+      let locked = false;
+
+      const ask = () => say(`${prob.t}　${P.carWho}`, { clips: [prob.t, P.carWho] });
+      const showMe = () => { sfx.hint(); moves.wave(targetEl); say(P.thisWay); };
+      const idle = idleHints(id, () => locked, [ask, showMe]);
+      askAgain = () => { idle.arm(); ask(); };
+
+      els.forEach((el, i) => el.addEventListener('click', async () => {
+        if (locked) return;
+        idle.arm();
+        const c = choices[i];
+        if (c === target) {
+          locked = true;
+          idle.stop();
+          st.streak = st.missed ? 0 : st.streak + 1;
+          moves.happy(el);
+          // 先に くるまが おしごとをして、そのあとで お祝い
+          await Promise.all([playCar(c), sleep(2600)]);
+          if (id !== flow) return;
+          const line = praise(st, el, els.filter(o => o !== el));
+          await Promise.all([say(line.text, { clips: line.clips }), sleep(CHEER_MS + 600)]);
+          if (id !== flow) return;
+          resolve();
+        } else {
+          // まちがいにはしない。そのくるまの なまえを言って、正解のくるまが光って教える
+          st.missed = true;
+          sfx.hint();
+          moves.shake(el);
+          moves.wave(targetEl);
+          say(`${carName(c)}！　こっちだよ〜。`, { clips: [VL.word(c.w), P.thisWay] });
+        }
+      }));
+
+      sleep(550).then(() => { if (id === flow) { ask(); idle.arm(); } });
+    });
+  }
+
   // ---------- おやすみ ----------
-  function goNight(list) {
+  // hats は、おともだちにかぶせる絵（省略時は、そのもじのことばの絵）
+  function goNight(list, hats) {
     show('night');
     const st = $('#nightStage');
     st.innerHTML = '';
     list.forEach((e, i) => {
-      const el = makeFriend(e, { asButton: false, delay: i * .7 });
+      const el = makeFriend(e, { asButton: false, delay: i * .7, emoji: hats && hats[i] });
       el.classList.add('sleep');
       el.style.setProperty('--friend', fit('64px', '15vmin', '120px'));
       const z = document.createElement('span');
@@ -1932,7 +2602,7 @@
     say(script === 'kata' ? P.welcomeKata : P.welcome);
   });
   document.querySelectorAll('[data-home]').forEach(b => b.addEventListener('click', () => { sfx.tap(); goHome(); }));
-  $('#askAgain').addEventListener('click', () => { sfx.tap(); if (askAgain) askAgain(); });
+  document.querySelectorAll('#askAgain, [data-ask]').forEach(b => b.addEventListener('click', () => { sfx.tap(); if (askAgain) askAgain(); }));
   $('#bgmBtn').addEventListener('click', () => {
     unlockAudio();
     BGM.setEnabled(!BGM.enabled);
@@ -1943,7 +2613,10 @@
     unlockAudio();
     sfx.tap();
     const m = b.dataset.mode;
-    if (m === 'touch') goTouch(); else runSession(m);
+    if (m === 'touch') goTouch();
+    else if (m === 'bubble') goBubble();
+    else if (m === 'cars') goCars('free');
+    else runSession(m);
   }));
   document.querySelectorAll('[data-script]').forEach(b => b.addEventListener('click', () => {
     sfx.tap();
@@ -2046,6 +2719,8 @@
       });
     }));
     for (let n = 2; n <= ROUNDS; n++) add(VL.streak(n));
+    CARS.forEach(c => { add(VL.word(c.w)); add(c.line); });
+    CAR_PROBLEMS.forEach(p => add(p.t));
     Object.keys(P).forEach(k => add(P[k], k === 'night' ? 'よふかし' : undefined));
     TICKLE.concat(QUIZ_ASK, PRAISE.map(p => p[1])).forEach(t => add(t));
     return Object.keys(out).map(k => out[k]);
