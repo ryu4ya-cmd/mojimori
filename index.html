@@ -305,12 +305,12 @@
   .car-card .text { font-size: 4.4vmin; font-size: clamp(17px, 4.4vmin, 34px); font-weight: 900; text-align: center; }
   .cars-area .progress { margin-bottom: 1.5vmin; }
   /* 道を走るくるまと、まわりの小物 */
-  .drive { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+  .drive { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 3; pointer-events: none; overflow: hidden; }
   .drive > span { position: absolute; left: 0; top: 0; line-height: 1; white-space: nowrap; }
-  .drive .rumble { display: inline-block; animation: rumble .22s linear infinite; }
+  .drive .rumble { display: inline-block; animation: rumble .3s linear infinite; }
   @keyframes rumble { 50% { transform: translateY(-3px); } }
-  /* くるまの なまえは、道のすぐ上に出す（字幕は、この画面では上に出す） */
-  .car-name { position: absolute; z-index: 3; left: 50%; bottom: calc(var(--road) + 8px); transform: translateX(-50%); font-family: var(--kana-font); font-size: var(--name); background: rgba(255,253,247,.94); padding: .05em .6em; border-radius: 999px; box-shadow: 0 6px 0 rgba(0,0,0,.1); white-space: nowrap; pointer-events: none; }
+  /* くるまの なまえは、道のすぐ上の右はしに出す。道の上の絵（.drive）より うしろ（字幕は、この画面では上に出す） */
+  .car-name { position: absolute; z-index: 2; right: 16px; bottom: calc(var(--road) + 8px); transform-origin: 100% 50%; font-family: var(--kana-font); font-size: var(--name); background: rgba(255,253,247,.94); padding: .05em .6em; border-radius: 999px; box-shadow: 0 6px 0 rgba(0,0,0,.1); white-space: nowrap; pointer-events: none; }
 
   /* ---------- 夜（おやすみ） ---------- */
   #night { background: linear-gradient(var(--night-top), var(--night-bottom)); color: #fff; }
@@ -1560,13 +1560,14 @@ var engine = (t, n, f = 100) => {
   });
 };
 var CAR_SOUNDS = {
+  // 時間は、道の上の おしごと（carScene）に合わせてある
   fire: t => {
-    glide(t, [[0, 420], [1.1, 880], [2.3, 880], [3.2, 480]], {
+    glide(t, [[0, 420], [1.1, 880], [2.3, 880], [3.2, 480], [4.3, 880], [5.5, 880], [6.4, 480]], {
       type: 'sawtooth',
       vol: .04,
       filter: 1800
     });
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < 16; i++) {
       ding(t + .2 + i * .38, 1760, .3, {
         type: 'square',
         vol: .03
@@ -1576,13 +1577,13 @@ var CAR_SOUNDS = {
       });
     }
   },
-  police: t => glide(t, [[0, 600], [.7, 1150], [1.4, 600], [2.1, 1150], [2.8, 600]], {
+  police: t => glide(t, [[0, 600], [.8, 1150], [1.6, 600], [2.4, 1150], [3.2, 600], [4, 1150], [4.8, 600]], {
     type: 'sawtooth',
     vol: .035,
     filter: 1600
   }),
   ambulance: t => {
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 5; i++) {
       glide(t + i, [[0, 960], [.46, 960]], {
         vol: .035,
         filter: 2000
@@ -1595,30 +1596,24 @@ var CAR_SOUNDS = {
   },
   bus: t => {
     horn(t, [[0, .15], [.25, .5]]);
-    hiss(t + 1.6, .8, 2600, .12);
-    horn(t + 3, [[0, .15], [.25, .5]]);
+    hiss(t + 2.9, .8, 2600, .12);
+    horn(t + 5.5, [[0, .15], [.25, .5]]);
   },
-  tractor: t => engine(t, 36),
+  tractor: t => engine(t, 68),
   truck: t => {
     horn(t, [[0, .8]]);
-    engine(t + .9, 14, 80);
+    engine(t + .9, 20, 80);
   },
+  // つりあげる音と がしゃんは、carScene の中で鳴らす。ここでは ピーッ ピーッ
   crane: t => {
-    glide(t + .2, [[0, 260], [1.6, 520]], {
-      type: 'triangle',
-      vol: .07
-    });
-    [1.9, 2.5, 3.1].forEach(s => {
-      hiss(t + s, .2, 900, .25, 2);
-      ding(t + s, 1250, .25, {
-        type: 'square',
-        vol: .03
-      });
+    for (var i = 0; i < 3; i++) ding(t + i * .5, 1000, .3, {
+      type: 'square',
+      vol: .03
     });
   },
   taxi: t => {
     horn(t, [[0, .12], [.22, .12]]);
-    horn(t + 2.6, [[0, .12], [.22, .12]]);
+    horn(t + 4.7, [[0, .12], [.22, .12]]);
   }
 };
 
@@ -3798,14 +3793,14 @@ function showCarName(c) {
   n.innerHTML = carNameHtml(c);
   n.hidden = false;
   anim(n, [{
-    transform: 'translateX(-50%) scale(.3)',
+    transform: 'scale(.3)',
     opacity: 0
   }, {
-    transform: 'translateX(-50%) scale(1.1)',
+    transform: 'scale(1.1)',
     opacity: 1,
     offset: .6
   }, {
-    transform: 'translateX(-50%) scale(1)',
+    transform: 'scale(1)',
     opacity: 1
   }], {
     duration: 400
@@ -3813,7 +3808,7 @@ function showCarName(c) {
   clearTimeout(carNameTimer);
   carNameTimer = setTimeout(() => {
     n.hidden = true;
-  }, 3200);
+  }, 5000);
 }
 // なまえを言って、道を走らせる（走りおわったら resolve）
 function playCar(c) {
@@ -3826,15 +3821,19 @@ function playCar(c) {
 }
 
 // 道の上の おしごと。べつのくるまをさわったら、前のくるまは消して はじめから
+// 子どもが目で追えるよう、ゆっくり走らせる（ミリ秒）
+var DRIVE_IN = 2800,
+  DRIVE_OUT = 2400,
+  PLOW = 9000;
 var carToken = 0;
 function carScene(_x3) {
   return _carScene.apply(this, arguments);
 } // 「どの くるまを よぶ？」（こまっている絵を見て、たすけにいく くるまを えらぶ）
 function _carScene() {
   _carScene = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(c) {
-    var token, id, ok, layer, W, H, R, size, cy, at, put, popIn, drive, midOf, car, body, gy, sprouts, i, r, sx, s, kx, bx, by, bricks, _i7, y, b, home, m, px, stopX, pxs, props, _loop0, _i8, _m, sy, light, _m2;
-    return _regenerator().w(function (_context9) {
-      while (1) switch (_context9.n) {
+    var token, id, ok, layer, W, H, R, size, cy, at, put, popIn, drive, midOf, car, body, gy, sprouts, _loop0, _ret, i, cs, kx, bx, by, bs, ky, gx, high, bricks, _i7, y, b, hs, home, m, px, stopX, pxs, props, _loop1, _i8, _m, sy, light, _m2;
+    return _regenerator().w(function (_context0) {
+      while (1) switch (_context0.n) {
         case 0:
           token = ++carToken, id = flow;
           ok = () => token === carToken && id === flow;
@@ -3880,150 +3879,221 @@ function _carScene() {
 
           // トラクター：はしからはしまで ゆっくり走って、うしろに 芽が出る
           if (!(c.act === 'plow')) {
-            _context9.n = 10;
+            _context0.n = 9;
             break;
           }
-          drive(car, W + size, -size, 5200, 'linear');
+          drive(car, W + size, -size, PLOW, 'linear');
           gy = H - R - size * .22;
           sprouts = [];
+          _loop0 = /*#__PURE__*/_regenerator().m(function _loop0() {
+            var r, sx, s;
+            return _regenerator().w(function (_context8) {
+              while (1) switch (_context8.n) {
+                case 0:
+                  _context8.n = 1;
+                  return sleep(400);
+                case 1:
+                  if (ok()) {
+                    _context8.n = 2;
+                    break;
+                  }
+                  return _context8.a(2, {
+                    v: void 0
+                  });
+                case 2:
+                  r = car.getBoundingClientRect();
+                  sx = r.right - r.width * .15;
+                  if (!(sx < 0 || sx > W || sprouts.some(s => Math.abs(s.x - sx) < size * .4))) {
+                    _context8.n = 3;
+                    break;
+                  }
+                  return _context8.a(2, 0);
+                case 3:
+                  s = put('🌱', sx, gy, Math.round(size * .42));
+                  popIn(s, sx, gy);
+                  sprouts.push({
+                    el: s,
+                    x: sx
+                  });
+                case 4:
+                  return _context8.a(2);
+              }
+            }, _loop0);
+          });
           i = 0;
         case 1:
-          if (!(i < 13)) {
-            _context9.n = 6;
+          if (!(i < 22)) {
+            _context0.n = 5;
             break;
           }
-          _context9.n = 2;
-          return sleep(380);
+          return _context0.d(_regeneratorValues(_loop0()), 2);
         case 2:
-          if (ok()) {
-            _context9.n = 3;
+          _ret = _context0.v;
+          if (!(_ret === 0)) {
+            _context0.n = 3;
             break;
           }
-          return _context9.a(2);
+          return _context0.a(3, 4);
         case 3:
-          r = car.getBoundingClientRect();
-          sx = r.right - r.width * .15;
-          if (!(sx < 0 || sx > W)) {
-            _context9.n = 4;
+          if (!_ret) {
+            _context0.n = 4;
             break;
           }
-          return _context9.a(3, 5);
+          return _context0.a(2, _ret.v);
         case 4:
-          s = put('🌱', sx, gy, Math.round(size * .42));
-          popIn(s, sx, gy);
-          sprouts.push(s);
-        case 5:
           i++;
-          _context9.n = 1;
+          _context0.n = 1;
           break;
+        case 5:
+          _context0.n = 6;
+          return sleep(600);
         case 6:
-          _context9.n = 7;
-          return sleep(500);
-        case 7:
           if (ok()) {
-            _context9.n = 8;
+            _context0.n = 7;
             break;
           }
-          return _context9.a(2);
-        case 8:
+          return _context0.a(2);
+        case 7:
           sprouts.forEach((s, i) => {
             if (i % 2) return;
-            s.textContent = pick(['🌷', '🌻', '🥕']);
-            var m = midOf(s);
+            s.el.textContent = pick(['🌷', '🌻', '🥕']);
+            var m = midOf(s.el);
             burst(m.x, m.y, ['✨'], 3, size * .4, [14, 22]);
           });
-          _context9.n = 9;
-          return sleep(1600);
-        case 9:
+          _context0.n = 8;
+          return sleep(2200);
+        case 8:
           if (ok()) layer.innerHTML = '';
-          return _context9.a(2);
-        case 10:
+          return _context0.a(2);
+        case 9:
           if (!(c.act === 'build')) {
-            _context9.n = 19;
+            _context0.n = 22;
             break;
           }
-          kx = W * .64, bx = W * .34, by = H - R * .35;
-          car.style.transform = at(kx, cy - size * .35);
-          car.style.fontSize = `${Math.round(size * 1.45)}px`;
-          popIn(car, kx, cy - size * .35);
+          // せまい画面では、クレーンを小さくする
+          cs = Math.round(Math.min(size * 1.45, W * .4));
+          kx = W * .68, bx = W * .3, by = H - R * .3, bs = Math.round(size * .45);
+          ky = by - cs * .38;
+          gx = kx - cs * .42; // ブロックが おいてある ところ（クレーンの足もと）
+          high = ky - cs * .3; // つりあげる 高さ（クレーンの うでのあたり）
+          [Math.max(bx - size * .95, size * .3), Math.min(kx + cs * .6, W - size * .3)].forEach((x, i) => popIn(put('🚧', x, cy + size * .1, Math.round(size * .45)), x, cy + size * .1, i * 150));
+          car.style.transform = at(kx, ky);
+          car.style.fontSize = `${cs}px`;
+          popIn(car, kx, ky, 200);
+          _context0.n = 10;
+          return sleep(1000);
+        case 10:
           bricks = [];
           _i7 = 0;
         case 11:
           if (!(_i7 < 3)) {
-            _context9.n = 15;
+            _context0.n = 18;
             break;
           }
-          _context9.n = 12;
-          return sleep(_i7 ? 600 : 1000);
-        case 12:
           if (ok()) {
-            _context9.n = 13;
+            _context0.n = 12;
             break;
           }
-          return _context9.a(2);
+          return _context0.a(2);
+        case 12:
+          y = by - _i7 * bs * .95;
+          b = put('🧱', gx, by, bs);
+          popIn(b, gx, by);
+          _context0.n = 13;
+          return sleep(600);
         case 13:
-          y = by - _i7 * size * .4;
-          b = put('🧱', bx, y, Math.round(size * .45));
+          if (ok()) {
+            _context0.n = 14;
+            break;
+          }
+          return _context0.a(2);
+        case 14:
+          if (ac) glide(ac.currentTime, [[0, 260], [1.4, 520]], {
+            type: 'triangle',
+            vol: .06
+          });
           anim(b, [{
-            transform: at(kx - size * .3, cy - size * 1.1)
+            transform: at(gx, by)
           }, {
-            transform: at(bx, y - size * .5),
+            transform: at(gx, high),
+            offset: .35
+          }, {
+            transform: at(bx, high),
             offset: .7
           }, {
             transform: at(bx, y)
           }], {
-            duration: 600,
-            easing: 'ease-in-out'
+            duration: 2400,
+            easing: 'ease-in-out',
+            fill: 'forwards'
           });
-          bricks.push(b);
-        case 14:
-          _i7++;
-          _context9.n = 11;
-          break;
+          _context0.n = 15;
+          return sleep(2450);
         case 15:
-          _context9.n = 16;
-          return sleep(800);
-        case 16:
           if (ok()) {
-            _context9.n = 17;
+            _context0.n = 16;
             break;
           }
-          return _context9.a(2);
+          return _context0.a(2);
+        case 16:
+          if (ac) {
+            hiss(ac.currentTime, .2, 900, .25, 2);
+            ding(ac.currentTime, 1250, .25, {
+              type: 'square',
+              vol: .03
+            });
+          }
+          bricks.push(b);
         case 17:
+          _i7++;
+          _context0.n = 11;
+          break;
+        case 18:
+          _context0.n = 19;
+          return sleep(700);
+        case 19:
+          if (ok()) {
+            _context0.n = 20;
+            break;
+          }
+          return _context0.a(2);
+        case 20:
           bricks.forEach(b => b.remove());
-          home = put(pick(['🏠', '🏡', '🏫']), bx, by - size * .45, Math.round(size * 1.3));
-          popIn(home, bx, by - size * .45);
+          hs = Math.round(Math.min(size * 1.3, W * .34));
+          home = put(pick(['🏠', '🏡', '🏫']), bx, by - hs * .35, hs);
+          popIn(home, bx, by - hs * .35);
           m = midOf(home);
           burst(m.x, m.y, ['✨', '⭐', '🎉'], 10, size);
-          _context9.n = 18;
-          return sleep(2000);
-        case 18:
+          sfx.yay();
+          _context0.n = 21;
+          return sleep(3000);
+        case 21:
           if (ok()) layer.innerHTML = '';
-          return _context9.a(2);
-        case 19:
+          return _context0.a(2);
+        case 22:
           // ほかのくるま：道のまんなかまで来て、おしごとをして、走っていく
           px = Math.round(W * .3), stopX = px + size * 1.05;
           pxs = c.props.map((p, i) => px - i * size * .5);
           props = c.props.map((p, i) => put(p, pxs[i], cy, Math.round(size * .55)));
           props.forEach((p, i) => popIn(p, pxs[i], cy, i * 120));
-          drive(car, W + size, stopX, 1500, 'ease-out');
-          _context9.n = 20;
-          return sleep(1550);
-        case 20:
+          drive(car, W + size, stopX, DRIVE_IN, 'ease-out');
+          _context0.n = 23;
+          return sleep(DRIVE_IN + 100);
+        case 23:
           if (ok()) {
-            _context9.n = 21;
+            _context0.n = 24;
             break;
           }
-          return _context9.a(2);
-        case 21:
+          return _context0.a(2);
+        case 24:
           if (!(c.act === 'water')) {
-            _context9.n = 28;
+            _context0.n = 31;
             break;
           }
-          _loop0 = /*#__PURE__*/_regenerator().m(function _loop0() {
+          _loop1 = /*#__PURE__*/_regenerator().m(function _loop1() {
             var sx, tx, d;
-            return _regenerator().w(function (_context8) {
-              while (1) switch (_context8.n) {
+            return _regenerator().w(function (_context9) {
+              while (1) switch (_context9.n) {
                 case 0:
                   sx = stopX - size * .45, tx = px + (Math.random() - .5) * size * .4;
                   d = put(pick(['💦', '💧']), sx, cy - size * .2, Math.round(size * .3));
@@ -4031,43 +4101,43 @@ function _carScene() {
                     transform: at(sx, cy - size * .2),
                     opacity: 1
                   }, {
-                    transform: at((sx + tx) / 2, cy - size * .8),
+                    transform: at((sx + tx) / 2, cy - size * .7),
                     opacity: 1,
                     offset: .5
                   }, {
                     transform: at(tx, cy, 'scale(.6)'),
                     opacity: 0
                   }], {
-                    duration: 700,
-                    delay: _i8 * 110,
+                    duration: 900,
+                    delay: _i8 * 150,
                     fill: 'backwards'
                   }).onfinish = () => d.remove();
                 case 1:
-                  return _context8.a(2);
+                  return _context9.a(2);
               }
-            }, _loop0);
+            }, _loop1);
           });
           _i8 = 0;
-        case 22:
-          if (!(_i8 < 9)) {
-            _context9.n = 24;
-            break;
-          }
-          return _context9.d(_regeneratorValues(_loop0()), 23);
-        case 23:
-          _i8++;
-          _context9.n = 22;
-          break;
-        case 24:
-          _context9.n = 25;
-          return sleep(1000);
         case 25:
-          if (ok()) {
-            _context9.n = 26;
+          if (!(_i8 < 12)) {
+            _context0.n = 27;
             break;
           }
-          return _context9.a(2);
+          return _context0.d(_regeneratorValues(_loop1()), 26);
         case 26:
+          _i8++;
+          _context0.n = 25;
+          break;
+        case 27:
+          _context0.n = 28;
+          return sleep(1700);
+        case 28:
+          if (ok()) {
+            _context0.n = 29;
+            break;
+          }
+          return _context0.a(2);
+        case 29:
           _m = midOf(props[0]);
           props[0].textContent = '💨';
           anim(props[0], [{
@@ -4077,86 +4147,86 @@ function _carScene() {
             transform: at(px, cy - size * .5, 'scale(1.5)'),
             opacity: 0
           }], {
-            duration: 1000,
+            duration: 1400,
             fill: 'forwards'
           });
           burst(_m.x, _m.y, ['✨', '⭐'], 8, size * .7);
-          _context9.n = 27;
-          return sleep(900);
-        case 27:
-          _context9.n = 35;
+          _context0.n = 30;
+          return sleep(1500);
+        case 30:
+          _context0.n = 38;
           break;
-        case 28:
+        case 31:
           if (!(c.act === 'help')) {
-            _context9.n = 32;
+            _context0.n = 35;
             break;
           }
-          sy = cy - size * .7;
+          sy = cy - size * .65;
           light = put('🚨', stopX, sy, Math.round(size * .42));
           anim(light, [{
             transform: at(stopX, sy, 'scale(.8)')
           }, {
             transform: at(stopX, sy, 'scale(1.3)')
           }], {
-            duration: 230,
-            iterations: 6,
+            duration: 260,
+            iterations: 10,
             direction: 'alternate'
           }).onfinish = () => light.remove();
-          _context9.n = 29;
-          return sleep(800);
-        case 29:
+          _context0.n = 32;
+          return sleep(1300);
+        case 32:
           if (ok()) {
-            _context9.n = 30;
+            _context0.n = 33;
             break;
           }
-          return _context9.a(2);
-        case 30:
+          return _context0.a(2);
+        case 33:
           props[0].textContent = '😊';
           anim(props[0], [{
             transform: at(px, cy)
           }, {
-            transform: at(px, cy - size * .5),
+            transform: at(px, cy - size * .45),
             offset: .4
           }, {
             transform: at(px, cy)
           }], {
-            duration: 700,
+            duration: 900,
             easing: 'ease-in-out'
           });
           _m2 = midOf(props[0]);
           burst(_m2.x, _m2.y, ['💖', '💕', '✨'], 7, size * .7);
-          _context9.n = 31;
-          return sleep(1000);
-        case 31:
-          _context9.n = 35;
+          _context0.n = 34;
+          return sleep(1600);
+        case 34:
+          _context0.n = 38;
           break;
-        case 32:
+        case 35:
           // のる（ひと・にもつが、ぴょんと くるまに入る）
           props.forEach((p, i) => anim(p, [{
             transform: at(pxs[i], cy, 'scale(1)'),
             opacity: 1
           }, {
-            transform: at((pxs[i] + stopX) / 2, cy - size * .7, 'scale(1)'),
+            transform: at((pxs[i] + stopX) / 2, cy - size * .55, 'scale(1)'),
             opacity: 1,
             offset: .5
           }, {
             transform: at(stopX, cy - size * .1, 'scale(.3)'),
             opacity: 0
           }], {
-            duration: 650,
-            delay: i * 280,
+            duration: 900,
+            delay: i * 400,
             fill: 'forwards',
             easing: 'ease-in-out'
           }));
-          _context9.n = 33;
-          return sleep(650 + props.length * 280);
-        case 33:
+          _context0.n = 36;
+          return sleep(900 + props.length * 400);
+        case 36:
           if (ok()) {
-            _context9.n = 34;
+            _context0.n = 37;
             break;
           }
-          return _context9.a(2);
-        case 34:
+          return _context0.a(2);
+        case 37:
           anim(body, [{
             transform: 'scale(1)'
           }, {
@@ -4164,24 +4234,24 @@ function _carScene() {
           }, {
             transform: 'scale(1)'
           }], {
-            duration: 350
+            duration: 450
           });
-          _context9.n = 35;
-          return sleep(400);
-        case 35:
+          _context0.n = 38;
+          return sleep(700);
+        case 38:
           if (ok()) {
-            _context9.n = 36;
+            _context0.n = 39;
             break;
           }
-          return _context9.a(2);
-        case 36:
-          drive(car, stopX, -size * 1.3, 1200, 'ease-in');
-          _context9.n = 37;
-          return sleep(1250);
-        case 37:
+          return _context0.a(2);
+        case 39:
+          drive(car, stopX, -size * 1.3, DRIVE_OUT, 'ease-in');
+          _context0.n = 40;
+          return sleep(DRIVE_OUT + 50);
+        case 40:
           if (ok()) layer.innerHTML = '';
-        case 38:
-          return _context9.a(2);
+        case 41:
+          return _context0.a(2);
       }
     }, _callee7);
   }));
@@ -4194,8 +4264,8 @@ function runCarQuiz() {
 function _runCarQuiz() {
   _runCarQuiz = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
     var id, probs, st, round, cars;
-    return _regenerator().w(function (_context0) {
-      while (1) switch (_context0.n) {
+    return _regenerator().w(function (_context1) {
+      while (1) switch (_context1.n) {
         case 0:
           id = flow;
           probs = shuffle(CAR_PROBLEMS).slice(0, ROUNDS);
@@ -4206,51 +4276,51 @@ function _runCarQuiz() {
           round = 0;
         case 1:
           if (!(round < ROUNDS)) {
-            _context0.n = 4;
+            _context1.n = 4;
             break;
           }
-          _context0.n = 2;
+          _context1.n = 2;
           return carRound(id, probs[round], round, st);
         case 2:
           if (!(id !== flow)) {
-            _context0.n = 3;
+            _context1.n = 3;
             break;
           }
-          return _context0.a(2);
+          return _context1.a(2);
         case 3:
           round++;
-          _context0.n = 1;
+          _context1.n = 1;
           break;
         case 4:
           $('#carsArea').innerHTML = '';
-          _context0.n = 5;
+          _context1.n = 5;
           return sleep(300);
         case 5:
           if (!(id !== flow)) {
-            _context0.n = 6;
+            _context1.n = 6;
             break;
           }
-          return _context0.a(2);
+          return _context1.a(2);
         case 6:
           cheer('ぜんぶ できたね！', {
             stamp: '🏆',
             sub: '⭐⭐⭐⭐⭐',
             big: true
           });
-          _context0.n = 7;
+          _context1.n = 7;
           return Promise.all([say(P.finale), sleep(CHEER_MS + 1700)]);
         case 7:
           if (!(id !== flow)) {
-            _context0.n = 8;
+            _context1.n = 8;
             break;
           }
-          return _context0.a(2);
+          return _context1.a(2);
         case 8:
           // おやすみの画面では、くるまの なまえの さいしょの字のおともだちが、くるまの ぼうしを かぶって ねる
           cars = probs.map(p => carById[p.car]);
           goNight(cars.map(c => byId[c.w[0]]), cars.map(c => c.e));
         case 9:
-          return _context0.a(2);
+          return _context1.a(2);
       }
     }, _callee8);
   }));
