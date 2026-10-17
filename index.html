@@ -48,6 +48,7 @@
     --ui-font: "Mojimori Emoji", "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Yu Gothic", sans-serif;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   html, body { margin: 0; height: 100%; overflow: hidden; }
   body {
@@ -116,8 +117,8 @@
 
   .menu { display: flex; gap: 3.5vmin; flex-wrap: wrap; justify-content: center; }
   .big-btn {
-    width: 29vmin; width: clamp(108px, 29vmin, 230px);
-    height: 29vmin; height: clamp(108px, 29vmin, 230px); max-width: 100%;
+    width: 24vmin; width: clamp(96px, 24vmin, 200px);
+    height: 24vmin; height: clamp(96px, 24vmin, 200px); max-width: 100%;
     border-radius: 32px;
     background: var(--paper);
     box-shadow: 0 10px 0 rgba(0,0,0,.12), 0 16px 28px rgba(0,0,0,.12);
@@ -125,11 +126,14 @@
     transition: transform .12s;
   }
   .big-btn:active { transform: translateY(6px); box-shadow: 0 4px 0 rgba(0,0,0,.12); }
-  .big-btn .icon { font-size: 14vmin; font-size: clamp(48px, 14vmin, 108px); line-height: 1; }
-  .big-btn .label { font-size: 3.6vmin; font-size: clamp(14px, 3.6vmin, 26px); font-weight: 900; }
+  .big-btn .icon { font-size: 11.5vmin; font-size: clamp(42px, 11.5vmin, 92px); line-height: 1; }
+  .big-btn .label { font-size: 3vmin; font-size: clamp(11px, 3vmin, 23px); font-weight: 900; white-space: nowrap; }
   .big-btn.touch { border: 6px solid #ffb74d; }
   .big-btn.find { border: 6px solid #64b5f6; }
   .big-btn.quiz { border: 6px solid #81c784; }
+  .big-btn.bubble { border: 6px solid #4dd0e1; }
+  .big-btn.cars { border: 6px solid #e57373; }
+  .big-btn .ball { width: 2em; height: 2em; font-size: .5em; }
   .parade { display: flex; gap: 2vmin; margin-top: 4vmin; }
   .parade .friend { --friend: clamp(56px, 12vmin, 92px); }
   @media (max-height: 560px) { .parade { display: none; } }
@@ -251,6 +255,63 @@
   .quiz-word.hide { visibility: hidden; }
   .quiz-word .blank { display: inline-block; width: .95em; height: .95em; border: 3px dashed rgba(74,59,51,.45); border-radius: 12px; vertical-align: -.1em; margin-right: .05em; }
 
+  /* ---------- しゃぼんだま ぱちん ---------- */
+  /* しゃぼんだまの玉（ホームのボタンの絵にも使う） */
+  .ball {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%; border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 27%, rgba(255,255,255,.95) 0, rgba(255,255,255,.95) 6%, rgba(255,255,255,0) 17%),
+      radial-gradient(circle at 70% 76%, rgba(255,255,255,.6) 0, rgba(255,255,255,0) 12%),
+      radial-gradient(circle, rgba(255,255,255,.12) 55%, rgba(140,215,255,.4) 70%, rgba(255,170,235,.55) 84%, rgba(255,255,255,.9) 100%);
+    box-shadow: inset 0 0 12px rgba(255,255,255,.7), 0 6px 14px rgba(40,110,160,.12);
+    font-family: var(--kana-font); font-size: .5em; font-weight: normal; line-height: 1;
+    color: var(--c, #5aa9f0);
+    text-shadow: 3px 0 0 #fff, -3px 0 0 #fff, 0 3px 0 #fff, 0 -3px 0 #fff, 2px 2px 0 #fff, -2px 2px 0 #fff, 2px -2px 0 #fff, -2px -2px 0 #fff;
+  }
+  .bubble-field { position: absolute; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; }
+  .soap { position: absolute; left: 0; top: 0; border-radius: 50%; will-change: transform; }
+  .soap .ball { font-size: calc(var(--s) * .52); animation: jiggle 1.9s ease-in-out infinite; }
+  @keyframes jiggle { 33% { transform: scale(1.05, .95); } 66% { transform: scale(.96, 1.04); } }
+  .soap.glow .ball { box-shadow: inset 0 0 12px rgba(255,255,255,.7), 0 0 0 7px #fff59d, 0 0 32px 14px #fff176; }
+  .want { position: absolute; z-index: 3; left: 50%; top: 84px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.8); padding: 6px 18px 6px 8px; border-radius: 999px; box-shadow: 0 5px 0 rgba(0,0,0,.1); pointer-events: none; }
+  .want .ball { width: 64px; height: 64px; font-size: 34px; }
+  .want span { font-size: 30px; }
+  @media (max-height: 520px) { .want { top: 66px; } .want .ball { width: 48px; height: 48px; font-size: 26px; } }
+
+  /* ---------- はたらくくるま ---------- */
+  #cars { --top: 84px; --road: 160px; --strip: 64px; --name: 36px; }
+  @media (max-height: 520px) { #cars { --top: 66px; } }
+  .road { position: absolute; left: 0; right: 0; bottom: 0; height: var(--road); background: #808a93; border-top: 10px solid #d7dde1; }
+  .road::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: -3px; background: repeating-linear-gradient(90deg, #fff 0, #fff 40px, transparent 40px, transparent 80px); opacity: .85; }
+  .cars-area { position: absolute; z-index: 1; top: var(--top); left: 8px; right: 8px; bottom: calc(var(--road) + var(--strip)); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .car-grid { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; }
+  .car-tile {
+    position: relative;
+    width: var(--cell); height: var(--cell); margin: 6px;
+    border-radius: 26%; background: var(--paper);
+    border: 5px solid var(--c);
+    box-shadow: 0 7px 0 rgba(0,0,0,.12), 0 12px 20px rgba(0,0,0,.1);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: box-shadow .3s;
+  }
+  .car-tile:active { transform: translateY(4px); }
+  .car-tile .icon { font-size: calc(var(--cell) * .48); line-height: 1.1; }
+  .car-tile .name { font-family: var(--kana-font); line-height: 1.2; white-space: nowrap; }
+  .car-tile .name b, .car-name b { color: var(--c); font-weight: inherit; }
+  .car-tile.glow { box-shadow: 0 7px 0 rgba(0,0,0,.12), 0 0 0 8px #fff59d, 0 0 30px 12px #fff176; }
+  .car-card { display: flex; flex-direction: column; align-items: center; background: var(--paper); border-radius: 32px; padding: 1vmin 5vmin 1.5vmin; box-shadow: 0 8px 0 rgba(0,0,0,.1); margin-bottom: 2vmin; max-width: 100%; }
+  .car-card .pic { font-size: 15vmin; font-size: clamp(56px, 15vmin, 130px); line-height: 1.15; }
+  .car-card .text { font-size: 4.4vmin; font-size: clamp(17px, 4.4vmin, 34px); font-weight: 900; text-align: center; }
+  .cars-area .progress { margin-bottom: 1.5vmin; }
+  /* 道を走るくるまと、まわりの小物 */
+  .drive { position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+  .drive > span { position: absolute; left: 0; top: 0; line-height: 1; white-space: nowrap; }
+  .drive .rumble { display: inline-block; animation: rumble .22s linear infinite; }
+  @keyframes rumble { 50% { transform: translateY(-3px); } }
+  /* くるまの なまえは、道のすぐ上に出す（字幕は、この画面では上に出す） */
+  .car-name { position: absolute; z-index: 3; left: 50%; bottom: calc(var(--road) + 8px); transform: translateX(-50%); font-family: var(--kana-font); font-size: var(--name); background: rgba(255,253,247,.94); padding: .05em .6em; border-radius: 999px; box-shadow: 0 6px 0 rgba(0,0,0,.1); white-space: nowrap; pointer-events: none; }
+
   /* ---------- 夜（おやすみ） ---------- */
   #night { background: linear-gradient(var(--night-top), var(--night-bottom)); color: #fff; }
   #night .moon { font-size: 16vmin; font-size: clamp(60px, 16vmin, 120px); margin-bottom: 2vmin; }
@@ -273,6 +334,7 @@
     opacity: 0; transition: opacity .3s; pointer-events: none;
   }
   .caption.show { opacity: 1; }
+  #cars.active ~ .caption { top: 14px; top: max(14px, env(safe-area-inset-top, 0px)); bottom: auto; max-width: calc(100vw - 180px); }
 
   /* ---------- 演出 ---------- */
   /* 正解したときの大きなお祝い（光の帯・はなまる・ほめ言葉） */
@@ -324,13 +386,14 @@
   .nogap .menu > *, .nogap .parade > *, .nogap .stage > * { margin: 1.6vmin; }
   .nogap .script-toggle > * + *, .nogap .page-toggle > * + *, .nogap .touch-head > * + *, .nogap .pill > * + * { margin-left: 8px; }
   .nogap .progress > * + * { margin-left: 4px; }
+  .nogap .want > * + * { margin-left: 10px; }
   .nogap .script-toggle button b { margin-right: 8px; }
   .nogap .big-btn > * + *, .nogap .spot-card > * + *, .nogap .play-body > * + * { margin-top: 2vmin; }
   .nogap .panel .row > * { margin: 0 8px 8px 0; }
   .old-msg { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 60; background: #fff3cd; color: #5d4500; border-radius: 14px; padding: 12px 16px; font-size: 15px; line-height: 1.6; box-shadow: 0 6px 16px rgba(0,0,0,.15); }
 
   @media (prefers-reduced-motion: reduce) {
-    .cloud, .start-btn, .friend .body { animation: none; }
+    .cloud, .start-btn, .friend .body, .soap .ball, .drive .rumble { animation: none; }
   }
 </style>
 </head>
@@ -368,6 +431,8 @@
     <button class="big-btn touch" data-mode="touch"><span class="icon">👆</span><span class="label">ふれてみよう</span></button>
     <button class="big-btn find" data-mode="find"><span class="icon">🔍</span><span class="label">さがしてみよう</span></button>
     <button class="big-btn quiz" data-mode="quiz"><span class="icon">🍎</span><span class="label">これ なあに？</span></button>
+    <button class="big-btn bubble" data-mode="bubble"><span class="icon"><b class="ball" id="bubbleIcon">あ</b></span><span class="label">しゃぼんだま</span></button>
+    <button class="big-btn cars" data-mode="cars"><span class="icon">🚒</span><span class="label">はたらくくるま</span></button>
   </div>
   <div class="parade" id="parade"></div>
 </section>
@@ -400,6 +465,33 @@
       <div class="quiz-word hide" id="quizWord"></div>
     </div>
     <div class="stage" id="stage"></div>
+  </div>
+</section>
+
+<!-- しゃぼんだま ぱちん -->
+<section id="bubble" class="screen">
+  <div class="bubble-field" id="bubbleField"></div>
+  <div class="topbar">
+    <button class="round-btn" data-home aria-label="おうちにもどる">🏠</button>
+    <div class="progress" id="bubbleProgress"></div>
+    <button class="round-btn" data-ask aria-label="もういちど きく">👂</button>
+  </div>
+  <div class="want" id="bubbleWant" hidden><b class="ball"></b><span aria-hidden="true">👀</span></div>
+</section>
+
+<!-- はたらくくるま -->
+<section id="cars" class="screen">
+  <div class="road"></div>
+  <div class="cars-area" id="carsArea"></div>
+  <div class="drive" id="carLayer" aria-hidden="true"></div>
+  <div class="car-name" id="carName" hidden></div>
+  <div class="topbar">
+    <button class="round-btn" data-home aria-label="おうちにもどる">🏠</button>
+    <div class="page-toggle" role="group" aria-label="あそびかた">
+      <button data-carmode="free" aria-pressed="true" aria-label="さわってみよう">🚗</button>
+      <button data-carmode="quiz" aria-pressed="false" aria-label="どの くるまを よぶ？">❓</button>
+    </div>
+    <button class="round-btn" data-ask id="carsAsk" aria-label="もういちど きく">👂</button>
   </div>
 </section>
 
@@ -819,6 +911,19 @@ var store = (key, v) => {
     localStorage.setItem(key, JSON.stringify(v));
   } catch (err) {}
 };
+// さわった瞬間に反応する（動いているものを、指をはなす前に つかまえたいとき）。古い Chrome には PointerEvent がない
+function onPress(el, fn) {
+  if (window.PointerEvent) el.addEventListener('pointerdown', ev => {
+    ev.preventDefault();
+    fn();
+  });else {
+    el.addEventListener('touchstart', ev => {
+      ev.preventDefault();
+      fn();
+    });
+    el.addEventListener('mousedown', fn);
+  }
+}
 
 // ---------- ひらがな／カタカナ ----------
 var SCRIPT_KEY = 'mojimori.v2.script';
@@ -1359,6 +1464,163 @@ function kanaSound(e) {
     vol: .14
   })])();
 }
+// しゃぼんだまが われる音（ぷちっ）
+function plop() {
+  if (!ac) return;
+  var t = ac.currentTime + .005,
+    o = ac.createOscillator(),
+    g = ac.createGain();
+  var f = 320 + Math.random() * 260;
+  o.type = 'sine';
+  o.frequency.setValueAtTime(f, t);
+  o.frequency.exponentialRampToValueAtTime(f * 4, t + .06);
+  g.gain.setValueAtTime(.3, t);
+  g.gain.exponentialRampToValueAtTime(.001, t + .13);
+  o.connect(g).connect(ac.destination);
+  o.start(t);
+  o.stop(t + .15);
+}
+
+// ---------- くるまの音（サイレン・クラクション・エンジン） ----------
+// t 秒に、f Hz の音を dur 秒だけ鳴らす
+function ding(t, f, dur, {
+  type = 'triangle',
+  vol = .1
+} = {}) {
+  var o = ac.createOscillator(),
+    g = ac.createGain();
+  o.type = type;
+  o.frequency.value = f;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + .01);
+  g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  o.connect(g).connect(ac.destination);
+  o.start(t);
+  o.stop(t + dur + .03);
+}
+// 音の高さを点でつないで鳴らす。pts は [秒, Hz] の並び
+function glide(t, pts, {
+  type = 'square',
+  vol = .05,
+  filter = 2400
+} = {}) {
+  var o = ac.createOscillator(),
+    g = ac.createGain(),
+    f = ac.createBiquadFilter();
+  var end = pts[pts.length - 1][0];
+  o.type = type;
+  f.type = 'lowpass';
+  f.frequency.value = filter;
+  o.frequency.setValueAtTime(pts[0][1], t);
+  pts.slice(1).forEach(([s, hz]) => o.frequency.linearRampToValueAtTime(hz, t + s));
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + .04);
+  g.gain.setValueAtTime(vol, t + Math.max(.05, end - .12));
+  g.gain.linearRampToValueAtTime(0, t + end);
+  o.connect(f).connect(g).connect(ac.destination);
+  o.start(t);
+  o.stop(t + end + .05);
+}
+// ぷしゅー、がしゃん（ノイズを、ある高さのあたりだけ通す）
+var noiseBuf = null;
+function hiss(t, dur, freq, vol, q = .8) {
+  if (!noiseBuf) {
+    var n = ac.sampleRate;
+    noiseBuf = ac.createBuffer(1, n, n);
+    var d = noiseBuf.getChannelData(0);
+    for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+  }
+  var src = ac.createBufferSource(),
+    f = ac.createBiquadFilter(),
+    g = ac.createGain();
+  src.buffer = noiseBuf;
+  src.loop = true;
+  f.type = 'bandpass';
+  f.frequency.value = freq;
+  f.Q.value = q;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + .03);
+  g.gain.setValueAtTime(vol, t + dur * .6);
+  g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  src.connect(f).connect(g).connect(ac.destination);
+  src.start(t);
+  src.stop(t + dur + .05);
+}
+// ぷっぷー。pattern は [はじまり, ながさ] の並び（秒）
+var horn = (t, pattern) => pattern.forEach(([s, d]) => [311, 392].forEach(f => glide(t + s, [[0, f], [d, f]], {
+  type: 'sawtooth',
+  vol: .045,
+  filter: 1500
+})));
+// どっどっど
+var engine = (t, n, f = 100) => {
+  for (var i = 0; i < n; i++) ding(t + i * .13, f, .1, {
+    type: 'square',
+    vol: .05
+  });
+};
+var CAR_SOUNDS = {
+  fire: t => {
+    glide(t, [[0, 420], [1.1, 880], [2.3, 880], [3.2, 480]], {
+      type: 'sawtooth',
+      vol: .04,
+      filter: 1800
+    });
+    for (var i = 0; i < 8; i++) {
+      ding(t + .2 + i * .38, 1760, .3, {
+        type: 'square',
+        vol: .03
+      });
+      ding(t + .2 + i * .38, 2637, .25, {
+        vol: .04
+      });
+    }
+  },
+  police: t => glide(t, [[0, 600], [.7, 1150], [1.4, 600], [2.1, 1150], [2.8, 600]], {
+    type: 'sawtooth',
+    vol: .035,
+    filter: 1600
+  }),
+  ambulance: t => {
+    for (var i = 0; i < 3; i++) {
+      glide(t + i, [[0, 960], [.46, 960]], {
+        vol: .035,
+        filter: 2000
+      });
+      glide(t + i + .5, [[0, 770], [.46, 770]], {
+        vol: .035,
+        filter: 2000
+      });
+    }
+  },
+  bus: t => {
+    horn(t, [[0, .15], [.25, .5]]);
+    hiss(t + 1.6, .8, 2600, .12);
+    horn(t + 3, [[0, .15], [.25, .5]]);
+  },
+  tractor: t => engine(t, 36),
+  truck: t => {
+    horn(t, [[0, .8]]);
+    engine(t + .9, 14, 80);
+  },
+  crane: t => {
+    glide(t + .2, [[0, 260], [1.6, 520]], {
+      type: 'triangle',
+      vol: .07
+    });
+    [1.9, 2.5, 3.1].forEach(s => {
+      hiss(t + s, .2, 900, .25, 2);
+      ding(t + s, 1250, .25, {
+        type: 'square',
+        vol: .03
+      });
+    });
+  },
+  taxi: t => {
+    horn(t, [[0, .12], [.22, .12]]);
+    horn(t + 2.6, [[0, .12], [.22, .12]]);
+  }
+};
 
 // ---------- おともだちの部品 ----------
 function makeFriend(e, {
@@ -2294,6 +2556,7 @@ function applyScript() {
   $('#scriptKata').setAttribute('aria-pressed', script === 'kata');
   $('#pageSei').textContent = script === 'kata' ? 'ア' : 'あ';
   $('#pageDaku').textContent = script === 'kata' ? 'ガ' : 'が';
+  $('#bubbleIcon').textContent = script === 'kata' ? 'ア' : 'あ';
   renderParade();
 }
 function renderParade() {
@@ -2440,7 +2703,11 @@ var P = {
   thisOne: 'これだよ！',
   finale: 'ぜんぶ　できたね！　すごい　すごい！　はなまる　いっぱい！',
   night: 'きょうは　ここまで。たくさん　あそんだね。おやすみ〜',
-  hello: 'こんにちは！　いっしょに　あそぼうね！'
+  hello: 'こんにちは！　いっしょに　あそぼうね！',
+  bubbleHello: 'しゃぼんだまを　ぱちんって　わってね！',
+  bubbleGlow: 'ひかってる　しゃぼんだまだよ！',
+  carsHello: 'はたらく　くるまに　さわってみよう！',
+  carWho: 'どの　くるまを　よぶ？'
 };
 var QUIZ_ASK = ['これは　なにかな？', 'これ、なあに？', 'これは　なんだろう？'];
 
@@ -2497,23 +2764,23 @@ function reactSpot() {
   return _reactSpot.apply(this, arguments);
 }
 function _reactSpot() {
-  _reactSpot = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+  _reactSpot = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
     var now, _spot, e, fr, word, token, id, key, list, wi, w, text, clips, _pick3, _pick4, t, c, got;
-    return _regenerator().w(function (_context3) {
-      while (1) switch (_context3.n) {
+    return _regenerator().w(function (_context4) {
+      while (1) switch (_context4.n) {
         case 0:
           if (spot) {
-            _context3.n = 1;
+            _context4.n = 1;
             break;
           }
-          return _context3.a(2);
+          return _context4.a(2);
         case 1:
           now = performance.now();
           if (!(now - lastTapAt < 380)) {
-            _context3.n = 2;
+            _context4.n = 2;
             break;
           }
-          return _context3.a(2);
+          return _context4.a(2);
         case 2:
           // 連打しすぎないように
           lastTapAt = now;
@@ -2550,49 +2817,49 @@ function _reactSpot() {
             clips = c(spoken(e), w.w);
           }
           got = collect(e);
-          _context3.n = 3;
+          _context4.n = 3;
           return say(text, {
             clips
           });
         case 3:
           if (!(id !== flow || !spot || spot.token !== token)) {
-            _context3.n = 4;
+            _context4.n = 4;
             break;
           }
-          return _context3.a(2);
+          return _context4.a(2);
         case 4:
           if (!(got === 'all')) {
-            _context3.n = 8;
+            _context4.n = 8;
             break;
           }
-          _context3.n = 5;
+          _context4.n = 5;
           return sleep(400);
         case 5:
           if (!(id !== flow)) {
-            _context3.n = 6;
+            _context4.n = 6;
             break;
           }
-          return _context3.a(2);
+          return _context4.a(2);
         case 6:
           sfx.yay();
           confetti();
-          _context3.n = 7;
+          _context4.n = 7;
           return say(e.group === 'sei' ? P.allSei : P.allDaku);
         case 7:
           if (!(id !== flow || !spot || spot.token !== token)) {
-            _context3.n = 8;
+            _context4.n = 8;
             break;
           }
-          return _context3.a(2);
+          return _context4.a(2);
         case 8:
           // しばらくさわらなければ、表にもどる
           spotCloseTimer = setTimeout(() => {
             if (spot && spot.token === token) closeSpot();
           }, 2600);
         case 9:
-          return _context3.a(2);
+          return _context4.a(2);
       }
-    }, _callee3);
+    }, _callee4);
   }));
   return _reactSpot.apply(this, arguments);
 }
@@ -2607,8 +2874,7 @@ $('#spot').addEventListener('click', ev => {
 
 // ---------- 進み具合の星 ----------
 var ROUNDS = 5;
-function renderProgress(done) {
-  var p = $('#progress');
+function renderProgress(done, p = $('#progress')) {
   p.innerHTML = '';
   for (var i = 0; i < ROUNDS; i++) {
     var s = document.createElement('span');
@@ -2658,17 +2924,17 @@ function runSession(_x) {
   return _runSession.apply(this, arguments);
 }
 function _runSession() {
-  _runSession = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(kind) {
+  _runSession = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(kind) {
     var id, items, pool, _iterator6, _step6, _loop9, st, round, _t;
-    return _regenerator().w(function (_context5) {
-      while (1) switch (_context5.p = _context5.n) {
+    return _regenerator().w(function (_context6) {
+      while (1) switch (_context6.p = _context6.n) {
         case 0:
           show('play');
           id = flow;
           $('#quizCard').hidden = kind !== 'quiz';
           $('#stage').innerHTML = '';
           if (!(kind === 'quiz')) {
-            _context5.n = 9;
+            _context6.n = 9;
             break;
           }
           // 先頭のもじがそのもじで、絵だけで名前がわかることばから出す
@@ -2678,54 +2944,54 @@ function _runSession() {
           }))), []));
           items = [];
           _iterator6 = _createForOfIteratorHelper(pool);
-          _context5.p = 1;
+          _context6.p = 1;
           _loop9 = /*#__PURE__*/_regenerator().m(function _loop9() {
             var it;
-            return _regenerator().w(function (_context4) {
-              while (1) switch (_context4.n) {
+            return _regenerator().w(function (_context5) {
+              while (1) switch (_context5.n) {
                 case 0:
                   it = _step6.value;
                   if (!(items.length >= ROUNDS)) {
-                    _context4.n = 1;
+                    _context5.n = 1;
                     break;
                   }
-                  return _context4.a(2, 1);
+                  return _context5.a(2, 1);
                 case 1:
                   if (!items.some(x => x.e === it.e || x.w.e === it.w.e)) items.push(it);
                 case 2:
-                  return _context4.a(2);
+                  return _context5.a(2);
               }
             }, _loop9);
           });
           _iterator6.s();
         case 2:
           if ((_step6 = _iterator6.n()).done) {
-            _context5.n = 5;
+            _context6.n = 5;
             break;
           }
-          return _context5.d(_regeneratorValues(_loop9()), 3);
+          return _context6.d(_regeneratorValues(_loop9()), 3);
         case 3:
-          if (!_context5.v) {
-            _context5.n = 4;
+          if (!_context6.v) {
+            _context6.n = 4;
             break;
           }
-          return _context5.a(3, 5);
+          return _context6.a(3, 5);
         case 4:
-          _context5.n = 2;
+          _context6.n = 2;
           break;
         case 5:
-          _context5.n = 7;
+          _context6.n = 7;
           break;
         case 6:
-          _context5.p = 6;
-          _t = _context5.v;
+          _context6.p = 6;
+          _t = _context6.v;
           _iterator6.e(_t);
         case 7:
-          _context5.p = 7;
+          _context6.p = 7;
           _iterator6.f();
-          return _context5.f(7);
+          return _context6.f(7);
         case 8:
-          _context5.n = 10;
+          _context6.n = 10;
           break;
         case 9:
           // 清音を多めに、濁音もときどき
@@ -2740,54 +3006,54 @@ function _runSession() {
           round = 0;
         case 11:
           if (!(round < ROUNDS)) {
-            _context5.n = 14;
+            _context6.n = 14;
             break;
           }
           renderProgress(round);
-          _context5.n = 12;
+          _context6.n = 12;
           return kind === 'quiz' ? quizRound(id, items[round], round, st) : findRound(id, items[round].e, round, st);
         case 12:
           if (!(id !== flow)) {
-            _context5.n = 13;
+            _context6.n = 13;
             break;
           }
-          return _context5.a(2);
+          return _context6.a(2);
         case 13:
           round++;
-          _context5.n = 11;
+          _context6.n = 11;
           break;
         case 14:
           renderProgress(ROUNDS);
           $('#stage').innerHTML = '';
           $('#quizCard').hidden = true;
-          _context5.n = 15;
+          _context6.n = 15;
           return sleep(300);
         case 15:
           if (!(id !== flow)) {
-            _context5.n = 16;
+            _context6.n = 16;
             break;
           }
-          return _context5.a(2);
+          return _context6.a(2);
         case 16:
           cheer('ぜんぶ できたね！', {
             stamp: '🏆',
             sub: '⭐⭐⭐⭐⭐',
             big: true
           });
-          _context5.n = 17;
+          _context6.n = 17;
           return Promise.all([say(P.finale), sleep(CHEER_MS + 1700)]);
         case 17:
           if (!(id !== flow)) {
-            _context5.n = 18;
+            _context6.n = 18;
             break;
           }
-          return _context5.a(2);
+          return _context6.a(2);
         case 18:
           goNight(items.map(x => x.e));
         case 19:
-          return _context5.a(2);
+          return _context6.a(2);
       }
-    }, _callee4, null, [[1, 6, 7, 8]]);
+    }, _callee5, null, [[1, 6, 7, 8]]);
   }));
   return _runSession.apply(this, arguments);
 }
@@ -3061,15 +3327,1068 @@ function quizRound(id, {
   });
 }
 
+// ---------- ④ しゃぼんだま ぱちん ----------
+// 下からのぼってくる しゃぼんだまを わる。ときどき「『あ』は どーこだ？」と聞かれた字の しゃぼんだまを さがす
+var BUBBLE_POOL = SEI.filter(e => e.id !== 'を');
+var bub = null;
+var bubbleSize = () => Math.max(88, Math.min(170, Math.min(innerWidth, innerHeight) * .22));
+function goBubble() {
+  show('bubble');
+  var id = flow;
+  $('#bubbleField').innerHTML = '';
+  $('#bubbleWant').hidden = true;
+  renderProgress(0, $('#bubbleProgress'));
+  bub = {
+    id,
+    list: [],
+    pops: 0,
+    nextAsk: 4 + Math.floor(Math.random() * 3),
+    target: null,
+    locked: false,
+    glow: false,
+    found: [],
+    quietUntil: 0,
+    lastSpawn: 0,
+    lanes: [],
+    idle: null
+  };
+  askAgain = () => say(P.bubbleHello);
+  say(P.bubbleHello);
+  var last = performance.now();
+  var step = now => {
+    if (id !== flow) return;
+    tickBubbles(now, Math.min(.05, Math.max(0, now - last) / 1000));
+    last = now;
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+function tickBubbles(now, dt) {
+  var b = bub;
+  // 古い端末で重くならないよう、小さい画面では数をへらす
+  var max = innerWidth * innerHeight > 600000 ? 7 : 5;
+  if (now > b.quietUntil && now - b.lastSpawn > 1100 && b.list.length < max) spawnBubble(now);
+  b.list.slice().forEach(o => {
+    o.y -= o.vy * dt;
+    o.t += dt;
+    o.el.style.transform = `translate(${o.x + Math.sin(o.t * o.f + o.p) * o.amp}px, ${o.y}px)`;
+    if (o.y < -o.s) removeBubble(o);
+  });
+}
+function spawnBubble(now) {
+  var b = bub,
+    W = innerWidth,
+    H = innerHeight;
+  var asking = b.target && !b.locked;
+  var e;
+  // 聞いている字が画面にないときは、すぐに出す。ほかは、形のにた字をときどきまぜる
+  if (asking && !b.list.some(o => o.e === b.target && !o.popped)) e = b.target;else if (asking && Math.random() < .5) e = pickDistractors(b.target, 1, 1)[0];else e = pick(BUBBLE_POOL);
+  var s = Math.round(bubbleSize() * (.85 + Math.random() * .3));
+  // 横の位置は、さっき出たところをさける
+  var n = Math.max(3, Math.floor((W - 24) / s));
+  var lane;
+  do {
+    lane = Math.floor(Math.random() * n);
+  } while (b.lanes.indexOf(lane) >= 0);
+  b.lanes = [lane].concat(b.lanes).slice(0, 2);
+  var x = 12 + s / 2 + lane * (W - 24 - s) / (n - 1);
+  var el = document.createElement('button');
+  el.className = 'soap' + (b.glow && e === b.target ? ' glow' : '');
+  el.setAttribute('aria-label', disp(e));
+  el.style.width = el.style.height = `${s}px`;
+  el.style.marginLeft = el.style.marginTop = `${-s / 2}px`;
+  el.style.setProperty('--s', `${s}px`);
+  var ball = document.createElement('b');
+  ball.className = 'ball';
+  ball.textContent = disp(e);
+  ball.style.setProperty('--c', e.color);
+  ball.style.animationDelay = `${-Math.random() * 2}s`;
+  el.appendChild(ball);
+  var o = {
+    el,
+    e,
+    s,
+    x,
+    y: H + s / 2,
+    vy: H / (6.5 + Math.random() * 2.5) * (e === b.target ? .85 : 1),
+    t: 0,
+    amp: 8 + Math.random() * 18,
+    f: .7 + Math.random() * .6,
+    p: Math.random() * 6.3
+  };
+  el.style.transform = `translate(${x}px, ${o.y}px)`;
+  onPress(el, () => popBubble(o));
+  $('#bubbleField').appendChild(el);
+  b.list.push(o);
+  b.lastSpawn = now;
+}
+function removeBubble(o) {
+  var i = bub ? bub.list.indexOf(o) : -1;
+  if (i >= 0) bub.list.splice(i, 1);
+  if (o.el.parentNode) o.el.parentNode.removeChild(o.el);
+}
+function popBubble(o) {
+  var b = bub;
+  if (!b || o.popped || b.id !== flow) return;
+  o.popped = true;
+  b.pops++;
+  plop();
+  var c = center(o.el);
+  ring(o.el, '#9fe0ff');
+  burst(c.x, c.y, ['💧', '✨', '💦'], 7, c.w * .65, [16, 30]);
+  var e = o.e,
+    K = disp(e),
+    S = spoken(e);
+  collect(e);
+  // お祝いのあいだは、声を出さずに音だけ
+  var quiet = performance.now() < b.quietUntil;
+  if (b.target === e && !b.locked) hitTarget(e);else if (!quiet) {
+    if (b.target) {
+      b.idle.arm();
+      say(`${K}！`, {
+        clips: [VL.kana(S)]
+      });
+    } else {
+      var w = pick(wordsOf(e));
+      popAt(o.el, w.e, .7);
+      if (Math.random() < .5) say(`${K}！`, {
+        clips: [VL.kana(S)]
+      });else say(`${w.w}の　${K}！`, {
+        clips: [VL.wordOf(w.w, S)]
+      });
+    }
+  }
+  anim(o.el.firstChild, [{
+    transform: 'scale(1)',
+    opacity: 1
+  }, {
+    transform: 'scale(1.4)',
+    opacity: 0
+  }], {
+    duration: 180,
+    fill: 'forwards'
+  }).onfinish = () => removeBubble(o);
+  if (!b.target && !quiet && b.pops >= b.nextAsk) setTimeout(() => {
+    if (bub === b && b.id === flow && !b.target) startAsk();
+  }, 1300);
+}
+function startAsk() {
+  var b = bub;
+  var e = pick(BUBBLE_POOL.filter(x => b.found.indexOf(x) < 0));
+  var K = disp(e),
+    S = spoken(e);
+  b.target = e;
+  var want = $('#bubbleWant'),
+    ball = want.querySelector('.ball');
+  ball.textContent = K;
+  ball.style.setProperty('--c', e.color);
+  want.hidden = false;
+  anim(want, [{
+    transform: 'translateX(-50%) scale(.3)',
+    opacity: 0
+  }, {
+    transform: 'translateX(-50%) scale(1.1)',
+    opacity: 1,
+    offset: .7
+  }, {
+    transform: 'translateX(-50%) scale(1)',
+    opacity: 1
+  }], {
+    duration: 450
+  });
+  var ask = () => say(`「${K}」は　どーこだ？`, {
+    clips: [VL.where(S)]
+  });
+  // ヒント：その字の しゃぼんだまを光らせる
+  var glow = () => {
+    sfx.hint();
+    b.glow = true;
+    b.list.forEach(o => {
+      if (o.e === e) o.el.classList.add('glow');
+    });
+    say(`「${K}」は　どーこだ？　${P.bubbleGlow}`, {
+      clips: [VL.where(S), P.bubbleGlow]
+    });
+  };
+  b.idle = idleHints(b.id, () => b.target !== e || b.locked, [ask, glow]);
+  askAgain = () => {
+    b.idle.arm();
+    ask();
+  };
+  ask();
+  b.idle.arm();
+}
+function hitTarget(_x2) {
+  return _hitTarget.apply(this, arguments);
+} // ---------- ⑤ はたらくくるま ----------
+// w は ひらがなで書く（カタカナのときは toKata にする）。line は くるまが言うこと。props は道で待っているもの
+function _hitTarget() {
+  _hitTarget = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(e) {
+    var b, id, K, S, last, _pick5, _pick6, big, line;
+    return _regenerator().w(function (_context7) {
+      while (1) switch (_context7.n) {
+        case 0:
+          b = bub, id = b.id, K = disp(e), S = spoken(e);
+          b.locked = true;
+          b.idle.stop();
+          b.glow = false;
+          b.list.forEach(o => o.el.classList.remove('glow'));
+          b.found.push(e);
+          $('#bubbleWant').hidden = true;
+          renderProgress(b.found.length, $('#bubbleProgress'));
+          last = b.found.length >= ROUNDS; // お祝いのあいだは、新しい しゃぼんだまを出さない
+          b.quietUntil = last ? Infinity : performance.now() + CHEER_MS;
+          _pick5 = pick(PRAISE), _pick6 = _slicedToArray(_pick5, 2), big = _pick6[0], line = _pick6[1];
+          cheer(big, {
+            stamp: pick(STAMPS)
+          });
+          _context7.n = 1;
+          return Promise.all([say(`${line}　「${K}」だね！`, {
+            clips: [line, VL.dane(S)]
+          }), sleep(CHEER_MS + 600)]);
+        case 1:
+          if (!(id !== flow)) {
+            _context7.n = 2;
+            break;
+          }
+          return _context7.a(2);
+        case 2:
+          b.target = null;
+          b.locked = false;
+          askAgain = () => say(P.bubbleHello);
+          if (last) {
+            _context7.n = 3;
+            break;
+          }
+          b.nextAsk = b.pops + 3 + Math.floor(Math.random() * 3);
+          return _context7.a(2);
+        case 3:
+          _context7.n = 4;
+          return sleep(300);
+        case 4:
+          if (!(id !== flow)) {
+            _context7.n = 5;
+            break;
+          }
+          return _context7.a(2);
+        case 5:
+          cheer('ぜんぶ できたね！', {
+            stamp: '🏆',
+            sub: '⭐⭐⭐⭐⭐',
+            big: true
+          });
+          _context7.n = 6;
+          return Promise.all([say(P.finale), sleep(CHEER_MS + 1700)]);
+        case 6:
+          if (!(id !== flow)) {
+            _context7.n = 7;
+            break;
+          }
+          return _context7.a(2);
+        case 7:
+          goNight(b.found);
+        case 8:
+          return _context7.a(2);
+      }
+    }, _callee6);
+  }));
+  return _hitTarget.apply(this, arguments);
+}
+var CARS = [{
+  id: 'fire',
+  e: '🚒',
+  w: 'しょうぼうしゃ',
+  c: '#e53935',
+  line: 'かじを　けすよ！',
+  act: 'water',
+  props: ['🔥']
+}, {
+  id: 'police',
+  e: '🚓',
+  w: 'ぱとかー',
+  c: '#3f51b5',
+  line: 'まちを　まもるよ！',
+  act: 'help',
+  props: ['😢']
+}, {
+  id: 'ambulance',
+  e: '🚑',
+  w: 'きゅうきゅうしゃ',
+  c: '#ec407a',
+  line: 'びょういんへ　いそげ！',
+  act: 'ride',
+  props: ['🤕']
+}, {
+  id: 'bus',
+  e: '🚌',
+  w: 'ばす',
+  c: '#f5a623',
+  line: 'みんなを　のせて　しゅっぱつ！',
+  act: 'ride',
+  props: ['🧒', '👧', '👦']
+}, {
+  id: 'tractor',
+  e: '🚜',
+  w: 'とらくたー',
+  c: '#43a047',
+  line: 'はたけを　たがやすよ！',
+  act: 'plow',
+  props: []
+}, {
+  id: 'truck',
+  e: '🚚',
+  w: 'とらっく',
+  c: '#1e88e5',
+  line: 'にもつを　はこぶよ！',
+  act: 'ride',
+  props: ['📦', '📦']
+}, {
+  id: 'crane',
+  e: '🏗️',
+  w: 'くれーん',
+  c: '#fb8c00',
+  line: 'たかく　もちあげるよ！',
+  act: 'build',
+  props: []
+}, {
+  id: 'taxi',
+  e: '🚕',
+  w: 'たくしー',
+  c: '#f9a825',
+  line: 'どちらまで　いきますか？',
+  act: 'ride',
+  props: ['🙋']
+}];
+var carById = {};
+CARS.forEach(c => {
+  carById[c.id] = c;
+});
+// 「どの くるまを よぶ？」の もんだい。not は、こたえと まぎらわしいので えらばせない くるま
+var CAR_PROBLEMS = [{
+  car: 'fire',
+  e: '🔥',
+  t: 'たいへん！　かじだ！'
+}, {
+  car: 'ambulance',
+  e: '🤕',
+  t: 'けがを　した　ひとが　いるよ！'
+}, {
+  car: 'police',
+  e: '😢',
+  t: 'まいごの　こが　ないてるよ！'
+}, {
+  car: 'bus',
+  e: '🚏',
+  t: 'みんなで　えんそくに　いきたいな！',
+  not: ['taxi']
+}, {
+  car: 'tractor',
+  e: '🌱',
+  t: 'はたけを　たがやしたいな！'
+}, {
+  car: 'truck',
+  e: '📦',
+  t: 'にもつを　とどけたいな！'
+}, {
+  car: 'crane',
+  e: '🧱',
+  t: 'おもい　ものを　もちあげたいな！',
+  not: ['truck']
+}];
+var carName = c => script === 'kata' ? toKata(c.w) : c.w;
+var carNameHtml = c => {
+  var n = carName(c);
+  return `<b>${n[0]}</b>${n.slice(1)}`;
+};
+var roadH = () => Math.round(Math.max(96, Math.min(210, innerHeight * .24)));
+var carNameFont = () => Math.round(Math.max(24, Math.min(52, Math.min(innerWidth, innerHeight) * .06)));
+var carStrip = () => Math.round(carNameFont() * 1.3) + 16;
+var carsAreaH = () => innerHeight - (innerHeight <= 520 ? 66 : 84) - roadH() - carStrip();
+function sizeCars() {
+  var el = $('#cars');
+  el.style.setProperty('--road', `${roadH()}px`);
+  el.style.setProperty('--strip', `${carStrip()}px`);
+  el.style.setProperty('--name', `${carNameFont()}px`);
+}
+var carMode = 'free';
+function goCars(mode) {
+  carMode = mode;
+  show('cars');
+  document.querySelectorAll('[data-carmode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.carmode === mode));
+  $('#carsAsk').style.visibility = mode === 'quiz' ? 'visible' : 'hidden';
+  $('#carLayer').innerHTML = '';
+  $('#carName').hidden = true;
+  sizeCars();
+  if (mode === 'free') {
+    renderCarGrid();
+    say(P.carsHello);
+  } else runCarQuiz();
+}
+document.querySelectorAll('[data-carmode]').forEach(b => b.addEventListener('click', () => {
+  if (carMode === b.dataset.carmode) return;
+  sfx.tap();
+  goCars(b.dataset.carmode);
+}));
+addEventListener('resize', () => {
+  if (!$('#cars').classList.contains('active')) return;
+  sizeCars();
+  if (carMode === 'free') renderCarGrid();
+});
+function carTile(c, cell) {
+  var t = document.createElement('button');
+  var n = carName(c);
+  t.className = 'car-tile';
+  t.style.setProperty('--c', c.c);
+  t.style.setProperty('--cell', `${cell}px`);
+  t.setAttribute('aria-label', n);
+  t.innerHTML = `<span class="icon" aria-hidden="true">${c.e}</span><span class="name" style="font-size:${Math.round(cell * Math.min(.17, .8 / n.length))}px">${carNameHtml(c)}</span>`;
+  anim(t, [{
+    transform: 'scale(.3)',
+    opacity: 0
+  }, {
+    transform: 'scale(1)',
+    opacity: 1
+  }], {
+    duration: 420,
+    delay: Math.random() * 200,
+    fill: 'backwards',
+    easing: 'cubic-bezier(.3,1.4,.6,1)'
+  });
+  return t;
+}
+// count 個のマス（まわりに 6px ずつ余白）が、いちばん大きく入る並べ方
+function carCells(count, w, h, maxCell) {
+  var best = {
+    cell: 0,
+    cols: count
+  };
+  for (var cols = 1; cols <= count; cols++) {
+    var cell = Math.floor(Math.min(maxCell, w / cols - 12, h / Math.ceil(count / cols) - 12));
+    if (cell > best.cell) best = {
+      cell,
+      cols
+    };
+  }
+  return best;
+}
+function renderCarGrid() {
+  var area = $('#carsArea');
+  area.innerHTML = '';
+  var _carCells = carCells(CARS.length, innerWidth - 16, carsAreaH(), 190),
+    cell = _carCells.cell,
+    cols = _carCells.cols;
+  var grid = document.createElement('div');
+  grid.className = 'car-grid';
+  grid.style.width = `${cols * (cell + 12)}px`;
+  CARS.forEach(c => {
+    var t = carTile(c, cell);
+    t.addEventListener('click', () => {
+      sfx.tap();
+      moves.bounce(t);
+      playCar(c);
+    });
+    grid.appendChild(t);
+  });
+  area.appendChild(grid);
+}
+var carNameTimer;
+function showCarName(c) {
+  var n = $('#carName');
+  n.style.setProperty('--c', c.c);
+  n.innerHTML = carNameHtml(c);
+  n.hidden = false;
+  anim(n, [{
+    transform: 'translateX(-50%) scale(.3)',
+    opacity: 0
+  }, {
+    transform: 'translateX(-50%) scale(1.1)',
+    opacity: 1,
+    offset: .6
+  }, {
+    transform: 'translateX(-50%) scale(1)',
+    opacity: 1
+  }], {
+    duration: 400
+  });
+  clearTimeout(carNameTimer);
+  carNameTimer = setTimeout(() => {
+    n.hidden = true;
+  }, 3200);
+}
+// なまえを言って、道を走らせる（走りおわったら resolve）
+function playCar(c) {
+  showCarName(c);
+  if (ac) CAR_SOUNDS[c.id](ac.currentTime + .02);
+  say(`${carName(c)}！　${c.line}`, {
+    clips: [VL.word(c.w), c.line]
+  });
+  return carScene(c);
+}
+
+// 道の上の おしごと。べつのくるまをさわったら、前のくるまは消して はじめから
+var carToken = 0;
+function carScene(_x3) {
+  return _carScene.apply(this, arguments);
+} // 「どの くるまを よぶ？」（こまっている絵を見て、たすけにいく くるまを えらぶ）
+function _carScene() {
+  _carScene = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(c) {
+    var token, id, ok, layer, W, H, R, size, cy, at, put, popIn, drive, midOf, car, body, gy, sprouts, i, r, sx, s, kx, bx, by, bricks, _i7, y, b, home, m, px, stopX, pxs, props, _loop0, _i8, _m, sy, light, _m2;
+    return _regenerator().w(function (_context9) {
+      while (1) switch (_context9.n) {
+        case 0:
+          token = ++carToken, id = flow;
+          ok = () => token === carToken && id === flow;
+          layer = $('#carLayer');
+          layer.innerHTML = '';
+          W = innerWidth, H = innerHeight, R = roadH();
+          size = Math.round(R * .74);
+          cy = H - R / 2 - size * .08;
+          at = (x, y, extra = '') => `translate(${x}px, ${y}px) translate(-50%, -50%) ${extra}`;
+          put = (txt, x, y, fs) => {
+            var s = document.createElement('span');
+            s.textContent = txt;
+            s.style.fontSize = `${fs}px`;
+            s.style.transform = at(x, y);
+            layer.appendChild(s);
+            return s;
+          };
+          popIn = (el, x, y, delay = 0) => anim(el, [{
+            transform: at(x, y, 'scale(0)')
+          }, {
+            transform: at(x, y, 'scale(1)')
+          }], {
+            duration: 450,
+            delay,
+            fill: 'backwards',
+            easing: 'cubic-bezier(.3,1.5,.6,1)'
+          });
+          drive = (el, x0, x1, ms, easing) => anim(el, [{
+            transform: at(x0, cy)
+          }, {
+            transform: at(x1, cy)
+          }], {
+            duration: ms,
+            easing,
+            fill: 'forwards'
+          });
+          midOf = el => center(el);
+          car = put('', W + size, cy, size);
+          body = document.createElement('span');
+          body.className = 'rumble';
+          body.textContent = c.e;
+          car.appendChild(body);
+
+          // トラクター：はしからはしまで ゆっくり走って、うしろに 芽が出る
+          if (!(c.act === 'plow')) {
+            _context9.n = 10;
+            break;
+          }
+          drive(car, W + size, -size, 5200, 'linear');
+          gy = H - R - size * .22;
+          sprouts = [];
+          i = 0;
+        case 1:
+          if (!(i < 13)) {
+            _context9.n = 6;
+            break;
+          }
+          _context9.n = 2;
+          return sleep(380);
+        case 2:
+          if (ok()) {
+            _context9.n = 3;
+            break;
+          }
+          return _context9.a(2);
+        case 3:
+          r = car.getBoundingClientRect();
+          sx = r.right - r.width * .15;
+          if (!(sx < 0 || sx > W)) {
+            _context9.n = 4;
+            break;
+          }
+          return _context9.a(3, 5);
+        case 4:
+          s = put('🌱', sx, gy, Math.round(size * .42));
+          popIn(s, sx, gy);
+          sprouts.push(s);
+        case 5:
+          i++;
+          _context9.n = 1;
+          break;
+        case 6:
+          _context9.n = 7;
+          return sleep(500);
+        case 7:
+          if (ok()) {
+            _context9.n = 8;
+            break;
+          }
+          return _context9.a(2);
+        case 8:
+          sprouts.forEach((s, i) => {
+            if (i % 2) return;
+            s.textContent = pick(['🌷', '🌻', '🥕']);
+            var m = midOf(s);
+            burst(m.x, m.y, ['✨'], 3, size * .4, [14, 22]);
+          });
+          _context9.n = 9;
+          return sleep(1600);
+        case 9:
+          if (ok()) layer.innerHTML = '';
+          return _context9.a(2);
+        case 10:
+          if (!(c.act === 'build')) {
+            _context9.n = 19;
+            break;
+          }
+          kx = W * .64, bx = W * .34, by = H - R * .35;
+          car.style.transform = at(kx, cy - size * .35);
+          car.style.fontSize = `${Math.round(size * 1.45)}px`;
+          popIn(car, kx, cy - size * .35);
+          bricks = [];
+          _i7 = 0;
+        case 11:
+          if (!(_i7 < 3)) {
+            _context9.n = 15;
+            break;
+          }
+          _context9.n = 12;
+          return sleep(_i7 ? 600 : 1000);
+        case 12:
+          if (ok()) {
+            _context9.n = 13;
+            break;
+          }
+          return _context9.a(2);
+        case 13:
+          y = by - _i7 * size * .4;
+          b = put('🧱', bx, y, Math.round(size * .45));
+          anim(b, [{
+            transform: at(kx - size * .3, cy - size * 1.1)
+          }, {
+            transform: at(bx, y - size * .5),
+            offset: .7
+          }, {
+            transform: at(bx, y)
+          }], {
+            duration: 600,
+            easing: 'ease-in-out'
+          });
+          bricks.push(b);
+        case 14:
+          _i7++;
+          _context9.n = 11;
+          break;
+        case 15:
+          _context9.n = 16;
+          return sleep(800);
+        case 16:
+          if (ok()) {
+            _context9.n = 17;
+            break;
+          }
+          return _context9.a(2);
+        case 17:
+          bricks.forEach(b => b.remove());
+          home = put(pick(['🏠', '🏡', '🏫']), bx, by - size * .45, Math.round(size * 1.3));
+          popIn(home, bx, by - size * .45);
+          m = midOf(home);
+          burst(m.x, m.y, ['✨', '⭐', '🎉'], 10, size);
+          _context9.n = 18;
+          return sleep(2000);
+        case 18:
+          if (ok()) layer.innerHTML = '';
+          return _context9.a(2);
+        case 19:
+          // ほかのくるま：道のまんなかまで来て、おしごとをして、走っていく
+          px = Math.round(W * .3), stopX = px + size * 1.05;
+          pxs = c.props.map((p, i) => px - i * size * .5);
+          props = c.props.map((p, i) => put(p, pxs[i], cy, Math.round(size * .55)));
+          props.forEach((p, i) => popIn(p, pxs[i], cy, i * 120));
+          drive(car, W + size, stopX, 1500, 'ease-out');
+          _context9.n = 20;
+          return sleep(1550);
+        case 20:
+          if (ok()) {
+            _context9.n = 21;
+            break;
+          }
+          return _context9.a(2);
+        case 21:
+          if (!(c.act === 'water')) {
+            _context9.n = 28;
+            break;
+          }
+          _loop0 = /*#__PURE__*/_regenerator().m(function _loop0() {
+            var sx, tx, d;
+            return _regenerator().w(function (_context8) {
+              while (1) switch (_context8.n) {
+                case 0:
+                  sx = stopX - size * .45, tx = px + (Math.random() - .5) * size * .4;
+                  d = put(pick(['💦', '💧']), sx, cy - size * .2, Math.round(size * .3));
+                  anim(d, [{
+                    transform: at(sx, cy - size * .2),
+                    opacity: 1
+                  }, {
+                    transform: at((sx + tx) / 2, cy - size * .8),
+                    opacity: 1,
+                    offset: .5
+                  }, {
+                    transform: at(tx, cy, 'scale(.6)'),
+                    opacity: 0
+                  }], {
+                    duration: 700,
+                    delay: _i8 * 110,
+                    fill: 'backwards'
+                  }).onfinish = () => d.remove();
+                case 1:
+                  return _context8.a(2);
+              }
+            }, _loop0);
+          });
+          _i8 = 0;
+        case 22:
+          if (!(_i8 < 9)) {
+            _context9.n = 24;
+            break;
+          }
+          return _context9.d(_regeneratorValues(_loop0()), 23);
+        case 23:
+          _i8++;
+          _context9.n = 22;
+          break;
+        case 24:
+          _context9.n = 25;
+          return sleep(1000);
+        case 25:
+          if (ok()) {
+            _context9.n = 26;
+            break;
+          }
+          return _context9.a(2);
+        case 26:
+          _m = midOf(props[0]);
+          props[0].textContent = '💨';
+          anim(props[0], [{
+            transform: at(px, cy, 'scale(1)'),
+            opacity: 1
+          }, {
+            transform: at(px, cy - size * .5, 'scale(1.5)'),
+            opacity: 0
+          }], {
+            duration: 1000,
+            fill: 'forwards'
+          });
+          burst(_m.x, _m.y, ['✨', '⭐'], 8, size * .7);
+          _context9.n = 27;
+          return sleep(900);
+        case 27:
+          _context9.n = 35;
+          break;
+        case 28:
+          if (!(c.act === 'help')) {
+            _context9.n = 32;
+            break;
+          }
+          sy = cy - size * .7;
+          light = put('🚨', stopX, sy, Math.round(size * .42));
+          anim(light, [{
+            transform: at(stopX, sy, 'scale(.8)')
+          }, {
+            transform: at(stopX, sy, 'scale(1.3)')
+          }], {
+            duration: 230,
+            iterations: 6,
+            direction: 'alternate'
+          }).onfinish = () => light.remove();
+          _context9.n = 29;
+          return sleep(800);
+        case 29:
+          if (ok()) {
+            _context9.n = 30;
+            break;
+          }
+          return _context9.a(2);
+        case 30:
+          props[0].textContent = '😊';
+          anim(props[0], [{
+            transform: at(px, cy)
+          }, {
+            transform: at(px, cy - size * .5),
+            offset: .4
+          }, {
+            transform: at(px, cy)
+          }], {
+            duration: 700,
+            easing: 'ease-in-out'
+          });
+          _m2 = midOf(props[0]);
+          burst(_m2.x, _m2.y, ['💖', '💕', '✨'], 7, size * .7);
+          _context9.n = 31;
+          return sleep(1000);
+        case 31:
+          _context9.n = 35;
+          break;
+        case 32:
+          // のる（ひと・にもつが、ぴょんと くるまに入る）
+          props.forEach((p, i) => anim(p, [{
+            transform: at(pxs[i], cy, 'scale(1)'),
+            opacity: 1
+          }, {
+            transform: at((pxs[i] + stopX) / 2, cy - size * .7, 'scale(1)'),
+            opacity: 1,
+            offset: .5
+          }, {
+            transform: at(stopX, cy - size * .1, 'scale(.3)'),
+            opacity: 0
+          }], {
+            duration: 650,
+            delay: i * 280,
+            fill: 'forwards',
+            easing: 'ease-in-out'
+          }));
+          _context9.n = 33;
+          return sleep(650 + props.length * 280);
+        case 33:
+          if (ok()) {
+            _context9.n = 34;
+            break;
+          }
+          return _context9.a(2);
+        case 34:
+          anim(body, [{
+            transform: 'scale(1)'
+          }, {
+            transform: 'scale(1.15, .88)'
+          }, {
+            transform: 'scale(1)'
+          }], {
+            duration: 350
+          });
+          _context9.n = 35;
+          return sleep(400);
+        case 35:
+          if (ok()) {
+            _context9.n = 36;
+            break;
+          }
+          return _context9.a(2);
+        case 36:
+          drive(car, stopX, -size * 1.3, 1200, 'ease-in');
+          _context9.n = 37;
+          return sleep(1250);
+        case 37:
+          if (ok()) layer.innerHTML = '';
+        case 38:
+          return _context9.a(2);
+      }
+    }, _callee7);
+  }));
+  return _carScene.apply(this, arguments);
+}
+var CAR_CHOICES = [2, 2, 3, 3, 3];
+function runCarQuiz() {
+  return _runCarQuiz.apply(this, arguments);
+}
+function _runCarQuiz() {
+  _runCarQuiz = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
+    var id, probs, st, round, cars;
+    return _regenerator().w(function (_context0) {
+      while (1) switch (_context0.n) {
+        case 0:
+          id = flow;
+          probs = shuffle(CAR_PROBLEMS).slice(0, ROUNDS);
+          st = {
+            streak: 0,
+            missed: false
+          };
+          round = 0;
+        case 1:
+          if (!(round < ROUNDS)) {
+            _context0.n = 4;
+            break;
+          }
+          _context0.n = 2;
+          return carRound(id, probs[round], round, st);
+        case 2:
+          if (!(id !== flow)) {
+            _context0.n = 3;
+            break;
+          }
+          return _context0.a(2);
+        case 3:
+          round++;
+          _context0.n = 1;
+          break;
+        case 4:
+          $('#carsArea').innerHTML = '';
+          _context0.n = 5;
+          return sleep(300);
+        case 5:
+          if (!(id !== flow)) {
+            _context0.n = 6;
+            break;
+          }
+          return _context0.a(2);
+        case 6:
+          cheer('ぜんぶ できたね！', {
+            stamp: '🏆',
+            sub: '⭐⭐⭐⭐⭐',
+            big: true
+          });
+          _context0.n = 7;
+          return Promise.all([say(P.finale), sleep(CHEER_MS + 1700)]);
+        case 7:
+          if (!(id !== flow)) {
+            _context0.n = 8;
+            break;
+          }
+          return _context0.a(2);
+        case 8:
+          // おやすみの画面では、くるまの なまえの さいしょの字のおともだちが、くるまの ぼうしを かぶって ねる
+          cars = probs.map(p => carById[p.car]);
+          goNight(cars.map(c => byId[c.w[0]]), cars.map(c => c.e));
+        case 9:
+          return _context0.a(2);
+      }
+    }, _callee8);
+  }));
+  return _runCarQuiz.apply(this, arguments);
+}
+function carRound(id, prob, round, st) {
+  st.missed = false;
+  return new Promise(resolve => {
+    var target = carById[prob.car];
+    var area = $('#carsArea');
+    area.innerHTML = '';
+    var prog = document.createElement('div');
+    prog.className = 'progress';
+    renderProgress(round, prog);
+    var card = document.createElement('div');
+    card.className = 'car-card';
+    card.innerHTML = `<div class="pic" aria-hidden="true">${prob.e}</div><div class="text">${prob.t}</div>`;
+    var grid = document.createElement('div');
+    grid.className = 'car-grid';
+    area.appendChild(prog);
+    area.appendChild(card);
+    area.appendChild(grid);
+    anim(card, [{
+      transform: 'scale(.5) rotate(-6deg)',
+      opacity: 0
+    }, {
+      transform: 'scale(1.06)',
+      opacity: 1,
+      offset: .7
+    }, {
+      transform: 'scale(1)',
+      opacity: 1
+    }], {
+      duration: 500
+    });
+    var others = shuffle(CARS.filter(c => c !== target && (prob.not || []).indexOf(c.id) < 0));
+    var choices = shuffle([target, ...others.slice(0, CAR_CHOICES[round] - 1)]);
+    var cell = Math.floor(Math.min(180, (innerWidth - 16) / choices.length - 12, carsAreaH() - prog.offsetHeight - card.offsetHeight - 40));
+    var els = choices.map(c => {
+      var t = carTile(c, cell);
+      grid.appendChild(t);
+      return t;
+    });
+    var targetEl = els[choices.indexOf(target)];
+    var locked = false;
+    var ask = () => say(`${prob.t}　${P.carWho}`, {
+      clips: [prob.t, P.carWho]
+    });
+    var showMe = () => {
+      sfx.hint();
+      moves.wave(targetEl);
+      say(P.thisWay);
+    };
+    var idle = idleHints(id, () => locked, [ask, showMe]);
+    askAgain = () => {
+      idle.arm();
+      ask();
+    };
+    els.forEach((el, i) => el.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+      var c, line;
+      return _regenerator().w(function (_context3) {
+        while (1) switch (_context3.n) {
+          case 0:
+            if (!locked) {
+              _context3.n = 1;
+              break;
+            }
+            return _context3.a(2);
+          case 1:
+            idle.arm();
+            c = choices[i];
+            if (!(c === target)) {
+              _context3.n = 6;
+              break;
+            }
+            locked = true;
+            idle.stop();
+            st.streak = st.missed ? 0 : st.streak + 1;
+            moves.happy(el);
+            // 先に くるまが おしごとをして、そのあとで お祝い
+            _context3.n = 2;
+            return Promise.all([playCar(c), sleep(2600)]);
+          case 2:
+            if (!(id !== flow)) {
+              _context3.n = 3;
+              break;
+            }
+            return _context3.a(2);
+          case 3:
+            line = praise(st, el, els.filter(o => o !== el));
+            _context3.n = 4;
+            return Promise.all([say(line.text, {
+              clips: line.clips
+            }), sleep(CHEER_MS + 600)]);
+          case 4:
+            if (!(id !== flow)) {
+              _context3.n = 5;
+              break;
+            }
+            return _context3.a(2);
+          case 5:
+            resolve();
+            _context3.n = 7;
+            break;
+          case 6:
+            // まちがいにはしない。そのくるまの なまえを言って、正解のくるまが光って教える
+            st.missed = true;
+            sfx.hint();
+            moves.shake(el);
+            moves.wave(targetEl);
+            say(`${carName(c)}！　こっちだよ〜。`, {
+              clips: [VL.word(c.w), P.thisWay]
+            });
+          case 7:
+            return _context3.a(2);
+        }
+      }, _callee3);
+    }))));
+    sleep(550).then(() => {
+      if (id === flow) {
+        ask();
+        idle.arm();
+      }
+    });
+  });
+}
+
 // ---------- おやすみ ----------
-function goNight(list) {
+// hats は、おともだちにかぶせる絵（省略時は、そのもじのことばの絵）
+function goNight(list, hats) {
   show('night');
   var st = $('#nightStage');
   st.innerHTML = '';
   list.forEach((e, i) => {
     var el = makeFriend(e, {
       asButton: false,
-      delay: i * .7
+      delay: i * .7,
+      emoji: hats && hats[i]
     });
     el.classList.add('sleep');
     el.style.setProperty('--friend', fit('64px', '15vmin', '120px'));
@@ -3113,10 +4432,10 @@ document.querySelectorAll('[data-home]').forEach(b => b.addEventListener('click'
   sfx.tap();
   goHome();
 }));
-$('#askAgain').addEventListener('click', () => {
+document.querySelectorAll('#askAgain, [data-ask]').forEach(b => b.addEventListener('click', () => {
   sfx.tap();
   if (askAgain) askAgain();
-});
+}));
 $('#bgmBtn').addEventListener('click', () => {
   unlockAudio();
   BGM.setEnabled(!BGM.enabled);
@@ -3127,7 +4446,7 @@ document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click'
   unlockAudio();
   sfx.tap();
   var m = b.dataset.mode;
-  if (m === 'touch') goTouch();else runSession(m);
+  if (m === 'touch') goTouch();else if (m === 'bubble') goBubble();else if (m === 'cars') goCars('free');else runSession(m);
 }));
 document.querySelectorAll('[data-script]').forEach(b => b.addEventListener('click', () => {
   sfx.tap();
@@ -3277,6 +4596,11 @@ window.voiceLines = function () {
     });
   }));
   for (var n = 2; n <= ROUNDS; n++) add(VL.streak(n));
+  CARS.forEach(c => {
+    add(VL.word(c.w));
+    add(c.line);
+  });
+  CAR_PROBLEMS.forEach(p => add(p.t));
   Object.keys(P).forEach(k => add(P[k], k === 'night' ? 'よふかし' : undefined));
   TICKLE.concat(QUIZ_ASK, PRAISE.map(p => p[1])).forEach(t => add(t));
   return Object.keys(out).map(k => out[k]);
