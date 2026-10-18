@@ -30,6 +30,7 @@ iPhone・iPad の Safari で開いて「共有 → ホーム画面に追加」�
 - 右下の ⚙️ を長押しすると、保護者メニューが開きます。ゲームの声と端末の読み上げの切りかえ、読み上げの声の種類・高さ・速さ、BGMの音量、ずかんのリセットができます。
 - ホーム右上の 🎵 で BGM を消せます。
 - ずかん（集めた字の記録）は、その端末のブラウザの中だけに保存されます。
+- 広告や外のサイトへの通信はありません（フォントも声も、すべてこのサイトの中から読みこみます）。
 
 ## 古いタブレットで遊ぶとき
 
@@ -47,5 +48,8 @@ iPhone・iPad の Safari で開いて「共有 → ホーム画面に追加」�
 - `icons/`、`manifest.webmanifest`：ホーム画面に追加したときのアイコンと設定。
 - `voice/`：ゲームの声（mp3 と、セリフの部品 → ファイル名の表 `index.json`）。セリフを足したら `tools/make_voice.py` で足りない分を作ります（作り方はスクリプトの先頭に書いてあります）。
 - `tools/voice_lines.js`：ゲームで使う声の部品をぜんぶ出します（`tools/make_voice.py` が使います）。
-- `fonts/`：古い端末向けの絵文字フォント（Noto Color Emoji から使う絵文字だけを抜き出したもの。ライセンスは `fonts/OFL.txt`）。
-  ゲームに絵文字を足したら `python3 tools/make_emoji_font.py` で作り直します（fonttools が必要）。
+- `fonts/`：ゲームで使うフォント（ライセンスは `fonts/OFL.txt`）。
+  - 字のフォント（Klee One・Zen Maru Gothic から、ゲームで使う字だけを抜き出したもの）。ゲームといっしょに配るので、Google Fonts などの外のサイトとは通信しません。
+    ゲームに新しい漢字などを足したら `python3 tools/make_text_fonts.py` で作り直します（fonttools と brotli が必要）。
+  - 古い端末向けの絵文字フォント（Noto Color Emoji から使う絵文字だけを抜き出したもの）。
+    ゲームに絵文字を足したら `python3 tools/make_emoji_font.py` で作り直します（fonttools が必要）。

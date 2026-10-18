@@ -1,8 +1,5 @@
 <title>もじもじの もり</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
 <style>
   /* 森の中の一枚絵。空と草はらの上に、もじのおともだちが並ぶ（昼の色だけで作る） */
   :root {
@@ -23,6 +20,25 @@
     --vh: 100vh;
   }
   @supports (height: 100dvh) { :root { --vh: 100dvh; } }
+  /* 字のフォントもゲームといっしょに配る（外のサイトとは通信しない）。ゲームで使う字だけにしぼってある（tools/make_text_fonts.py） */
+  @font-face {
+    font-family: "Klee One";
+    src: url("fonts/klee-one-600.woff2") format("woff2");
+    font-weight: 600;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Zen Maru Gothic";
+    src: url("fonts/zen-maru-gothic-700.woff2") format("woff2");
+    font-weight: 700;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Zen Maru Gothic";
+    src: url("fonts/zen-maru-gothic-900.woff2") format("woff2");
+    font-weight: 900;
+    font-display: swap;
+  }
   /* 端末に新しい絵文字がないとき（古い Android など）だけ使う。数字や英字には使わない */
   @font-face {
     font-family: "Mojimori Emoji";
