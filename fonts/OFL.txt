@@ -1,10 +1,20 @@
-このフォルダの emoji.ttf は、Google の Noto Color Emoji（https://github.com/googlefonts/noto-emoji）から、
-ゲームで使う絵文字だけを抜き出したものです。古い端末で新しい絵文字が出ないときだけ使います。
+このフォルダのフォントは、どれも SIL Open Font License 1.1 で配られているフォントから、
+ゲームで使う字だけを抜き出したものです。
 
-Copyright 2013-2017 Google Inc.
+- emoji.ttf：Google の Noto Color Emoji（https://github.com/googlefonts/noto-emoji）から、
+  ゲームで使う絵文字だけを抜き出したもの。古い端末で新しい絵文字が出ないときだけ使います。
+  Copyright 2013-2017 Google Inc.
 
-This Font Software is licensed under the SIL Open Font License,
-Version 1.1.
+- klee-one-600.woff2：Klee One SemiBold（https://github.com/fontworks-fonts/Klee）から、
+  ゲームで使う字だけを抜き出したもの。もじのおともだちや ことばの字に使います。
+  Copyright 2020 The Klee Project Authors (https://github.com/fontworks-fonts/Klee)
+
+- zen-maru-gothic-700.woff2、zen-maru-gothic-900.woff2：Zen Maru Gothic Bold・Black
+  （https://github.com/googlefonts/zen-marugothic）から、ゲームで使う字だけを抜き出したもの。
+  ボタンや案内の字に使います。
+  Copyright 2021 The Zen Maru Gothic Project Authors (https://github.com/googlefonts/zen-marugothic)
+
+These fonts are licensed under the SIL Open Font License, Version 1.1.
 
 This license is copied below, and is also available with a FAQ at:
 http://scripts.sil.org/OFL
