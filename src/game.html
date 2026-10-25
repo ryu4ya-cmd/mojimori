@@ -314,7 +314,9 @@
   }
   .seat.glow { background: rgba(255,250,190,.6); box-shadow: 0 0 0 8px #fff59d, 0 0 30px 12px #fff176; }
   .mover { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
-  .me { display: flex; flex-direction: column; align-items: center; }
+  .me { position: relative; display: flex; flex-direction: column; align-items: center; }
+  .me .flag { position: absolute; right: -22%; bottom: 30%; font-size: calc(var(--friend) * .5); line-height: 1; transform-origin: 20% 90%; animation: flagwave .8s ease-in-out infinite alternate; }
+  @keyframes flagwave { from { transform: rotate(-15deg); } to { transform: rotate(20deg); } }
   .me .face { display: inline-block; font-size: calc(var(--friend) * .92); line-height: 1; filter: drop-shadow(0 4px 2px rgba(0,0,0,.18)); }
   .me .star { font-size: calc(var(--friend) * .3); line-height: 1; margin-bottom: -.15em; }
   .walking .me .face { animation: hop .45s ease-in-out infinite; }
@@ -334,6 +336,8 @@
   #night { background: linear-gradient(var(--night-top), var(--night-bottom)); color: #fff; }
   #night .moon { font-size: 16vmin; font-size: clamp(60px, 16vmin, 120px); margin-bottom: 2vmin; }
   #night .stage { margin-top: 2vmin; }
+  /* ねている どうぶつ（いすとりの あと） */
+  .sleeper { position: relative; --friend: 15vmin; --friend: clamp(64px, 15vmin, 120px); width: var(--friend); text-align: center; font-size: calc(var(--friend) * .85); line-height: 1.1; opacity: .9; filter: saturate(.8); animation: bob 4.5s ease-in-out infinite; animation-delay: var(--d, 0s); transform-origin: 50% 100%; }
   .zzz { position: absolute; right: -6%; top: 6%; font-weight: 900; font-size: calc(var(--friend) * .2); color: #fff; opacity: 0; animation: zzz 3s ease-in-out infinite; animation-delay: var(--d, 0s); }
   @keyframes zzz { 0% { opacity: 0; transform: translate(0, 10px) scale(.6); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(14px, -30px) scale(1.1); } }
   .twinkle { position: fixed; color: #fff8c4; animation: tw 2.4s ease-in-out infinite; pointer-events: none; }
@@ -411,7 +415,7 @@
   .old-msg { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 60; background: #fff3cd; color: #5d4500; border-radius: 14px; padding: 12px 16px; font-size: 15px; line-height: 1.6; box-shadow: 0 6px 16px rgba(0,0,0,.15); }
 
   @media (prefers-reduced-motion: reduce) {
-    .cloud, .start-btn, .friend .body, .soap .ball, .drive .rumble, .walking .me .face, .music-pill .notes { animation: none; }
+    .cloud, .start-btn, .friend .body, .soap .ball, .drive .rumble, .walking .me .face, .music-pill .notes, .me .flag, .sleeper { animation: none; }
   }
 </style>
 
@@ -2650,9 +2654,11 @@
 
   // ---------- ⑥ いすとり ----------
   // 4さいの子が ひとりで遊ぶ：音楽が止まったら、じぶんのどうぶつを あいている いすに すわらせる。
-  // コンピューターのどうぶつ（もじのおともだち）と いすを取りあうが、子どもは ぜったいに ぬけない
+  // コンピューターのどうぶつと いすを取りあうが、子どもは ぜったいに ぬけない
   // （おそかったら、おともだちが「どうぞ」と ゆずってくれる）
   const CHAIR_ANIMALS = [['🐰', 'うさぎ'], ['🐻', 'くま'], ['🐱', 'ねこ'], ['🐶', 'いぬ'], ['🐼', 'ぱんだ'], ['🦊', 'きつね']];
+  // あいて（コンピューター）の どうぶつ。子どもが選ばなかった どうぶつと、ここから えらぶ
+  const CHAIR_RIVALS = ['🐸', '🐵', '🐷', '🐯', '🐨', '🐮', '🐔'];
   // 回ごとの コンピューターと いすの数（どうぶつは いつも いすより 1ぴき多い）。letters は 字の いす
   const CHAIR_ROUNDS = [
     { cpus: 3, chairs: 3 },
@@ -2672,23 +2678,40 @@
 
   // いすとりの音楽（オルゴールの BGM とは べつ。止まるのが あそびの合図なので、BGM を消していても鳴らす）
   const March = (() => {
-    const BEAT = 60 / 150;
-    // メロディは 8分音符、ベースは 4分音符。R はやすみ
-    const MEL = 'G4 C5 E5 C5 G4 C5 E5 G5 F5 D5 B4 G4 F5 D5 B4 G4 E5 C5 G4 C5 E5 G5 E5 C5 D5 B4 G4 B4 C5 R C5 R'.split(' ');
-    const BASS = 'C3 G2 C3 G2 G2 D3 G2 D3 C3 G2 C3 G2 G2 G2 C3 C3'.split(' ');
+    // 曲は「オクラホマミキサー」（アメリカ民謡「Turkey in the Straw」。19世紀の曲で、著作権は切れている）。
+    // 音は ここで1つずつ作って鳴らすので、録音は使っていない
+    const STEP = 60 / 120 / 4; // 16分音符の長さ（秒）
+    // 「音:16分音符いくつ分」の並び。| は小節の区切り。R はやすみ。最後の G5 F5 は、つぎの回の はじまり（弱起）
+    const MELODY = `
+      E5:1 D5:1 C5:1 D5:1 E5:1 C5:1 A4:1 B4:1 | C5:2 C5:2 C5:2 G5:1 F5:1 |
+      E5:1 D5:1 C5:1 D5:1 E5:1 C5:1 A4:1 B4:1 | C5:2 C5:2 C5:2 E5:1 F5:1 |
+      G5:2 G5:1 G5:1 G5:1 F5:1 E5:1 F5:1 | G5:2 E5:2 C5:2 E5:1 F5:1 |
+      G5:2 F5:2 E5:2 D5:2 | C5:4 R:2 G5:1 F5:1`;
+    // 半小節ごとの和音（ベースの ブン・チャッ）
+    const CHORDS = ['C', 'C', 'C', 'G', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'G', 'G', 'C', 'C'];
+    const CHORD_NOTES = { C: ['C3', 'E4', 'G4'], G: ['G2', 'D4', 'B3'] };
     const NOTE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
     const hz = n => 440 * Math.pow(2, (12 * (+n.slice(-1) + 1) + NOTE[n[0]] - 69) / 12);
     const events = [];
-    MEL.forEach((n, i) => { if (n !== 'R') events.push({ beat: i / 2, f: hz(n), type: 'square', vol: .05, dur: .18 }); });
-    BASS.forEach((n, i) => events.push({ beat: i, f: hz(n), type: 'triangle', vol: .16, dur: .3 }));
-    events.sort((a, b) => a.beat - b.beat);
-    const LOOP = BASS.length;
+    let step = 0;
+    for (const tok of MELODY.replace(/\|/g, ' ').trim().split(/\s+/)) {
+      const [n, len] = tok.split(':');
+      if (n !== 'R') events.push({ at: step, f: hz(n), type: 'square', vol: .05, dur: Math.min(.3, +len * STEP * .9) });
+      step += +len;
+    }
+    const LOOP = step;
+    CHORDS.forEach((c, i) => {
+      const [root, ...tones] = CHORD_NOTES[c];
+      events.push({ at: i * 4, f: hz(root), type: 'triangle', vol: .17, dur: .22 });
+      tones.forEach(t => events.push({ at: i * 4 + 2, f: hz(t), type: 'triangle', vol: .05, dur: .12 }));
+    });
+    events.sort((a, b) => a.at - b.at);
     let master = null, timer = null, idx = 0, loopStart = 0;
     function tick() {
       const ahead = ac.currentTime + .3;
       for (;;) {
         const ev = events[idx];
-        const t = loopStart + ev.beat * BEAT;
+        const t = loopStart + ev.at * STEP;
         if (t > ahead) break;
         if (t >= ac.currentTime - .02) {
           const o = ac.createOscillator(), g = ac.createGain();
@@ -2699,7 +2722,7 @@
           o.connect(g).connect(master);
           o.start(t); o.stop(t + ev.dur + .03);
         }
-        if (++idx >= events.length) { idx = 0; loopStart += LOOP * BEAT; }
+        if (++idx >= events.length) { idx = 0; loopStart += LOOP * STEP; }
       }
     }
     function start() {
@@ -2778,11 +2801,8 @@
   function makeMover(a) {
     const w = document.createElement('div');
     w.className = 'mover';
-    if (a.kind === 'me') {
-      w.innerHTML = `<div class="me"><span class="star" aria-hidden="true">⭐</span><span class="face">${a.e}</span></div>`;
-    } else {
-      w.appendChild(makeFriend(a.e, { asButton: false, hat: false, delay: Math.random() * 2 }));
-    }
+    // じぶんの どうぶつには ⭐。あいては おうえんに まわると 🚩 を もつ
+    w.innerHTML = `<div class="me">${a.kind === 'me' ? '<span class="star" aria-hidden="true">⭐</span>' : ''}<span class="face">${a.e}</span><span class="flag" aria-hidden="true" hidden>🚩</span></div>`;
     a.el = w;
     a.inner = w.firstChild;
     a.x = innerWidth / 2; a.y = innerHeight + 100;
@@ -2828,7 +2848,8 @@
   }
 
   async function runChairs(id, me) {
-    ch = { id, me: { kind: 'me', e: me.e }, cpus: shuffle(CHAIR_POOL).slice(0, 3).map(e => ({ kind: 'cpu', e })), out: [], avg: 2, base: 0, rd: null, lastTarget: null };
+    const rivals = shuffle(CHAIR_ANIMALS.map(x => x[0]).filter(e => e !== me.e).concat(CHAIR_RIVALS)).slice(0, 3);
+    ch = { id, me: { kind: 'me', e: me.e }, cpus: rivals.map(e => ({ kind: 'cpu', e })), out: [], avg: 2, base: 0, rd: null, lastTarget: null };
     ch.all = ch.cpus.slice();
     [ch.me].concat(ch.cpus).forEach(makeMover);
     await say(`${me.w}！`, { clips: [VL.word(me.w)] });
@@ -2845,7 +2866,7 @@
     moves.happy(ch.me.inner);
     await Promise.all([say(P.chairWin), sleep(CHEER_MS + 1700)]);
     if (id !== flow) return;
-    goNight(ch.all.map(a => a.e));
+    goNight([ch.me.e].concat(ch.all.map(a => a.e)));
   }
 
   async function chairRound(id, r) {
@@ -2859,7 +2880,7 @@
     if (R.back && ch.out.length) {
       ch.cpus = ch.cpus.concat(ch.out);
       ch.out = [];
-      ch.cpus.forEach(a => { a.inner.classList.add('nohat'); });
+      ch.cpus.forEach(a => { a.inner.querySelector('.flag').hidden = true; });
     }
     const animals = [ch.me].concat(ch.cpus);
     animals.forEach(a => { a.seat = null; a.left = false; setSize(a, L.f); });
@@ -2988,9 +3009,7 @@
       moves.shake(a.inner);
       ch.cpus.splice(ch.cpus.indexOf(a), 1);
       ch.out.push(a);
-      const fr = a.inner;
-      fr.classList.remove('nohat');
-      fr.querySelector('.hat').textContent = '🚩';
+      a.inner.querySelector('.flag').hidden = false;
       setSize(a, L.side);
       const p = sidelineSpot(ch.out.length - 1, L);
       await Promise.all([moveTo(a, p.x, p.y, 900), say(P.chairCheer)]);
@@ -3118,14 +3137,22 @@
   }
 
   // ---------- おやすみ ----------
-  // hats は、おともだちにかぶせる絵（省略時は、そのもじのことばの絵）
+  // hats は、おともだちにかぶせる絵（省略時は、そのもじのことばの絵）。list に絵文字を入れると、どうぶつが ねる
   function goNight(list, hats) {
     show('night');
     const st = $('#nightStage');
     st.innerHTML = '';
     list.forEach((e, i) => {
-      const el = makeFriend(e, { asButton: false, delay: i * .7, emoji: hats && hats[i] });
-      el.classList.add('sleep');
+      let el;
+      if (typeof e === 'string') {
+        el = document.createElement('div');
+        el.className = 'sleeper';
+        el.innerHTML = `<span aria-hidden="true">${e}</span>`;
+        el.style.setProperty('--d', `-${i * .7}s`);
+      } else {
+        el = makeFriend(e, { asButton: false, delay: i * .7, emoji: hats && hats[i] });
+        el.classList.add('sleep');
+      }
       el.style.setProperty('--friend', fit('64px', '15vmin', '120px'));
       const z = document.createElement('span');
       z.className = 'zzz';
