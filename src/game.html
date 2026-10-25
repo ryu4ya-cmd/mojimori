@@ -120,6 +120,9 @@
   .big-btn.quiz { border: 6px solid #81c784; }
   .big-btn.bubble { border: 6px solid #4dd0e1; }
   .big-btn.cars { border: 6px solid #e57373; }
+  .big-btn.chairs { border: 6px solid #ba68c8; }
+  /* ボタンは 3つずつ 2だんに並べる（4つは入らない はば） */
+  .menu { max-width: 84vmin; }
   .big-btn .ball { width: 2em; height: 2em; font-size: .5em; }
   .parade { display: flex; gap: 2vmin; margin-top: 4vmin; }
   .parade .friend { --friend: clamp(56px, 12vmin, 92px); }
@@ -299,6 +302,34 @@
   /* くるまの なまえは、道のすぐ上の右はしに出す。道の上の絵（.drive）より うしろ（字幕は、この画面では上に出す） */
   .car-name { position: absolute; z-index: 2; right: 16px; bottom: calc(var(--road) + 8px); transform-origin: 100% 50%; font-family: var(--kana-font); font-size: var(--name); background: rgba(255,253,247,.94); padding: .05em .6em; border-radius: 999px; box-shadow: 0 6px 0 rgba(0,0,0,.1); white-space: nowrap; pointer-events: none; }
 
+  /* ---------- いすとり ---------- */
+  .chair-stage { position: absolute; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; }
+  .seat { position: absolute; left: 0; top: 0; width: var(--cs); height: var(--cs); border-radius: 24%; display: flex; align-items: center; justify-content: center; transition: box-shadow .3s, background .3s; }
+  .seat .chair-pic { display: inline-block; font-size: calc(var(--cs) * .82); line-height: 1; }
+  .seat .plate {
+    position: absolute; top: -16%; left: 27%; width: 46%; height: 46%; border-radius: 50%;
+    background: var(--paper); border: 4px solid var(--c2); color: var(--c2);
+    font-family: var(--kana-font); font-size: calc(var(--cs) * .3); line-height: 1;
+    display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 rgba(0,0,0,.12);
+  }
+  .seat.glow { background: rgba(255,250,190,.6); box-shadow: 0 0 0 8px #fff59d, 0 0 30px 12px #fff176; }
+  .mover { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
+  .me { display: flex; flex-direction: column; align-items: center; }
+  .me .face { display: inline-block; font-size: calc(var(--friend) * .92); line-height: 1; filter: drop-shadow(0 4px 2px rgba(0,0,0,.18)); }
+  .me .star { font-size: calc(var(--friend) * .3); line-height: 1; margin-bottom: -.15em; }
+  .walking .me .face { animation: hop .45s ease-in-out infinite; }
+  @keyframes hop { 50% { transform: translateY(-12%); } }
+  /* 音楽が鳴っているか、止まったかを 目でも わかるように */
+  .music-pill { position: absolute; z-index: 4; left: 50%; top: 84px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 4px 20px; border-radius: 999px; background: rgba(255,255,255,.85); box-shadow: 0 5px 0 rgba(0,0,0,.1); font-size: 34px; font-weight: 900; white-space: nowrap; pointer-events: none; }
+  .music-pill .notes { display: inline-block; animation: hop .45s ease-in-out infinite; }
+  .music-pill .ball { width: 48px; height: 48px; font-size: 26px; }
+  .music-pill.stop { background: #e53935; color: #fff; }
+  @media (max-height: 520px) { .music-pill { top: 66px; font-size: 26px; } }
+  .chair-pick { position: absolute; z-index: 5; top: 0; right: 0; bottom: 0; left: 0; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; padding: 90px 16px 24px; }
+  .chair-pick button { width: 24vmin; width: clamp(96px, 24vmin, 180px); height: 24vmin; height: clamp(96px, 24vmin, 180px); margin: 2vmin; border-radius: 30%; background: var(--paper); border: 6px solid #ba68c8; box-shadow: 0 8px 0 rgba(0,0,0,.12); font-size: 15vmin; font-size: clamp(56px, 15vmin, 120px); line-height: 1; }
+  .chair-pick button:active { transform: translateY(5px); box-shadow: 0 3px 0 rgba(0,0,0,.12); }
+  .nogap .music-pill > * + * { margin-left: 10px; }
+
   /* ---------- 夜（おやすみ） ---------- */
   #night { background: linear-gradient(var(--night-top), var(--night-bottom)); color: #fff; }
   #night .moon { font-size: 16vmin; font-size: clamp(60px, 16vmin, 120px); margin-bottom: 2vmin; }
@@ -380,7 +411,7 @@
   .old-msg { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 60; background: #fff3cd; color: #5d4500; border-radius: 14px; padding: 12px 16px; font-size: 15px; line-height: 1.6; box-shadow: 0 6px 16px rgba(0,0,0,.15); }
 
   @media (prefers-reduced-motion: reduce) {
-    .cloud, .start-btn, .friend .body, .soap .ball, .drive .rumble { animation: none; }
+    .cloud, .start-btn, .friend .body, .soap .ball, .drive .rumble, .walking .me .face, .music-pill .notes { animation: none; }
   }
 </style>
 
@@ -419,6 +450,7 @@
     <button class="big-btn quiz" data-mode="quiz"><span class="icon">🍎</span><span class="label">これ なあに？</span></button>
     <button class="big-btn bubble" data-mode="bubble"><span class="icon"><b class="ball" id="bubbleIcon">あ</b></span><span class="label">しゃぼんだま</span></button>
     <button class="big-btn cars" data-mode="cars"><span class="icon">🚒</span><span class="label">はたらくくるま</span></button>
+    <button class="big-btn chairs" data-mode="chairs"><span class="icon">🪑</span><span class="label">いすとり</span></button>
   </div>
   <div class="parade" id="parade"></div>
 </section>
@@ -481,6 +513,18 @@
   </div>
 </section>
 
+<!-- いすとり -->
+<section id="chairs" class="screen">
+  <div class="chair-stage" id="chairStage"></div>
+  <div class="topbar">
+    <button class="round-btn" data-home aria-label="おうちにもどる">🏠</button>
+    <div class="progress" id="chairsProgress"></div>
+    <button class="round-btn" data-ask aria-label="もういちど きく">👂</button>
+  </div>
+  <div class="music-pill" id="musicPill" hidden></div>
+  <div class="chair-pick" id="chairPick" hidden></div>
+</section>
+
 <!-- おやすみ -->
 <section id="night" class="screen">
   <div class="moon" aria-hidden="true">🌙</div>
@@ -515,6 +559,9 @@
     <p class="note">ゲームの声：Style-Bert-VITS2 モデル「小春音アミ」、あみたろの声素材工房（https://amitaro.net/）の声をもとにした音声モデルを使っています。</p>
     <h3>おんがく</h3>
     <label for="bgmVolume"><span>BGMの音量</span><input type="range" id="bgmVolume" min="0" max="1" step="0.05"><output id="bgmOut"></output></label>
+    <h3>いすとり</h3>
+    <label for="chairSpeed"><span>あいての速さ</span><select id="chairSpeed"><option value="easy">ゆっくり</option><option value="normal">ふつう（子どもに合わせる）</option><option value="fast">はやい</option></select></label>
+    <label class="check" for="chairLetters"><input type="checkbox" id="chairLetters">3回目と4回目に、字の いすを出す</label>
     <h3>ずかん</h3>
     <p>ひらがな：<b id="countHira">0</b> / 71　カタカナ：<b id="countKata">0</b> / 71</p>
     <div class="row">
@@ -951,7 +998,7 @@
     document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else if (nightQuiet === false) start(); });
     return { start, stop, duck, setVolume, setEnabled, get enabled() { return enabled; }, get volume() { return volume; } };
   })();
-  let nightQuiet = false; // おやすみの画面では BGM を止めておく
+  let nightQuiet = false; // おやすみと いすとり（べつの音楽を鳴らす）の画面では BGM を止めておく
 
   // ---------- 声（ブラウザの音声合成） ----------
   const VOICE_KEY = 'mojimori.v2.voice';
@@ -1616,7 +1663,8 @@
     $('#cheer').hidden = true;
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
     document.querySelectorAll('.twinkle').forEach(t => t.remove());
-    nightQuiet = id === 'night';
+    March.stop();
+    nightQuiet = id === 'night' || id === 'chairs';
     if (nightQuiet) BGM.stop(); else BGM.start();
   }
 
@@ -1734,6 +1782,7 @@
     here: s => `${s}は、ここだよ！`,
     dane: s => `${s}だね！`,
     streak: n => `${n}かい、れんぞく！`,
+    chairOf: s => `${s}の、いすに、すわろう！`,
   };
   // 決まったセリフ
   const P = {
@@ -1757,6 +1806,19 @@
     bubbleGlow: 'ひかってる　しゃぼんだまだよ！',
     carsHello: 'はたらく　くるまに　さわってみよう！',
     carWho: 'どの　くるまを　よぶ？',
+    chairPick: 'どの　どうぶつで　あそぶ？',
+    chairRule: 'おんがくが　とまったら、あいている　いすに　すわってね！',
+    chairMusic: 'おんがく、スタート！',
+    chairStop: 'ストップ！',
+    chairWait: 'まだ　おんがくが　なってるよ〜',
+    chairTaken: 'そこは　もう　すわってるよ！',
+    chairCheer: 'すわれなかった〜。おうえん　するね！',
+    chairDouzo: 'どうぞ！　すわって　いいよ！',
+    chairThanks: 'よかったね！　ゆずって　もらえたね！',
+    chairBack: 'おうえんしてた　みんなも　もどってきたよ！',
+    chairLetters: 'こんどは、じの　いすだよ！',
+    chairFinal: 'さいごの　いすだよ！　がんばって！',
+    chairWin: 'ゆうしょう！　おめでとう！',
   };
   const QUIZ_ASK = ['これは　なにかな？', 'これ、なあに？', 'これは　なんだろう？'];
 
@@ -2586,6 +2648,475 @@
     });
   }
 
+  // ---------- ⑥ いすとり ----------
+  // 4さいの子が ひとりで遊ぶ：音楽が止まったら、じぶんのどうぶつを あいている いすに すわらせる。
+  // コンピューターのどうぶつ（もじのおともだち）と いすを取りあうが、子どもは ぜったいに ぬけない
+  // （おそかったら、おともだちが「どうぞ」と ゆずってくれる）
+  const CHAIR_ANIMALS = [['🐰', 'うさぎ'], ['🐻', 'くま'], ['🐱', 'ねこ'], ['🐶', 'いぬ'], ['🐼', 'ぱんだ'], ['🦊', 'きつね']];
+  // 回ごとの コンピューターと いすの数（どうぶつは いつも いすより 1ぴき多い）。letters は 字の いす
+  const CHAIR_ROUNDS = [
+    { cpus: 3, chairs: 3 },
+    { cpus: 2, chairs: 2 },
+    { cpus: 3, chairs: 3, letters: true, back: true },
+    { cpus: 2, chairs: 2, letters: true },
+    { cpus: 1, chairs: 1, final: true },
+  ];
+  const CHAIR_POOL = SEI.filter(e => e.id !== 'を');
+  const KANA_NUM = { 1: ['ひとつ', 'いっぴき'], 2: ['ふたつ', 'にひき'], 3: ['みっつ', 'さんびき'], 4: ['よっつ', 'よんひき'] };
+  // [字幕, 声の部品]（数字の読みがぶれないように、声は かなで書く）
+  const countLine = (a, c) => [`どうぶつ　${a}ひき、いすは　${c}つ。ひとつ　たりないね！`, `どうぶつ、${KANA_NUM[a][1]}、いすは、${KANA_NUM[c][0]}。ひとつ、たりないね！`];
+  const CHAIR_KEY = 'mojimori.v2.chairs';
+  const chairSettings = { speed: 'normal', letters: true, ...load(CHAIR_KEY, {}) };
+  // あいての速さ：[子どもが すわるまでの時間の平均に かける数, いちばん はやくても この秒数]
+  const CHAIR_SPEED = { easy: [1.8, 2.5], normal: [1.25, 1.4], fast: [.95, 1] };
+
+  // いすとりの音楽（オルゴールの BGM とは べつ。止まるのが あそびの合図なので、BGM を消していても鳴らす）
+  const March = (() => {
+    const BEAT = 60 / 150;
+    // メロディは 8分音符、ベースは 4分音符。R はやすみ
+    const MEL = 'G4 C5 E5 C5 G4 C5 E5 G5 F5 D5 B4 G4 F5 D5 B4 G4 E5 C5 G4 C5 E5 G5 E5 C5 D5 B4 G4 B4 C5 R C5 R'.split(' ');
+    const BASS = 'C3 G2 C3 G2 G2 D3 G2 D3 C3 G2 C3 G2 G2 G2 C3 C3'.split(' ');
+    const NOTE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+    const hz = n => 440 * Math.pow(2, (12 * (+n.slice(-1) + 1) + NOTE[n[0]] - 69) / 12);
+    const events = [];
+    MEL.forEach((n, i) => { if (n !== 'R') events.push({ beat: i / 2, f: hz(n), type: 'square', vol: .05, dur: .18 }); });
+    BASS.forEach((n, i) => events.push({ beat: i, f: hz(n), type: 'triangle', vol: .16, dur: .3 }));
+    events.sort((a, b) => a.beat - b.beat);
+    const LOOP = BASS.length;
+    let master = null, timer = null, idx = 0, loopStart = 0;
+    function tick() {
+      const ahead = ac.currentTime + .3;
+      for (;;) {
+        const ev = events[idx];
+        const t = loopStart + ev.beat * BEAT;
+        if (t > ahead) break;
+        if (t >= ac.currentTime - .02) {
+          const o = ac.createOscillator(), g = ac.createGain();
+          o.type = ev.type; o.frequency.value = ev.f;
+          g.gain.setValueAtTime(0, t);
+          g.gain.linearRampToValueAtTime(ev.vol, t + .01);
+          g.gain.exponentialRampToValueAtTime(.001, t + ev.dur);
+          o.connect(g).connect(master);
+          o.start(t); o.stop(t + ev.dur + .03);
+        }
+        if (++idx >= events.length) { idx = 0; loopStart += LOOP * BEAT; }
+      }
+    }
+    function start() {
+      if (!ac || timer) return;
+      master = ac.createGain();
+      master.gain.value = 1;
+      master.connect(ac.destination);
+      idx = 0;
+      loopStart = ac.currentTime + .05;
+      tick();
+      timer = setInterval(tick, 80);
+    }
+    // ぴたっと止める（ゆっくり小さくすると、止まったのが わかりにくい）
+    function stop() {
+      if (!timer) return;
+      clearInterval(timer);
+      timer = null;
+      const m = master;
+      m.gain.cancelScheduledValues(ac.currentTime);
+      m.gain.setValueAtTime(m.gain.value, ac.currentTime);
+      m.gain.linearRampToValueAtTime(0, ac.currentTime + .03);
+      setTimeout(() => m.disconnect(), 400);
+    }
+    // ひっかけ：少しのあいだ 音を消して、また鳴らす
+    function dip(ms) {
+      if (!timer) return;
+      const t = ac.currentTime;
+      master.gain.cancelScheduledValues(t);
+      master.gain.setValueAtTime(1, t);
+      master.gain.linearRampToValueAtTime(0, t + .04);
+      master.gain.setValueAtTime(0, t + ms / 1000);
+      master.gain.linearRampToValueAtTime(1, t + ms / 1000 + .05);
+    }
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+    return { start, stop, dip };
+  })();
+  // ピピッ（止まった合図）
+  const whistle = () => { if (ac) { const t = ac.currentTime + .01; ding(t, 2100, .12, { type: 'sine', vol: .15 }); ding(t + .15, 2100, .3, { type: 'sine', vol: .15 }); } };
+
+  let ch = null;
+  const chairTop = () => (innerHeight <= 520 ? 66 : 84) + 64;
+  // n 個の いすを まんなかに並べ、そのまわりを どうぶつが歩く だえんを決める。よこ長なら よこに、たて長なら たてに並べる
+  function chairLayout(n) {
+    const W = innerWidth, H = innerHeight;
+    const top = chairTop(), side = 80;
+    const aw = W - 32, ah = H - top - side;
+    const land = W >= H;
+    const along = 1.3 * n + 2.38, across = 3.47;
+    const c = Math.floor(Math.min(170, land ? Math.min(aw / along, ah / across) : Math.min(ah / along, aw / across)));
+    const f = Math.round(c * .85);
+    const cx = W / 2, cy = top + ah / 2;
+    const span = (n - 1) * c * 1.3;
+    const seats = [];
+    for (let i = 0; i < n; i++) {
+      const off = -span / 2 + i * c * 1.3;
+      seats.push(land ? { x: cx + off, y: cy } : { x: cx, y: cy + off });
+    }
+    const ra = span / 2 + c * .65 + f * .9, rb = c * .5 + f * .85;
+    return { c, f, cx, cy, rx: land ? ra : rb, ry: land ? rb : ra, seats, side: Math.round(Math.min(64, f * .6)) };
+  }
+  const posTf = (x, y) => `translate(${x}px, ${y}px) translate(-50%, -62%)`;
+  function place(a, x, y) {
+    a.x = x; a.y = y;
+    a.el.style.transform = posTf(x, y);
+    a.el.style.zIndex = Math.round(y);
+  }
+  // a を (x, y) まで動かす
+  function moveTo(a, x, y, ms = 600) {
+    const from = posTf(a.x, a.y);
+    place(a, x, y);
+    return new Promise(res => {
+      anim(a.el, [{ transform: from }, { transform: posTf(x, y) }], { duration: ms, easing: 'ease-in-out' });
+      setTimeout(res, ms);
+    });
+  }
+  function makeMover(a) {
+    const w = document.createElement('div');
+    w.className = 'mover';
+    if (a.kind === 'me') {
+      w.innerHTML = `<div class="me"><span class="star" aria-hidden="true">⭐</span><span class="face">${a.e}</span></div>`;
+    } else {
+      w.appendChild(makeFriend(a.e, { asButton: false, hat: false, delay: Math.random() * 2 }));
+    }
+    a.el = w;
+    a.inner = w.firstChild;
+    a.x = innerWidth / 2; a.y = innerHeight + 100;
+    $('#chairStage').appendChild(w);
+  }
+  const setSize = (a, f) => a.el.style.setProperty('--friend', `${f}px`);
+  // すわれなかった おともだちは、左下で 旗をふって おうえんする
+  function sidelineSpot(k, L) { return { x: 16 + L.side * .6 + k * L.side * 1.15, y: innerHeight - L.side * .55 - 8 }; }
+  function musicPill(kind, target) {
+    const p = $('#musicPill');
+    p.hidden = !kind;
+    p.classList.toggle('stop', kind === 'stop');
+    const ball = target ? `<b class="ball" style="--c:${target.color}">${disp(target)}</b><span aria-hidden="true">🪑</span>` : '';
+    p.innerHTML = kind === 'stop' ? `<span aria-hidden="true">✋</span><span>ストップ！</span>${ball}` : `<span class="notes" aria-hidden="true">🎵</span><span class="notes" aria-hidden="true" style="animation-delay:-.22s">🎶</span>${ball}`;
+    if (kind) anim(p, [{ transform: 'translateX(-50%) scale(.4)' }, { transform: 'translateX(-50%) scale(1.12)', offset: .6 }, { transform: 'translateX(-50%) scale(1)' }], { duration: 380 });
+  }
+
+  function goChairs() {
+    show('chairs');
+    const id = flow;
+    ch = null;
+    $('#chairStage').innerHTML = '';
+    musicPill(null);
+    renderProgress(0, $('#chairsProgress'));
+    const pickEl = $('#chairPick');
+    pickEl.innerHTML = '';
+    pickEl.hidden = false;
+    CHAIR_ANIMALS.forEach(([e, w], i) => {
+      const b = document.createElement('button');
+      b.textContent = e;
+      b.setAttribute('aria-label', w);
+      anim(b, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 420, delay: i * 70, fill: 'backwards', easing: 'cubic-bezier(.3,1.4,.6,1)' });
+      b.addEventListener('click', () => {
+        if (id !== flow || pickEl.hidden) return;
+        sfx.yay();
+        pickEl.hidden = true;
+        runChairs(id, { e, w });
+      });
+      pickEl.appendChild(b);
+    });
+    askAgain = () => say(P.chairPick);
+    say(P.chairPick);
+  }
+
+  async function runChairs(id, me) {
+    ch = { id, me: { kind: 'me', e: me.e }, cpus: shuffle(CHAIR_POOL).slice(0, 3).map(e => ({ kind: 'cpu', e })), out: [], avg: 2, base: 0, rd: null, lastTarget: null };
+    ch.all = ch.cpus.slice();
+    [ch.me].concat(ch.cpus).forEach(makeMover);
+    await say(`${me.w}！`, { clips: [VL.word(me.w)] });
+    for (let r = 0; r < CHAIR_ROUNDS.length; r++) {
+      if (id !== flow) return;
+      renderProgress(r, $('#chairsProgress'));
+      await chairRound(id, r);
+    }
+    if (id !== flow) return;
+    renderProgress(CHAIR_ROUNDS.length, $('#chairsProgress'));
+    await sleep(300);
+    if (id !== flow) return;
+    cheer('ゆうしょう！', { stamp: '🏆', sub: '⭐⭐⭐⭐⭐', big: true });
+    moves.happy(ch.me.inner);
+    await Promise.all([say(P.chairWin), sleep(CHEER_MS + 1700)]);
+    if (id !== flow) return;
+    goNight(ch.all.map(a => a.e));
+  }
+
+  async function chairRound(id, r) {
+    const R = CHAIR_ROUNDS[r];
+    const letters = !!(R.letters && chairSettings.letters);
+    const stage = $('#chairStage');
+    const L = chairLayout(R.chairs);
+    const alive = () => id === flow;
+
+    // おうえんしていた おともだちが もどってくる
+    if (R.back && ch.out.length) {
+      ch.cpus = ch.cpus.concat(ch.out);
+      ch.out = [];
+      ch.cpus.forEach(a => { a.inner.classList.add('nohat'); });
+    }
+    const animals = [ch.me].concat(ch.cpus);
+    animals.forEach(a => { a.seat = null; a.left = false; setSize(a, L.f); });
+    ch.out.forEach((a, k) => { setSize(a, L.side); const p = sidelineSpot(k, L); place(a, p.x, p.y); });
+
+    // いす（字の いすの回は、聞く字と、形のにた字を ならべる）
+    stage.querySelectorAll('.seat').forEach(s => s.remove());
+    let target = null, labels = null;
+    if (letters) {
+      target = pick(CHAIR_POOL.filter(x => x !== ch.lastTarget));
+      ch.lastTarget = target;
+      labels = shuffle([target, ...pickDistractors(target, R.chairs - 1, 2)]);
+    }
+    const seats = L.seats.map((p, i) => {
+      const b = document.createElement('button');
+      const e = labels && labels[i];
+      b.className = 'seat';
+      b.style.setProperty('--cs', `${L.c}px`);
+      b.setAttribute('aria-label', e ? `${disp(e)}の いす` : 'いす');
+      b.innerHTML = `<span class="chair-pic" aria-hidden="true">🪑</span>` + (e ? `<span class="plate" style="--c2:${e.color}">${disp(e)}</span>` : '');
+      const tf = `translate(${p.x}px, ${p.y}px) translate(-50%, -50%)`;
+      b.style.transform = tf;
+      anim(b, [{ transform: `${tf} scale(0)` }, { transform: `${tf} scale(1)` }], { duration: 450, delay: i * 120, fill: 'backwards', easing: 'cubic-bezier(.3,1.5,.6,1)' });
+      stage.appendChild(b);
+      const seat = { el: b, x: p.x, y: p.y, e, by: null };
+      onPress(b, () => tapChair(seat));
+      return seat;
+    });
+    const seatY = seat => seat.y - L.c * .12;
+    const ell = (k, base) => {
+      const t = base + k / animals.length * Math.PI * 2;
+      return { x: L.cx + Math.cos(t) * L.rx, y: L.cy + Math.sin(t) * L.ry };
+    };
+    const rd = ch.rd = { phase: 'intro', seats, target, letters, stopAt: 0, lastWait: 0, timers: [], offer: null, seatY, R, L };
+    const K = target && disp(target), S = target && spoken(target);
+    const sayTarget = () => say(`「${K}」の　いすに　すわろう！`, { clips: [VL.chairOf(S)] });
+
+    // みんな だえんの上に ならぶ
+    await Promise.all(animals.map((a, k) => { const p = ell(k, ch.base); return moveTo(a, p.x, p.y, 700); }));
+    if (!alive()) return;
+    if (r === 0) await say(P.chairRule);
+    if (R.back) await say(P.chairBack);
+    if (letters && !CHAIR_ROUNDS[r - 1].letters) await say(P.chairLetters);
+    if (!alive()) return;
+    const [cap, clip] = countLine(animals.length, R.chairs);
+    await say(cap, { clips: [clip] });
+    if (R.final) await say(P.chairFinal);
+    if (letters) await sayTarget();
+    if (!alive()) return;
+    askAgain = letters ? sayTarget : () => say(P.chairRule);
+
+    // 音楽にあわせて ぐるぐる歩く
+    await say(P.chairMusic);
+    if (!alive()) return;
+    rd.phase = 'walk';
+    musicPill('play', target);
+    March.start();
+    stage.classList.add('walking');
+    let speed = 1, last = performance.now();
+    const loop = now => {
+      if (!alive() || rd.phase !== 'walk') return;
+      ch.base += Math.min(.05, (now - last) / 1000) * speed * Math.PI * 2 / 8;
+      last = now;
+      animals.forEach((a, k) => { const p = ell(k, ch.base); place(a, p.x, p.y); });
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+    const dur = r === 0 ? 3500 + Math.random() * 2500 : 4000 + Math.random() * 5000;
+    // 2回目からは、ときどき ひっかけ（音が一瞬 消えて、また鳴る）
+    if (r > 0 && Math.random() < .55) {
+      const at = 1500 + Math.random() * (dur - 3000);
+      setTimeout(() => {
+        if (!alive() || rd.phase !== 'walk') return;
+        March.dip(800);
+        speed = .35;
+        setTimeout(() => { speed = 1; }, 800);
+      }, at);
+    }
+    await sleep(dur);
+    if (!alive()) return;
+
+    // ストップ！
+    rd.phase = 'stop';
+    March.stop();
+    stage.classList.remove('walking');
+    whistle();
+    musicPill('stop', target);
+    rd.stopAt = performance.now();
+    if (letters) say(`ストップ！　「${K}」の　いすに　すわろう！`, { clips: [P.chairStop, VL.chairOf(S)] });
+    else say(P.chairStop);
+    askAgain = letters ? sayTarget : () => say(P.chairStop);
+
+    const outcome = await new Promise(resolve => {
+      rd.resolve = resolve;
+      // コンピューターが すわりにいく時間。字の いすの回は、聞いた字の いすには すわらない
+      const [factor, minS] = CHAIR_SPEED[chairSettings.speed] || CHAIR_SPEED.normal;
+      const limit = Math.max(minS, Math.min(5, ch.avg * factor)) * 1000;
+      const sitters = shuffle(ch.cpus).slice(0, letters ? R.chairs - 1 : R.chairs);
+      sitters.forEach((a, k) => {
+        const d = letters ? 900 + k * 800 : limit * (sitters.length === 1 ? 1 : .35 + .65 * k / (sitters.length - 1));
+        rd.timers.push(setTimeout(() => cpuSit(a), d));
+      });
+      // 字の いすが見つからないときは、光らせて教える
+      if (letters) {
+        let n = 0;
+        const hint = () => {
+          if (!alive() || rd.phase !== 'stop' || ch.me.seat) return;
+          const t = seats.find(s => s.e === target);
+          t.el.classList.add('glow');
+          sfx.hint();
+          say(`「${K}」は　ここだよ！`, { clips: [VL.here(S)] });
+          if (++n < 4) rd.timers.push(setTimeout(hint, 6000));
+        };
+        rd.timers.push(setTimeout(hint, 4000));
+      }
+    });
+    rd.timers.forEach(clearTimeout);
+    if (!alive()) return;
+    musicPill(null);
+
+    // すわれなかった おともだちは、おうえんに まわる
+    const left = ch.cpus.filter(a => !a.seat);
+    await sleep(400);
+    for (const a of left) {
+      if (!alive()) return;
+      moves.shake(a.inner);
+      ch.cpus.splice(ch.cpus.indexOf(a), 1);
+      ch.out.push(a);
+      const fr = a.inner;
+      fr.classList.remove('nohat');
+      fr.querySelector('.hat').textContent = '🚩';
+      setSize(a, L.side);
+      const p = sidelineSpot(ch.out.length - 1, L);
+      await Promise.all([moveTo(a, p.x, p.y, 900), say(P.chairCheer)]);
+      moves.wave(a.inner);
+    }
+    if (!alive()) return;
+    if (outcome === 'douzo') {
+      heartBurst(ch.me.el);
+      await say(P.chairThanks);
+    } else if (!R.final) {
+      const [big, line] = pick(PRAISE);
+      cheer(big, { stamp: pick(STAMPS) });
+      moves.happy(ch.me.inner);
+      await Promise.all([say(line), sleep(CHEER_MS + 600)]);
+    }
+    if (!alive()) return;
+    seats.forEach(s => s.el.classList.remove('glow'));
+    ch.rd = null;
+  }
+
+  // いすを さわった
+  function tapChair(seat) {
+    const rd = ch && ch.rd;
+    if (!rd || ch.id !== flow) return;
+    const now = performance.now();
+    if (rd.phase === 'walk') {
+      // まだ 音楽が鳴っている（ひっかけのときも）。失敗にはしないで、ずっこける
+      if (now - rd.lastWait < 2000) return;
+      rd.lastWait = now;
+      sfx.hint();
+      moves.zukko(ch.me.inner);
+      say(P.chairWait);
+      return;
+    }
+    if (rd.phase === 'douzo') {
+      if (seat === rd.offer) sitMe(seat);
+      return;
+    }
+    if (rd.phase !== 'stop' || ch.me.seat) return;
+    if (seat.by) {
+      sfx.hint();
+      moves.shake(seat.el.firstChild);
+      say(P.chairTaken);
+      return;
+    }
+    if (rd.letters && seat.e !== rd.target) {
+      sfx.hint();
+      moves.shake(seat.el.firstChild);
+      say(`「${disp(seat.e)}」の　いすだよ。「${disp(rd.target)}」は　どーこだ？`, { clips: [VL.kana(spoken(seat.e)), VL.where(spoken(rd.target))] });
+      return;
+    }
+    sitMe(seat);
+  }
+  function sitMe(seat) {
+    const rd = ch.rd;
+    seat.by = ch.me;
+    ch.me.seat = seat;
+    seat.el.classList.remove('glow');
+    sfx.pop();
+    sparkle(seat.el);
+    moveTo(ch.me, seat.x, rd.seatY(seat), 350);
+    if (rd.phase === 'douzo') {
+      rd.phase = 'done';
+      rd.resolve('douzo');
+      return;
+    }
+    // 子どもの速さを おぼえて、つぎの回の あいての速さを 合わせる
+    ch.avg = ch.avg * .5 + (performance.now() - rd.stopAt) / 1000 * .5;
+    // まだ すわっていない おともだちは、いそいで すわりにいく
+    rd.timers.forEach(clearTimeout);
+    ch.cpus.filter(a => !a.seat && !a.left).forEach((a, k) => rd.timers.push(setTimeout(() => cpuSit(a), 300 + k * 350)));
+    chairCheck();
+  }
+  function cpuSit(a) {
+    const rd = ch && ch.rd;
+    if (!rd || ch.id !== flow || rd.phase !== 'stop' || a.seat || a.left) return;
+    const free = rd.seats.filter(s => !s.by && !(rd.letters && s.e === rd.target));
+    if (!free.length) { a.left = true; chairCheck(); return; }
+    // いちばん近い いすへ
+    const seat = free.reduce((b, s) => (Math.hypot(s.x - a.x, s.y - a.y) < Math.hypot(b.x - a.x, b.y - a.y) ? s : b));
+    seat.by = a;
+    a.seat = seat;
+    rd.lastSat = a;
+    moveTo(a, seat.x, rd.seatY(seat), 500).then(() => { if (ch && ch.rd === rd) moves.squish(a.inner); });
+    chairCheck();
+  }
+  // 回の おわりを しらべる
+  function chairCheck() {
+    const rd = ch.rd;
+    if (rd.phase !== 'stop') return;
+    const waiting = ch.cpus.some(a => !a.seat && !a.left);
+    if (ch.me.seat) {
+      if (!waiting) { rd.phase = 'done'; setTimeout(() => rd.resolve('win'), 500); }
+      return;
+    }
+    // 子どもが すわる前に いすが うまった → さいごに すわった おともだちが「どうぞ」
+    if (rd.seats.every(s => s.by)) douzo(rd);
+  }
+  async function douzo(rd) {
+    rd.phase = 'douzo-wait';
+    const id = ch.id;
+    rd.timers.forEach(clearTimeout);
+    await sleep(900);
+    if (id !== flow) return;
+    const giver = rd.lastSat;
+    const seat = giver.seat;
+    seat.by = null;
+    giver.seat = null;
+    giver.left = true;
+    // いすの前（たて長の画面では となり）に よけて、手をふる
+    const L = rd.L;
+    await (innerWidth >= innerHeight ? moveTo(giver, seat.x, seat.y + L.c * .8, 600) : moveTo(giver, seat.x + L.c * .95, seat.y, 600));
+    if (id !== flow) return;
+    rd.phase = 'douzo';
+    rd.offer = seat;
+    seat.el.classList.add('glow');
+    // 光るのは いすだけ（moves.wave は おともだちも光らせるので使わない）
+    moves.jumpjump(giver.inner);
+    const offer = () => { if (id === flow && rd.phase === 'douzo') { seat.el.classList.add('glow'); sfx.hint(); say(P.chairDouzo); } };
+    offer();
+    let n = 0;
+    const again = () => { if (id === flow && rd.phase === 'douzo' && ++n < 4) { offer(); rd.timers.push(setTimeout(again, 7000)); } };
+    rd.timers.push(setTimeout(again, 7000));
+    askAgain = offer;
+  }
+
   // ---------- おやすみ ----------
   // hats は、おともだちにかぶせる絵（省略時は、そのもじのことばの絵）
   function goNight(list, hats) {
@@ -2637,6 +3168,7 @@
     if (m === 'touch') goTouch();
     else if (m === 'bubble') goBubble();
     else if (m === 'cars') goCars('free');
+    else if (m === 'chairs') goChairs();
     else runSession(m);
   }));
   document.querySelectorAll('[data-script]').forEach(b => b.addEventListener('click', () => {
@@ -2673,6 +3205,8 @@
     $('#rateOut').textContent = (+voiceSettings.rate).toFixed(2);
     $('#bgmVolume').value = BGM.volume;
     $('#bgmOut').textContent = Math.round(BGM.volume * 100);
+    $('#chairSpeed').value = chairSettings.speed;
+    $('#chairLetters').checked = chairSettings.letters;
     $('#browserInfo').textContent = `ブラウザ：${BROWSER}`;
     $('#useGameVoice').checked = VOICE.use;
     $('#gameVoiceInfo').textContent = VOICE.map
@@ -2697,6 +3231,8 @@
   $('#voicePitch').addEventListener('input', ev => { voiceSettings.pitch = +ev.target.value; saveVoice(); $('#pitchOut').textContent = voiceSettings.pitch.toFixed(1); });
   $('#voiceRate').addEventListener('input', ev => { voiceSettings.rate = +ev.target.value; saveVoice(); $('#rateOut').textContent = voiceSettings.rate.toFixed(2); });
   $('#bgmVolume').addEventListener('input', ev => { unlockAudio(); BGM.setVolume(+ev.target.value); $('#bgmOut').textContent = Math.round(BGM.volume * 100); });
+  $('#chairSpeed').addEventListener('change', ev => { chairSettings.speed = ev.target.value; store(CHAIR_KEY, chairSettings); });
+  $('#chairLetters').addEventListener('change', ev => { chairSettings.letters = ev.target.checked; store(CHAIR_KEY, chairSettings); });
   $('#closePanel').addEventListener('click', () => $('#panelBg').classList.remove('open'));
   $('#voiceTest').addEventListener('click', () => { unlockAudio(); say(P.hello); });
   // リセットは2回押したときだけ（1回目で確認の表示に変わる）
@@ -2742,6 +3278,8 @@
     for (let n = 2; n <= ROUNDS; n++) add(VL.streak(n));
     CARS.forEach(c => { add(VL.word(c.w)); add(c.line); });
     CAR_PROBLEMS.forEach(p => add(p.t));
+    CHAIR_POOL.forEach(e => add(VL.chairOf(toKata(e.id))));
+    CHAIR_ROUNDS.forEach(r => add(countLine(r.cpus + 1, r.chairs)[1]));
     Object.keys(P).forEach(k => add(P[k], k === 'night' ? 'よふかし' : undefined));
     TICKLE.concat(QUIZ_ASK, PRAISE.map(p => p[1])).forEach(t => add(t));
     return Object.keys(out).map(k => out[k]);
