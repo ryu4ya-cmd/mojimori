@@ -327,7 +327,9 @@
   }
   .seat.glow { background: rgba(255,250,190,.6); box-shadow: 0 0 0 8px #fff59d, 0 0 30px 12px #fff176; }
   .mover { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
-  .me { display: flex; flex-direction: column; align-items: center; }
+  .me { position: relative; display: flex; flex-direction: column; align-items: center; }
+  .me .flag { position: absolute; right: -22%; bottom: 30%; font-size: calc(var(--friend) * .5); line-height: 1; transform-origin: 20% 90%; animation: flagwave .8s ease-in-out infinite alternate; }
+  @keyframes flagwave { from { transform: rotate(-15deg); } to { transform: rotate(20deg); } }
   .me .face { display: inline-block; font-size: calc(var(--friend) * .92); line-height: 1; filter: drop-shadow(0 4px 2px rgba(0,0,0,.18)); }
   .me .star { font-size: calc(var(--friend) * .3); line-height: 1; margin-bottom: -.15em; }
   .walking .me .face { animation: hop .45s ease-in-out infinite; }
@@ -347,6 +349,8 @@
   #night { background: linear-gradient(var(--night-top), var(--night-bottom)); color: #fff; }
   #night .moon { font-size: 16vmin; font-size: clamp(60px, 16vmin, 120px); margin-bottom: 2vmin; }
   #night .stage { margin-top: 2vmin; }
+  /* ねている どうぶつ（いすとりの あと） */
+  .sleeper { position: relative; --friend: 15vmin; --friend: clamp(64px, 15vmin, 120px); width: var(--friend); text-align: center; font-size: calc(var(--friend) * .85); line-height: 1.1; opacity: .9; filter: saturate(.8); animation: bob 4.5s ease-in-out infinite; animation-delay: var(--d, 0s); transform-origin: 50% 100%; }
   .zzz { position: absolute; right: -6%; top: 6%; font-weight: 900; font-size: calc(var(--friend) * .2); color: #fff; opacity: 0; animation: zzz 3s ease-in-out infinite; animation-delay: var(--d, 0s); }
   @keyframes zzz { 0% { opacity: 0; transform: translate(0, 10px) scale(.6); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(14px, -30px) scale(1.1); } }
   .twinkle { position: fixed; color: #fff8c4; animation: tw 2.4s ease-in-out infinite; pointer-events: none; }
@@ -424,7 +428,7 @@
   .old-msg { position: fixed; left: 12px; right: 12px; top: 12px; z-index: 60; background: #fff3cd; color: #5d4500; border-radius: 14px; padding: 12px 16px; font-size: 15px; line-height: 1.6; box-shadow: 0 6px 16px rgba(0,0,0,.15); }
 
   @media (prefers-reduced-motion: reduce) {
-    .cloud, .start-btn, .friend .body, .soap .ball, .drive .rumble, .walking .me .face, .music-pill .notes { animation: none; }
+    .cloud, .start-btn, .friend .body, .soap .ball, .drive .rumble, .walking .me .face, .music-pill .notes, .me .flag, .sleeper { animation: none; }
   }
 </style>
 </head>
@@ -2982,7 +2986,7 @@ function runSession(_x) {
 }
 function _runSession() {
   _runSession = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(kind) {
-    var id, items, pool, _iterator6, _step6, _loop9, st, round, _t;
+    var id, items, pool, _iterator7, _step7, _loop9, st, round, _t;
     return _regenerator().w(function (_context6) {
       while (1) switch (_context6.p = _context6.n) {
         case 0:
@@ -3000,14 +3004,14 @@ function _runSession() {
             w
           }))), []));
           items = [];
-          _iterator6 = _createForOfIteratorHelper(pool);
+          _iterator7 = _createForOfIteratorHelper(pool);
           _context6.p = 1;
           _loop9 = /*#__PURE__*/_regenerator().m(function _loop9() {
             var it;
             return _regenerator().w(function (_context5) {
               while (1) switch (_context5.n) {
                 case 0:
-                  it = _step6.value;
+                  it = _step7.value;
                   if (!(items.length >= ROUNDS)) {
                     _context5.n = 1;
                     break;
@@ -3020,9 +3024,9 @@ function _runSession() {
               }
             }, _loop9);
           });
-          _iterator6.s();
+          _iterator7.s();
         case 2:
-          if ((_step6 = _iterator6.n()).done) {
+          if ((_step7 = _iterator7.n()).done) {
             _context6.n = 5;
             break;
           }
@@ -3042,10 +3046,10 @@ function _runSession() {
         case 6:
           _context6.p = 6;
           _t = _context6.v;
-          _iterator6.e(_t);
+          _iterator7.e(_t);
         case 7:
           _context6.p = 7;
-          _iterator6.f();
+          _iterator7.f();
           return _context6.f(7);
         case 8:
           _context6.n = 10;
@@ -4512,9 +4516,11 @@ function carRound(id, prob, round, st) {
 
 // ---------- ⑥ いすとり ----------
 // 4さいの子が ひとりで遊ぶ：音楽が止まったら、じぶんのどうぶつを あいている いすに すわらせる。
-// コンピューターのどうぶつ（もじのおともだち）と いすを取りあうが、子どもは ぜったいに ぬけない
+// コンピューターのどうぶつと いすを取りあうが、子どもは ぜったいに ぬけない
 // （おそかったら、おともだちが「どうぞ」と ゆずってくれる）
 var CHAIR_ANIMALS = [['🐰', 'うさぎ'], ['🐻', 'くま'], ['🐱', 'ねこ'], ['🐶', 'いぬ'], ['🐼', 'ぱんだ'], ['🦊', 'きつね']];
+// あいて（コンピューター）の どうぶつ。子どもが選ばなかった どうぶつと、ここから えらぶ
+var CHAIR_RIVALS = ['🐸', '🐵', '🐷', '🐯', '🐨', '🐮', '🐔'];
 // 回ごとの コンピューターと いすの数（どうぶつは いつも いすより 1ぴき多い）。letters は 字の いす
 var CHAIR_ROUNDS = [{
   cpus: 3,
@@ -4559,10 +4565,21 @@ var CHAIR_SPEED = {
 
 // いすとりの音楽（オルゴールの BGM とは べつ。止まるのが あそびの合図なので、BGM を消していても鳴らす）
 var March = (() => {
-  var BEAT = 60 / 150;
-  // メロディは 8分音符、ベースは 4分音符。R はやすみ
-  var MEL = 'G4 C5 E5 C5 G4 C5 E5 G5 F5 D5 B4 G4 F5 D5 B4 G4 E5 C5 G4 C5 E5 G5 E5 C5 D5 B4 G4 B4 C5 R C5 R'.split(' ');
-  var BASS = 'C3 G2 C3 G2 G2 D3 G2 D3 C3 G2 C3 G2 G2 G2 C3 C3'.split(' ');
+  // 曲は「オクラホマミキサー」（アメリカ民謡「Turkey in the Straw」。19世紀の曲で、著作権は切れている）。
+  // 音は ここで1つずつ作って鳴らすので、録音は使っていない
+  var STEP = 60 / 120 / 4; // 16分音符の長さ（秒）
+  // 「音:16分音符いくつ分」の並び。| は小節の区切り。R はやすみ。最後の G5 F5 は、つぎの回の はじまり（弱起）
+  var MELODY = `
+      E5:1 D5:1 C5:1 D5:1 E5:1 C5:1 A4:1 B4:1 | C5:2 C5:2 C5:2 G5:1 F5:1 |
+      E5:1 D5:1 C5:1 D5:1 E5:1 C5:1 A4:1 B4:1 | C5:2 C5:2 C5:2 E5:1 F5:1 |
+      G5:2 G5:1 G5:1 G5:1 F5:1 E5:1 F5:1 | G5:2 E5:2 C5:2 E5:1 F5:1 |
+      G5:2 F5:2 E5:2 D5:2 | C5:4 R:2 G5:1 F5:1`;
+  // 半小節ごとの和音（ベースの ブン・チャッ）
+  var CHORDS = ['C', 'C', 'C', 'G', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'G', 'G', 'C', 'C'];
+  var CHORD_NOTES = {
+    C: ['C3', 'E4', 'G4'],
+    G: ['G2', 'D4', 'B3']
+  };
   var NOTE = {
     C: 0,
     D: 2,
@@ -4574,24 +4591,51 @@ var March = (() => {
   };
   var hz = n => 440 * Math.pow(2, (12 * (+n.slice(-1) + 1) + NOTE[n[0]] - 69) / 12);
   var events = [];
-  MEL.forEach((n, i) => {
-    if (n !== 'R') events.push({
-      beat: i / 2,
-      f: hz(n),
-      type: 'square',
-      vol: .05,
-      dur: .18
+  var step = 0;
+  var _iterator5 = _createForOfIteratorHelper(MELODY.replace(/\|/g, ' ').trim().split(/\s+/)),
+    _step5;
+  try {
+    for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+      var tok = _step5.value;
+      var _tok$split3 = tok.split(':'),
+        _tok$split4 = _slicedToArray(_tok$split3, 2),
+        n = _tok$split4[0],
+        len = _tok$split4[1];
+      if (n !== 'R') events.push({
+        at: step,
+        f: hz(n),
+        type: 'square',
+        vol: .05,
+        dur: Math.min(.3, +len * STEP * .9)
+      });
+      step += +len;
+    }
+  } catch (err) {
+    _iterator5.e(err);
+  } finally {
+    _iterator5.f();
+  }
+  var LOOP = step;
+  CHORDS.forEach((c, i) => {
+    var _CHORD_NOTES$c2 = _toArray(CHORD_NOTES[c]),
+      root = _CHORD_NOTES$c2[0],
+      tones = _arrayLikeToArray(_CHORD_NOTES$c2).slice(1);
+    events.push({
+      at: i * 4,
+      f: hz(root),
+      type: 'triangle',
+      vol: .17,
+      dur: .22
     });
+    tones.forEach(t => events.push({
+      at: i * 4 + 2,
+      f: hz(t),
+      type: 'triangle',
+      vol: .05,
+      dur: .12
+    }));
   });
-  BASS.forEach((n, i) => events.push({
-    beat: i,
-    f: hz(n),
-    type: 'triangle',
-    vol: .16,
-    dur: .3
-  }));
-  events.sort((a, b) => a.beat - b.beat);
-  var LOOP = BASS.length;
+  events.sort((a, b) => a.at - b.at);
   var master = null,
     timer = null,
     idx = 0,
@@ -4600,7 +4644,7 @@ var March = (() => {
     var ahead = ac.currentTime + .3;
     for (;;) {
       var ev = events[idx];
-      var t = loopStart + ev.beat * BEAT;
+      var t = loopStart + ev.at * STEP;
       if (t > ahead) break;
       if (t >= ac.currentTime - .02) {
         var o = ac.createOscillator(),
@@ -4616,7 +4660,7 @@ var March = (() => {
       }
       if (++idx >= events.length) {
         idx = 0;
-        loopStart += LOOP * BEAT;
+        loopStart += LOOP * STEP;
       }
     }
   }
@@ -4742,15 +4786,8 @@ function moveTo(a, x, y, ms = 600) {
 function makeMover(a) {
   var w = document.createElement('div');
   w.className = 'mover';
-  if (a.kind === 'me') {
-    w.innerHTML = `<div class="me"><span class="star" aria-hidden="true">⭐</span><span class="face">${a.e}</span></div>`;
-  } else {
-    w.appendChild(makeFriend(a.e, {
-      asButton: false,
-      hat: false,
-      delay: Math.random() * 2
-    }));
-  }
+  // じぶんの どうぶつには ⭐。あいては おうえんに まわると 🚩 を もつ
+  w.innerHTML = `<div class="me">${a.kind === 'me' ? '<span class="star" aria-hidden="true">⭐</span>' : ''}<span class="face">${a.e}</span><span class="flag" aria-hidden="true" hidden>🚩</span></div>`;
   a.el = w;
   a.inner = w.firstChild;
   a.x = innerWidth / 2;
@@ -4827,17 +4864,18 @@ function runChairs(_x4, _x5) {
 }
 function _runChairs() {
   _runChairs = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(id, me) {
-    var r;
+    var rivals, r;
     return _regenerator().w(function (_context10) {
       while (1) switch (_context10.n) {
         case 0:
+          rivals = shuffle(CHAIR_ANIMALS.map(x => x[0]).filter(e => e !== me.e).concat(CHAIR_RIVALS)).slice(0, 3);
           ch = {
             id,
             me: {
               kind: 'me',
               e: me.e
             },
-            cpus: shuffle(CHAIR_POOL).slice(0, 3).map(e => ({
+            cpus: rivals.map(e => ({
               kind: 'cpu',
               e
             })),
@@ -4905,7 +4943,7 @@ function _runChairs() {
           }
           return _context10.a(2);
         case 10:
-          goNight(ch.all.map(a => a.e));
+          goNight([ch.me.e].concat(ch.all.map(a => a.e)));
         case 11:
           return _context10.a(2);
       }
@@ -4918,7 +4956,7 @@ function chairRound(_x6, _x7) {
 } // いすを さわった
 function _chairRound() {
   _chairRound = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(id, r) {
-    var R, letters, stage, L, alive, animals, target, labels, seats, seatY, ell, rd, K, S, sayTarget, _countLine, _countLine2, cap, clip, speed, last, loop, dur, _at, outcome, left, _iterator7, _step7, a, fr, p, _pick7, _pick8, big, line, _t2;
+    var R, letters, stage, L, alive, animals, target, labels, seats, seatY, ell, rd, K, S, sayTarget, _countLine, _countLine2, cap, clip, speed, last, loop, dur, _at, outcome, left, _iterator8, _step8, a, p, _pick7, _pick8, big, line, _t2;
     return _regenerator().w(function (_context11) {
       while (1) switch (_context11.p = _context11.n) {
         case 0:
@@ -4931,7 +4969,7 @@ function _chairRound() {
             ch.cpus = ch.cpus.concat(ch.out);
             ch.out = [];
             ch.cpus.forEach(a => {
-              a.inner.classList.add('nohat');
+              a.inner.querySelector('.flag').hidden = true;
             });
           }
           animals = [ch.me].concat(ch.cpus);
@@ -5180,15 +5218,15 @@ function _chairRound() {
           _context11.n = 17;
           return sleep(400);
         case 17:
-          _iterator7 = _createForOfIteratorHelper(left);
+          _iterator8 = _createForOfIteratorHelper(left);
           _context11.p = 18;
-          _iterator7.s();
+          _iterator8.s();
         case 19:
-          if ((_step7 = _iterator7.n()).done) {
+          if ((_step8 = _iterator8.n()).done) {
             _context11.n = 23;
             break;
           }
-          a = _step7.value;
+          a = _step8.value;
           if (alive()) {
             _context11.n = 20;
             break;
@@ -5198,9 +5236,7 @@ function _chairRound() {
           moves.shake(a.inner);
           ch.cpus.splice(ch.cpus.indexOf(a), 1);
           ch.out.push(a);
-          fr = a.inner;
-          fr.classList.remove('nohat');
-          fr.querySelector('.hat').textContent = '🚩';
+          a.inner.querySelector('.flag').hidden = false;
           setSize(a, L.side);
           p = sidelineSpot(ch.out.length - 1, L);
           _context11.n = 21;
@@ -5216,10 +5252,10 @@ function _chairRound() {
         case 24:
           _context11.p = 24;
           _t2 = _context11.v;
-          _iterator7.e(_t2);
+          _iterator8.e(_t2);
         case 25:
           _context11.p = 25;
-          _iterator7.f();
+          _iterator8.f();
           return _context11.f(25);
         case 26:
           if (alive()) {
@@ -5357,7 +5393,7 @@ function chairCheck() {
 function douzo(_x8) {
   return _douzo.apply(this, arguments);
 } // ---------- おやすみ ----------
-// hats は、おともだちにかぶせる絵（省略時は、そのもじのことばの絵）
+// hats は、おともだちにかぶせる絵（省略時は、そのもじのことばの絵）。list に絵文字を入れると、どうぶつが ねる
 function _douzo() {
   _douzo = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(rd) {
     var id, giver, seat, L, offer, n, again;
@@ -5426,12 +5462,20 @@ function goNight(list, hats) {
   var st = $('#nightStage');
   st.innerHTML = '';
   list.forEach((e, i) => {
-    var el = makeFriend(e, {
-      asButton: false,
-      delay: i * .7,
-      emoji: hats && hats[i]
-    });
-    el.classList.add('sleep');
+    var el;
+    if (typeof e === 'string') {
+      el = document.createElement('div');
+      el.className = 'sleeper';
+      el.innerHTML = `<span aria-hidden="true">${e}</span>`;
+      el.style.setProperty('--d', `-${i * .7}s`);
+    } else {
+      el = makeFriend(e, {
+        asButton: false,
+        delay: i * .7,
+        emoji: hats && hats[i]
+      });
+      el.classList.add('sleep');
+    }
     el.style.setProperty('--friend', fit('64px', '15vmin', '120px'));
     var z = document.createElement('span');
     z.className = 'zzz';
@@ -5524,17 +5568,17 @@ function renderVoicePanel() {
   sel.innerHTML = '';
   var auto = new Option('おまかせ（いちばんなめらかな声）', '');
   sel.add(auto);
-  var _iterator5 = _createForOfIteratorHelper(ja),
-    _step5;
+  var _iterator6 = _createForOfIteratorHelper(ja),
+    _step6;
   try {
-    for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-      var v = _step5.value;
+    for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+      var v = _step6.value;
       sel.add(new Option(v.name, v.name));
     }
   } catch (err) {
-    _iterator5.e(err);
+    _iterator6.e(err);
   } finally {
-    _iterator5.f();
+    _iterator6.f();
   }
   sel.value = voiceSettings.name && ja.some(v => v.name === voiceSettings.name) ? voiceSettings.name : '';
   $('#voicePitch').value = voiceSettings.pitch;
